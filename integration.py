@@ -22,7 +22,6 @@
 """
 
 import sys
-from AccessControl import allow_type, allow_class
 from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
 

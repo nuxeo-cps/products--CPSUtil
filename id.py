@@ -27,7 +27,6 @@ import string
 import re
 import random
 from DateTime.DateTime import DateTime
-from AccessControl import allow_type, allow_class
 from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 from zLOG import LOG, INFO, DEBUG

@@ -24,11 +24,9 @@ import re
 import sgmllib
 from htmlentitydefs import entitydefs
 
-from AccessControl import allow_type, allow_class
 from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
 from Products.CMFDefault.utils import bodyfinder
-
 
 # Regexp of the form xxx<body>xxx</body>xxx.
 # DOTALL: Make the "." special character match any character at all, including a
