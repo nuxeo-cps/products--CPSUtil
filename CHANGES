@@ -3,9 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added method isProductPresent.
-- Added the beginning of a script "findbadhtml" that HTML and ZPT developers
-  should run on their work for checking validity.
+-
 Bug fixes:
 ~~~~~~~~~~
 -
