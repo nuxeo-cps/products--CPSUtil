@@ -36,7 +36,7 @@ class Test(unittest.TestCase):
         self.assert_(isProductPresent('Products.Epoz'))
 
         ZopeTestCase.installProduct('ExternalEditor', quiet=1)
-        # XXX: Why is this test failing why the same with Epoz is passing?
+        # XXX: Why is this test failing while the same with Epoz is passing?
         #self.assert_(isProductPresent('Products.ExternalEditor'))
 
         self.assert_(not isProductPresent('Products.DummyProductWhichDoesntExist'))
