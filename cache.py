@@ -43,6 +43,7 @@ class TimeoutCache(object):
         self._clear()
 
     def _clear(self):
+        """Non thread safe cache clearing."""
         # Values stored in the cache are a tuple (value, orig_time)
         # where orig_time is the time the value was inserted.
         self._cache = {}
@@ -60,6 +61,7 @@ class TimeoutCache(object):
         self._timeout = timeout
 
     def _getTimeout(self):
+        """Return the time when all the current cache will be expired."""
         return int(time()) + self._timeout
 
     def __getitem__(self, key):
