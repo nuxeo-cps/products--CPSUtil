@@ -179,5 +179,3 @@ def _generateAnotherId(id):
         suffix = str(random.randrange(1000, 10000))
         id = prefix + suffix
         return id
-
-
