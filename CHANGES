@@ -9,4 +9,5 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- Changed implementation of the integration.isProductPresent method by checking
+  if the product is present in sys.modules. The code is cleaner and safer.

@@ -21,6 +21,7 @@
 """Utility functions for integrating other or third-party products.
 """
 
+import sys
 from AccessControl import allow_type, allow_class
 from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
@@ -36,23 +37,10 @@ def isProductPresent(product_name):
     Examples:
       * in Python code integration.isProductPresent('Products.ExternalEditor')
       * in ZEXPR modules["Products.CPSUtil.utils"].isProductPresent("Products.ExternalEditor")
-
     """
     log_key = 'isProductPresent'
-    LOG(log_key, DEBUG, "...")
-    import_error_message_base = "No module named %s"
-    import_error_message = (import_error_message_base
-                            % product_name.replace(PRODUCTS_PREFIX, ''))
-    LOG(log_key, DEBUG, "testing error message: [%s]" % import_error_message)
-    try:
-        __import__(product_name)
-        present = True
-    except ImportError, e:
-        if str(e) == import_error_message:
-            present = False
-        else:
-            raise
-    LOG(log_key, DEBUG, "present = %s" % present)
+    present = product_name in sys.modules
+    LOG(log_key, DEBUG, "[%s] present = %s" % (product_name, present))
     return present
 
 def isUserAgentMsie(request):

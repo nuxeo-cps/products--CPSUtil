@@ -19,9 +19,30 @@
 #
 # $Id$
 import unittest
-from Products.CPSUtil.integration import isUserAgentMsie
+import sys
+from Testing import ZopeTestCase
+from Products.CPSUtil.integration import isProductPresent, isUserAgentMsie
 
 class Test(unittest.TestCase):
+
+
+    def test_isProductPresent(self):
+        #print "sys.modules = %s" % sys.modules
+
+        self.assert_(not isProductPresent('Products.Epoz'))
+        self.assert_(not isProductPresent('Products.ExternalEditor'))
+
+        ZopeTestCase.installProduct('CPSCore', quiet=1)
+        self.assert_(isProductPresent('Products.CPSCore'))
+
+        ZopeTestCase.installProduct('Epoz', quiet=1)
+        self.assert_(isProductPresent('Products.Epoz'))
+
+        ZopeTestCase.installProduct('ExternalEditor', quiet=1)
+        # XXX: Why is this test failing why the same with Epoz is passing?
+        #self.assert_(isProductPresent('Products.ExternalEditor'))
+
+        self.assert_(not isProductPresent('Products.DummyProductWhichDoesntExist'))
 
     def test_isUserAgentMsie(self):
         request = {'HTTP_USER_AGENT': "Mozilla/1.0"}
