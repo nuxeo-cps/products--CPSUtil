@@ -31,11 +31,11 @@ class Test(unittest.TestCase):
     def test_id(self):
         s1 = "C'est l'été !"
         self.assertEquals(generateId(s1), "C-est-l-ete")
-        self.assertEquals(generateId(s1, lower=1), "c-est-l-ete")
+        self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
 
         s1 = "C'est !!! l'été !!!!"
         self.assertEquals(generateId(s1), "C-est-l-ete")
-        self.assertEquals(generateId(s1, lower=1), "c-est-l-ete")
+        self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
 
 
 def test_suite():
