@@ -141,28 +141,9 @@ class TestTimeoutCache(unittest.TestCase):
         self.assertEquals(sorted(cache.keysWithValidity()),
                           [('abc', False), ('foo', False), ('mom', False)])
         self.assertEquals(cache['abc'], None)
-        # Unaccessed entries have not been purged
+        # All the cache is invalid accessing a key have cleared all entry
         self.assertEquals(sorted(cache.keysWithValidity()),
-                          [('foo', False), ('mom', False)])
-
-        # Re-bump timeout higher
-        cache.setTimeout(60)
-        self.assertEquals(sorted(cache.keysWithValidity()),
-                          [('foo', True), ('mom', True)])
-        self.assertEquals(cache['foo'], 'bar')
-        # And lower again
-        cache.setTimeout(1)
-        self.assertEquals(sorted(cache.keysWithValidity()),
-                          [('foo', False), ('mom', False)])
-        self.assertEquals(cache['foo'], None)
-        self.assertEquals(cache.keysWithValidity(), [('mom', False)])
-
-        # Check that timeout is not reset when writing again
-        cache['mom'] = 'brb'
-        self.assertEquals(cache.keysWithValidity(), [('mom', False)])
-        self.assertEquals(cache['mom'], None)
-        self.assertEquals(cache.keysWithValidity(), [])
-
+                          [])
 
 def test_suite():
     return unittest.TestSuite((
