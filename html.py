@@ -68,8 +68,12 @@ class HTMLSanitizer(sgmllib.SGMLParser):
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'class', 'accesskey', 'onclick')
 
-    def __init__(self):
+    def __init__(self, attributes_to_keep=None, attributes_to_remove=None):
         sgmllib.SGMLParser.__init__(self)
+        if attributes_to_keep:
+            self.attributes_to_keep = attributes_to_keep
+        if attributes_to_remove:
+            self.attributes_to_remove = attributes_to_remove
         self.result = []
         self.endTagList = []
 
