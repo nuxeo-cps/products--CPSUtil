@@ -5,3 +5,7 @@
 # valign="center" => valign="middle" 
 # 
 grep -R 'valign="center"' .
+# float: center =>  float: center is not a float value
+# 
+find . -name "*.dtml" -or -name "*.pt" -or -name "*.zpt" \
+    | xargs egrep 'float: center|float:center'
