@@ -63,7 +63,7 @@ class HTMLSanitizer(sgmllib.SGMLParser):
     tags_to_keep = ('p', 'br', 'span', 'div', 'ul', 'ol', 'li',
                     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a',
                     'em', 'strong', 'i', 'd', 'dl', 'dd', 'dd',
-                    'table', 'tr', 'td', 'font', 'b')
+                    'table', 'tr', 'td', 'b')
     tolerant_tags = ('br', 'p')
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'class', 'accesskey', 'onclick')
