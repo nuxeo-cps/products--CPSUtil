@@ -110,12 +110,12 @@ class TestTimeoutCache(unittest.TestCase):
         self.assertEquals(cache['mom'], 'mum')
         self.assertEquals(sorted(cache.keysWithValidity()),
                           [('abc', True), ('foo', True), ('mom', True)])
-        cache.setTimeout(2)
+        cache.setTimeout(1)
         self.assertEquals(sorted(cache.keysWithValidity()),
                           [('abc', True), ('foo', True), ('mom', True)])
 
         # Make timeouts expire
-        time.sleep(3)
+        time.sleep(2)
         self.assertEquals(sorted(cache.keysWithValidity()),
                           [('abc', False), ('foo', False), ('mom', False)])
         self.assertEquals(cache['abc'], None)
