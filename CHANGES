@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Moved the method isUserAgentMsie from CPSCore.utils to CPSUtil.integration.
 Bug fixes:
 ~~~~~~~~~~
 -

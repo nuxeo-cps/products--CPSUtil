@@ -54,3 +54,13 @@ def isProductPresent(product_name):
             raise
     LOG(log_key, DEBUG, "present = %s" % present)
     return present
+
+def isUserAgentMsie(request):
+    """Return wether the user agent performing the request is
+    an MSIE user agent"""
+    user_agent = request.get('HTTP_USER_AGENT')
+    if user_agent.find('MSIE') != -1:
+        return True
+    else:
+        return False
+
