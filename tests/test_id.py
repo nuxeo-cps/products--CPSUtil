@@ -27,16 +27,15 @@ class Test(unittest.TestCase):
         password = generatePassword(min_chars=20, max_chars=30)
         password_length = len(password)
         self.assert_(password_length >= 20 and password_length <= 30)
-        self.assert_(password)
 
     def test_id(self):
         s1 = "C'est l'été !"
-        self.assertEquals(utils.makeId(s1), "C-est-l-ete")
-        self.assertEquals(utils.makeId(s1, lower=1), "c-est-l-ete")
+        self.assertEquals(generateId(s1), "C-est-l-ete")
+        self.assertEquals(generateId(s1, lower=1), "c-est-l-ete")
 
         s1 = "C'est !!! l'été !!!!"
-        self.assertEquals(utils.makeId(s1), "C-est-l-ete")
-        self.assertEquals(utils.makeId(s1, lower=1), "c-est-l-ete")
+        self.assertEquals(generateId(s1), "C-est-l-ete")
+        self.assertEquals(generateId(s1, lower=1), "c-est-l-ete")
 
 
 def test_suite():
