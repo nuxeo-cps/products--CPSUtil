@@ -44,6 +44,7 @@ class TimeoutCache(object):
         self._timeout = timeout
         self._lock = Lock()
         self._clear()
+        self._last_modified_time = 0
 
     def _clear(self):
         """Non thread safe cache clearing."""
@@ -83,20 +84,19 @@ class TimeoutCache(object):
         """
         self._lock.acquire()
         try:
+            now = int(time())
+            if now > self._last_modified_time + self._timeout:
+                # all cache is expired, freeing memory
+                self._clear()
             if not self._cache.has_key(key):
                 return default
             value, orig_time = self._cache.get(key)
-            if min_date is not None and orig_time < min_date:
-                # key is removed from cache
+            if min_date is not None and orig_time < min_date or (
+                now > orig_time + self._timeout):
+                # expired key is removed from cache
                 del self._cache[key]
                 return default
-            now = int(time())
-            if now < orig_time + self._timeout:
-                return value
-            else:
-                # expire
-                del self._cache[key]
-                return default
+            return value
         finally:
             self._lock.release()
 
@@ -107,9 +107,9 @@ class TimeoutCache(object):
         """
         self._lock.acquire()
         try:
-            if not self._cache.has_key(key):
-                orig_time = int(time())
-            else:
+            orig_time = int(time())
+            self._last_modified_time = orig_time
+            if self._cache.has_key(key):
                 oldvalue, orig_time = self._cache.get(key)
             self._cache[key] = (value, orig_time)
         finally:
