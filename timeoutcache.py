@@ -72,18 +72,32 @@ class TimeoutCache(object):
 
         Returns None if not present or timeout expired.
         """
+        return self.get(key)
+
+    def get(self, key, default=None, min_date=None):
+        """Get an object from the cache.
+
+        Return default if object is not in the cache,
+        if min_date is specified assure that orig_time is
+        greater than min_date.
+        """
         self._lock.acquire()
         try:
             if not self._cache.has_key(key):
-                return None
+                return default
             value, orig_time = self._cache.get(key)
+            print 'key %s mindate %s orig %s' % (key, min_date, orig_time)
+            if min_date is not None and orig_time > min_date:
+                # key is removed from cache
+                del self._cache[key]
+                return default
             now = int(time())
             if now < orig_time + self._timeout:
                 return value
             else:
                 # expire
                 del self._cache[key]
-                return None
+                return default
         finally:
             self._lock.release()
 
