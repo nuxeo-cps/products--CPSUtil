@@ -86,7 +86,6 @@ class TimeoutCache(object):
             if not self._cache.has_key(key):
                 return default
             value, orig_time = self._cache.get(key)
-            print 'key %s mindate %s orig %s' % (key, min_date, orig_time)
             if min_date is not None and orig_time > min_date:
                 # key is removed from cache
                 del self._cache[key]
