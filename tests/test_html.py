@@ -18,7 +18,7 @@
 #
 # $Id$
 import unittest
-from Products.CPSWiki.htmlsanitizer import sanitize, remove_attributes
+from Products.CPSUtil.html import sanitize, remove_attributes
 
 class HTMLSanitizerTests(unittest.TestCase):
 
