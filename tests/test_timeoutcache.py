@@ -99,9 +99,9 @@ class TestTimeoutCache(unittest.TestCase):
         self.assertEquals(cache.get('abc', default='123'), 'def')
         self.assertEquals(cache.get('foo', default='123'), 'bar')
         # check min date
-        self.assertEquals(cache.get('abc', min_date=t_now), 'def')
-        self.assertEquals(cache.get('foo', min_date=t_now), 'bar')
-        self.assertEquals(cache.get('foo', default='123', min_date=t_old),
+        self.assertEquals(cache.get('abc', min_date=t_old), 'def')
+        self.assertEquals(cache.get('foo', min_date=t_old), 'bar')
+        self.assertEquals(cache.get('foo', default='123', min_date=t_now),
                           '123')
         # foo is cleared after a miss
         self.assertEquals(cache.get('foo'), None)
