@@ -63,8 +63,12 @@ class HTMLSanitizer(sgmllib.SGMLParser):
     """ clean up entered text to avoid
         dangerous tags like forms, style, etc
     """
-    white_list = ('a', 'b', 'i', 'strong', 'br', 'p', 'h1', 'h2', 'h3', 'h4',
-                  'h5', 'div')
+    white_list = ('p', 'br', 'span', 'div',
+                  'ul', 'ol', 'li',
+                  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                  'a', 'em', 'strong',
+                  'dl', 'dd', 'dd',
+                  )
 
     tolerant_tags = ('br', 'p')
 
