@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- adding cache, from CPSUserFolder.TimeoutCache
+- adding timeoutcache, from CPSUserFolder.TimeoutCache
 Bug fixes:
 ~~~~~~~~~~
 -
