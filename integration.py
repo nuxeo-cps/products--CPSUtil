@@ -26,8 +26,6 @@ from AccessControl import allow_type, allow_class
 from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
 
-PRODUCTS_PREFIX = 'Products.'
-
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('isProductPresent')
 def isProductPresent(product_name):
