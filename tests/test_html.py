@@ -22,7 +22,6 @@ from Products.CPSUtil.html import sanitize, remove_attributes
 
 class HTMLSanitizerTests(unittest.TestCase):
 
-
     def tests(self):
         res = sanitize('<html>ftgyuhjik</html>')
         self.assertEquals(res, 'ftgyuhjik')
