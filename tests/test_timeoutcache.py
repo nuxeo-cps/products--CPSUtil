@@ -84,6 +84,28 @@ class TestTimeoutCache(unittest.TestCase):
     def tearDown(self):
         resetAllCaches()
 
+    def test_get(self):
+        cache = self.cache
+        cache.setTimeout(60)
+        t_now = int(time.time()) + 1
+        t_old = t_now - 3
+        cache['abc'] = 'def'
+        cache['foo'] = 'bar'
+        self.assertEquals(cache.get('abc'), 'def')
+        self.assertEquals(cache.get('foo'), 'bar')
+        # check default
+        self.assertEquals(cache.get('xyz'), None)
+        self.assertEquals(cache.get('xyz', default='123'), '123')
+        self.assertEquals(cache.get('abc', default='123'), 'def')
+        self.assertEquals(cache.get('foo', default='123'), 'bar')
+        # check min date
+        self.assertEquals(cache.get('abc', min_date=t_now), 'def')
+        self.assertEquals(cache.get('foo', min_date=t_now), 'bar')
+        self.assertEquals(cache.get('foo', default='123', min_date=t_old),
+                          '123')
+        # foo is cleared after a miss
+        self.assertEquals(cache.get('foo'), None)
+
     def test_cache(self):
         cache = self.cache
         self.assertEquals(cache['abc'], None)
@@ -140,6 +162,7 @@ class TestTimeoutCache(unittest.TestCase):
         self.assertEquals(cache.keysWithValidity(), [('mom', False)])
         self.assertEquals(cache['mom'], None)
         self.assertEquals(cache.keysWithValidity(), [])
+
 
 def test_suite():
     return unittest.TestSuite((
