@@ -19,7 +19,6 @@
 #
 # $Id$
 import unittest
-import sys
 from Testing import ZopeTestCase
 from Products.CPSUtil.integration import isProductPresent, isUserAgentMsie
 
@@ -27,8 +26,6 @@ class Test(unittest.TestCase):
 
 
     def test_isProductPresent(self):
-        #print "sys.modules = %s" % sys.modules
-
         self.assert_(not isProductPresent('Products.Epoz'))
         self.assert_(not isProductPresent('Products.ExternalEditor'))
 
