@@ -10,7 +10,8 @@ grep -R 'valign="center"' .
 find . -name "*.dtml" -or -name "*.pt" -or -name "*.zpt" \
     | xargs egrep 'float: center|float:center'
 
-<b>
-<i>
-<br>
-<hr>
+# TODO: Look for those tags
+#<b>
+#<i>
+#<br>
+#<hr>
