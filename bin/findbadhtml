@@ -1,0 +1,7 @@
+#!/bin/sh
+# This script checks common HTML mistakes. Developpers should check their HTML
+# pages and Zope Page Templates with this script.
+
+# valign="center" => valign="middle" 
+# 
+grep -R 'valign="center"' .
