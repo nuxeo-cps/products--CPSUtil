@@ -1,4 +1,20 @@
 *******************************************
+** CPSUtil V0.3.0 [R1 build 2005/03/11-08:55 by madarche]
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added the text, html and id modules.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.2.0 [R1 build 2005/03/05-12:03 by madarche]
 
 Requires:
