@@ -73,17 +73,17 @@ def generatePassword(min_chars=10, max_chars=20):
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generateId')
 def generateId(s, max_chars=24, lower=False, portal_type=None,
-               meaningless_words=[], portal_check=None):
+               meaningless_words=[], container=None):
     """Generate an id from a given string.
 
     This method avoids collisions.
 
-    The portal_type parameter is not used at this time, but might be interesting
-    to generate IDs in special manners for certain portal_types.
+    The optional portal_type parameter is not used at this time, but might be
+    interesting to generate IDs in special manners for certain portal_types.
 
-    The portal_check parameter is used to pass a optional container on which a
-    check is made to be sure that the generated ID is not already used or does
-    not correspond to portal reserved word.
+    The optional container parameter is used to check if the generated ID is not
+    already used in the specified container or does not correspond to a reserved
+    word in this container.
     """
     # TODO: this method assumes we're using latin-9
     # TODO: similar code is duplicated in other places
@@ -140,8 +140,7 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
     else:
         id = id[:max_chars]
 
-    if portal_check is not None:
-        container = portal_check
+    if container is not None:
         # Ensuring that the id is not a portal reserved id (this is a case where
         # acquisition is a pain) and that the id is not used in the given
         # container.
