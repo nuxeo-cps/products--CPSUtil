@@ -18,7 +18,7 @@
 #
 # $Id$
 import unittest
-from Products.CPSUtil.html import sanitize, remove_attributes
+from Products.CPSUtil.html import sanitize
 
 class HTMLSanitizerTests(unittest.TestCase):
 
@@ -32,12 +32,11 @@ class HTMLSanitizerTests(unittest.TestCase):
         res = sanitize('yu<script langage="javascript">h</script></c>')
         self.assertEquals(res, 'yuh')
 
-        res = remove_attributes('dfrtgyhju<span class="myclass" >ghj</span>', ('class',))
-        self.assertEquals(res, 'dfrtgyhju<span >ghj</span>')
+        res = sanitize('dfrtgyhju<span class="myclass" >ghj</span>')
+        self.assertEquals(res, 'dfrtgyhju<span>ghj</span>')
 
-        res = remove_attributes('<a href="../../../../../../../view" accesskey="U" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>', ('accesskey',))
-
-        self.assertEquals(res, '<a href="../../../../../../../view"  title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
+        res = sanitize('<a href="../../../../../../../view" accesskey="U" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
+        self.assertEquals(res, '<a href="../../../../../../../view" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
 
 def test_suite():
     return unittest.TestSuite((

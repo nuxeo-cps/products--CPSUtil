@@ -33,11 +33,9 @@ from Products.CMFDefault.utils import bodyfinder
 # Regexp of the form xxx<body>xxx</body>xxx.
 # DOTALL: Make the "." special character match any character at all, including a
 # newline; without this flag, "." will match anything except a newline.
-html_body_regexp = re.compile('.*<body.*?>(.*)</body>.*',
-                              re.DOTALL)
+html_body_regexp = re.compile('.*<body.*?>(.*)</body>.*', re.DOTALL)
 
-strip_attributes_regexp = re.compile('xml:lang=".*?"\s?',
-                                     re.DOTALL)
+strip_attributes_regexp = re.compile('xml:lang=".*?"\s?', re.DOTALL)
 
 
 # Allowing this method to be imported in restricted code
@@ -60,17 +58,15 @@ def getHtmlBody(html_content):
 
 # inspired from Alex Martelli's "Python Cookbook"
 class HTMLSanitizer(sgmllib.SGMLParser):
-    """ clean up entered text to avoid
-        dangerous tags like forms, style, etc
+    """Clean up entered text to avoid dangerous tags like forms, style, etc
     """
-    white_list = ('p', 'br', 'span', 'div',
-                  'ul', 'ol', 'li',
-                  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                  'a', 'em', 'strong',
-                  'dl', 'dd', 'dd',
-                  )
-
+    tags_to_keep = ('p', 'br', 'span', 'div', 'ul', 'ol', 'li',
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a',
+                    'em', 'strong', 'i', 'd', 'dl', 'dd', 'dd',
+                    'table', 'tr', 'td', 'font', 'b')
     tolerant_tags = ('br', 'p')
+    attributes_to_keep = ()
+    attributes_to_remove = ('style', 'class', 'accesskey', 'onclick')
 
     def __init__(self):
         sgmllib.SGMLParser.__init__(self)
@@ -88,10 +84,14 @@ class HTMLSanitizer(sgmllib.SGMLParser):
         self.result.append('&%s%s' % (name, x))
 
     def unknown_starttag(self, tag, attrs):
-        """ remove unwanted tag, using white list """
-        if tag in self.white_list:
+        """Remove unwanted tag, using tags_to_keep"""
+        if tag in self.tags_to_keep:
             self.result.append('<%s' % tag)
             for k, v in attrs:
+                if self.attributes_to_keep and not k in self.attributes_to_keep:
+                    continue
+                if self.attributes_to_remove and k in self.attributes_to_remove:
+                    continue
                 if k[0:2].lower() != 'on' and v[0:10] != 'javascript':
                     self.result.append(' %s="%s"' % (k, v))
             self.result.append('>')
@@ -100,34 +100,19 @@ class HTMLSanitizer(sgmllib.SGMLParser):
                 self.endTagList.insert(0, end_tag)
 
     def unknown_endtag(self, tag):
-        if tag in self.white_list:
+        if tag in self.tags_to_keep:
             end_tag = '</%s>' % tag
             self.result.append(end_tag)
             if end_tag in self.endTagList:
                 self.endTagList.remove(end_tag)
 
     def cleanup(self):
-        """ append mising closing tag """
+        """Append missing closing tags"""
         self.result.extend(self.endTagList)
 
 
-def remove_attributes(html, names):
-    current = html
-    for name in names:
-        splitted = re.split(r'(<.*)(%s\s{0,1}\=\s{0,1}".*"\s{0,1})(>)' \
-                            % name, current, re.I)
-        result = []
-        for line in splitted:
-            if not line.startswith(name):
-                result.append(line)
-        current = ''.join(result)
-    return current
-
-attributes = ('style', 'class', 'accesskey', 'onclick')
-
 def sanitize(html):
-    """ cleans html """
-    html = remove_attributes(html, attributes)
+    """Cleans html"""
     parser = HTMLSanitizer()
     parser.feed(html)
     parser.close()
