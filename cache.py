@@ -21,6 +21,9 @@ TimeoutCache
 
 A simple thread-safe cache implementation that stores data globally.
 Each cache is individually locked when accessed.
+
+Note that TimeoutCache is NOT transactional so make sure that your
+transaction will be commited when caching data.
 """
 
 from time import time
