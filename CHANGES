@@ -4,6 +4,8 @@ Requires:
 New features:
 ~~~~~~~~~~~~~
 - Moved the method isUserAgentMsie from CPSCore.utils to CPSUtil.integration.
+- Added the method generateId to CPSUtil.id as a result from code factorization
+  from CPSCore.utils and CPSDefault/skins/cps_default/computeId.
 Bug fixes:
 ~~~~~~~~~~
 -

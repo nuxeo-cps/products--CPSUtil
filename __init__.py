@@ -20,6 +20,7 @@
 
 # Making sure that the ModuleSecurityInfo info statements of the following
 # modules are taken into account.
+import id
 import integration
 import text
 import html
