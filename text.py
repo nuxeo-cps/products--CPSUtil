@@ -17,9 +17,17 @@
 # 02111-1307, USA.
 #
 # $Id$
+"""Utility functions for manipulating texts.
+"""
 
-# Making sure that the ModuleSecurityInfo info statements of the following
-# modules are taken into account.
-import integration
-import text
-import html
+from AccessControl import allow_type, allow_class
+from AccessControl import ModuleSecurityInfo
+from zLOG import LOG, INFO, DEBUG
+
+
+def truncateText(text, size=25):
+    """Middle truncature."""
+    if text is None or len(text) < size:
+        return text
+    mid_size = (size-3)/2
+    return text[:mid_size] + '...' + text[-mid_size:]
