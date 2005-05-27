@@ -52,7 +52,7 @@ WORD_SEPARATOR = "-"
 
 # A regexp that does word splitting  based on the following separators:
 # '-' '_' '.'
-word_splitting_regexp = re.compile('-*_*\.*\s*')
+WORD_SPLITTING_REGEXP = re.compile('-*_*\.*\s*')
 
 
 # Allowing this method to be imported in restricted code
@@ -123,7 +123,7 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
     if meaningless_words:
         # Word splitting the id based on the following separators:
         # '-' '_' '.'
-        words = re.split(word_splitting_regexp, id)
+        words = re.split(WORD_SPLITTING_REGEXP, id)
 
         # Removing meaningless words and obtaining a cleaned words list, but
         # making sure though that we at least have one word left.

@@ -31,9 +31,9 @@ from Products.CMFDefault.utils import bodyfinder
 # Regexp of the form xxx<body>xxx</body>xxx.
 # DOTALL: Make the "." special character match any character at all, including a
 # newline; without this flag, "." will match anything except a newline.
-html_body_regexp = re.compile('.*<body.*?>(.*)</body>.*', re.DOTALL)
+HTML_BODY_REGEXP = re.compile('.*<body.*?>(.*)</body>.*', re.DOTALL)
 
-strip_attributes_regexp = re.compile('xml:lang=".*?"\s?', re.DOTALL)
+STRIP_ATTRIBUTES_REGEXP = re.compile('xml:lang=".*?"\s?', re.DOTALL)
 
 
 # Allowing this method to be imported in restricted code
@@ -48,9 +48,9 @@ def getHtmlBody(html_content):
     # Substituting the <html><body>xxx</body></html> by xxx.
     # This has the effect of getting the content of the <body> tag of an HTML
     # document.
-    #html_body = re.sub(html_body_regexp, r'\1', html_content)
+    #html_body = re.sub(HTML_BODY_REGEXP, r'\1', html_content)
     html_body = bodyfinder(html_content)
-    html_body = re.sub(strip_attributes_regexp, '', html_body)
+    html_body = re.sub(STRIP_ATTRIBUTES_REGEXP, '', html_body)
 
     return html_body
 
