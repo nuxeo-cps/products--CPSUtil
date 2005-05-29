@@ -1,0 +1,155 @@
+#!/usr/bin/python
+#
+# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# Authors:
+# Julien Anguenot <ja@nuxeo.com>
+# M.-A. Darche <madarche@nuxeo.com>
+#
+# $Id$
+"""A script that packs the ZODB by calling Zope through HTTPS and optionally
+makes a backup of it.
+
+This script should be used directly on the server running Zope.
+
+Place this script in /etc/cron.daily/, /etc/cron.weekly/, /etc/cron.monthly/
+depending on your needs.
+
+Or you can even make it call by adding an entry in /etc/crontab or through the
+"crontab -e" command. Really it is up to you.
+
+Starts the pack_zodb script every night at 03h59:
+59 3 * * * /usr/local/bin/pack_zodb > /dev/null 2>&1
+"""
+
+import sys, urllib, os, time
+from optparse import OptionParser
+
+DEFAULT_ZODB_PATH = '/var/lib/zope2.7/instance/cps/var/Data.fs'
+DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups'
+
+
+class AuthenticatedUrlOpener(urllib.FancyURLopener):
+
+    def __init__(self, *args, **kwargs):
+        self.version = "Zope Packer"
+        self.kwargs = kwargs
+        urllib.FancyURLopener.__init__(self, *args)
+
+    def prompt_user_passwd(self, host, realm):
+        return (self.kwargs['user_name'], self.kwargs['user_password'])
+
+
+def exec_args():
+    """Analyze command line arguments.
+    """
+    usage = "usage: %prog [options]"
+    parser = OptionParser(usage=usage)
+
+    parser.add_option('-v', '--verbose',
+                      action='store_true',
+                      dest='verbose',
+                      default=False,
+                      help="Print additional information to stdout.")
+
+    parser.add_option('-n', '--host',
+                      action='store',
+                      dest='host_name',
+                      type='string',
+                      metavar='NAME',
+                      default='localhost',
+                      help="Use NAME for the server to connect to. "
+                      "Defaults to localhost")
+
+    parser.add_option('-p', '--port',
+                      action='store',
+                      dest='host_port',
+                      type='int',
+                      metavar='NUMBER',
+                      default=9673,
+                      help="Use NUMBER for the server port to use. "
+                      "Defaults to 9673")
+
+    parser.add_option('-d', '--days',
+                      action='store',
+                      dest='days',
+                      type='float',
+                      metavar='NUMBER',
+                      default=0,
+                      help="Use NUMBER for the days to keep in history. "
+                      "Defaults to 0")
+
+    parser.add_option('-u', '--user',
+                      action='store',
+                      dest='user_name',
+                      type='string',
+                      metavar='NAME',
+                      default=None,
+                      help="Mandatory option.")
+
+    parser.add_option('-w', '--password',
+                      action='store',
+                      dest='user_password',
+                      type='string',
+                      metavar='NAME',
+                      default=None,
+                      help="Mandatory option.")
+
+    parser.add_option('-b', '--backup',
+                      action='store_true',
+                      dest='backup',
+                      default=False,
+                      help="Backup the ZODB that has just been packed.")
+
+    parser.add_option('-z', '--zodbfile',
+                      action='store',
+                      dest='zodbfile_path',
+                      type='string',
+                      metavar='FILE',
+                      default=DEFAULT_ZODB_PATH,
+                      help="The FILE path to the ZODB. "
+                      "The default is " + DEFAULT_ZODB_PATH)
+
+    parser.add_option('-k', '--backupdir',
+                      action='store',
+                      dest='backupdir_path',
+                      type='string',
+                      metavar='FILE',
+                      default=DEFAULT_ZODB_BACKUP_DIR_PATH,
+                      help="The FILE path to the directory used for storing "
+                      "ZODB backups. "
+                      "The default is " + DEFAULT_ZODB_BACKUP_DIR_PATH)
+
+    (options, args) = parser.parse_args()
+
+    if options.user_name is None or options.user_password is None:
+        parser.print_help()
+        sys.exit(2)
+
+    packZodb(options.host_name, options.host_port, options.days,
+             options.user_name, options.user_password)
+    if options.backup:
+        backupZodb(options.zodbfile_path, options.backupdir_path)
+
+
+def packZodb(host_name, host_port, history_days, user_name, user_password):
+    urllib._urlopener = AuthenticatedUrlOpener(user_name=user_name,
+                                               user_password=user_password)
+    url = "http://%s:%s/Control_Panel/Database/manage_pack?days:float=%s" % \
+          (host_name, host_port, history_days)
+    try:
+        f = urllib.urlopen(url).read()
+    except IOError:
+        print "Cannot open URL %s, aborting" % url
+        return
+    print "Successfully packed ZODB on host %s" % host_name
+
+
+def backupZodb(zodb_path, zodb_backup_path):
+    command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
+    os.system(command)
+
+
+# Shell conversion
+if __name__ == '__main__':
+     exec_args()
+
