@@ -32,17 +32,11 @@ class Test(unittest.TestCase):
         ZopeTestCase.installProduct('CPSCore', quiet=1)
         self.assert_(isProductPresent('Products.CPSCore'))
 
-        # This product is not installed and tested if present because the actual
-        # unit tests with the bundles they are using do not make it possible to
-        # control that aspect.
-        #ZopeTestCase.installProduct('Epoz', quiet=1)
-        #self.assert_(isProductPresent('Products.Epoz'))
+        ZopeTestCase.installProduct('Epoz', quiet=1)
+        self.assert_(isProductPresent('Products.Epoz'))
 
-        # This product is not installed and tested if present because the actual
-        # unit tests with the bundles they are using do not make it possible to
-        # control that aspect.
-        #ZopeTestCase.installProduct('ExternalEditor', quiet=1)
-        #self.assert_(isProductPresent('Products.ExternalEditor'))
+        ZopeTestCase.installProduct('ExternalEditor', quiet=1)
+        self.assert_(isProductPresent('Products.ExternalEditor'))
 
         self.assert_(not isProductPresent('Products.DummyProductWhichDoesntExist'))
 
