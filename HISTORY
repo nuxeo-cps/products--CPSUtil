@@ -1,4 +1,20 @@
 *******************************************
+** CPSUtil V0.5.2 [R1 build 2005/06/02-09:35 by fguillaume]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 22058
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added a pack_zodb script. Fixes #668.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Used upper case naming for constants.
+
+*******************************************
 ** CPSUtil V0.5.1 [R1 build 2005/03/31-15:34 by madarche]
 
 Requires:
