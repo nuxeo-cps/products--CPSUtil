@@ -62,7 +62,7 @@ class AuthenticatedUrlOpener(urllib.FancyURLopener):
         return (self.kwargs['user_name'], self.kwargs['user_password'])
 
 
-def exec_args():
+def execArgs():
     """Analyze command line arguments.
     """
     usage = "usage: %prog [options]"
@@ -183,5 +183,5 @@ def log(message, force=False):
 
 # Shell conversion
 if __name__ == '__main__':
-    exec_args()
+    execArgs()
 
