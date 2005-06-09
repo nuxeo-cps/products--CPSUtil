@@ -23,12 +23,13 @@ from Products.CPSUtil.id import generatePassword, generateId
 
 class Test(unittest.TestCase):
 
-    def test_password(self):
+    def testPassword(self):
         password = generatePassword(min_chars=20, max_chars=30)
         password_length = len(password)
         self.assert_(password_length >= 20 and password_length <= 30)
 
-    def test_id(self):
+
+    def testIdGeneration(self):
         s1 = "C'est l'été !"
         self.assertEquals(generateId(s1), "C-est-l-ete")
         self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
@@ -36,6 +37,27 @@ class Test(unittest.TestCase):
         s1 = "C'est !!! l'été !!!!"
         self.assertEquals(generateId(s1), "C-est-l-ete")
         self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
+
+
+    def testIdDeterminism(self):
+        """Test if the generateId() method always return the same id when there
+        isn't any container in which objects are created.
+
+        Of course if an Id already exists in a given container, the generateId()
+        method does NOT return the same value, since its purpose is to generate
+        unique and meaningful Ids in a given container.
+        """
+        examples = ["We are belong to us",
+                    "C'est l'été !",
+                    # This kind of string can be found on wiki links
+                    "?Mine",
+                    "???",
+                    "???????????",
+                   ]
+        for s in examples:
+            res1 = generateId(s, container=None)
+            res2 = generateId(s, container=None)
+            self.assertEquals(res1, res2, "Results differ for string '%s'" % s)
 
 
 def test_suite():

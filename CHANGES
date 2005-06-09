@@ -7,6 +7,8 @@ New features:
 Bug fixes:
 ~~~~~~~~~~
 - Added missing GNU GPL license statement.
+- Made the id.generateId() method always return the same id when there isn't any
+  container in which objects are created. This fixes #730.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

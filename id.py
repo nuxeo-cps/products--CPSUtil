@@ -3,7 +3,7 @@
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Stefane Fermigier <sf@nuxeo.com>
-# Andreea Stefanescu <astefanescu@nuxeo.com>
+# Tarek Ziade <tziade@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -23,10 +23,10 @@
 """Utility functions for generating and manipulating IDs, logins and passwords.
 """
 
-import string
 import re
 import random
-from DateTime.DateTime import DateTime
+import md5
+import string
 from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 from zLOG import LOG, INFO, DEBUG
@@ -116,8 +116,10 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
         id = id[:-1]
 
     # Fallback if empty
-    if not id:
-        id = str(int(DateTime())) + str(random.randrange(1000, 10000))
+    if len(id) == 0:
+        hash_object = md5.new()
+        hash_object.update(s)
+        id = generateId(hash_object.digest())
 
     # Removing meaningless words if this has been asked
     if meaningless_words:
