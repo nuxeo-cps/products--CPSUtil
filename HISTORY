@@ -1,4 +1,22 @@
 *******************************************
+** CPSUtil V0.5.3 [R1 build 2005/06/10-16:15 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 23780
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Added missing GNU GPL license statement.
+- Made the id.generateId() method always return the same id when there isn't any
+  container in which objects are created. This fixes #730.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.5.2 [R1 build 2005/06/02-09:35 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 22058
 Requires:
