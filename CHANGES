@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- added an option to backup Data.fs.old with rdiff-backup to the bin/pack_zodb
+  script
 Bug fixes:
 ~~~~~~~~~~
 -
