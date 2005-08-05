@@ -3,9 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- added an option to backup Data.fs.old with rdiff-backup to the bin/pack_zodb
-  script
-- added PropertiesPostProcessor (used to be in CPSSchemas).
+-
 Bug fixes:
 ~~~~~~~~~~
 -

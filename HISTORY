@@ -1,4 +1,22 @@
 *******************************************
+** CPSUtil V0.6.0 [R1 build 2005/08/05-14:00 by ben]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 25426
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- added an option to backup Data.fs.old with rdiff-backup to the bin/pack_zodb
+  script
+- added PropertiesPostProcessor (used to be in CPSSchemas).
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.5.3 [R1 build 2005/06/10-16:15 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 23780
 Requires:
