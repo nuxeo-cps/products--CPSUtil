@@ -76,15 +76,24 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
                meaningless_words=[], container=None):
     """Generate an id from a given string.
 
-    This method avoids collisions.
+    This method avoids collisions and prevents words' cut.
+
+    The optional max_chars parameter truncates the generated ID if set to a
+    strictly positive number.
+
+    The optional lower parameter sets to lower-case the generated ID.
 
     The optional portal_type parameter is not used at this time, but might be
     interesting to generate IDs in special manners for certain portal_types.
+
+    The optional meaningless_words parameter removes all the specified words
+    from the generated ID. The words are compared in a case sensitive manner.
 
     The optional container parameter is used to check if the generated ID is not
     already used in the specified container or does not correspond to a reserved
     word in this container.
     """
+    # TODO: this method should use a word_separator parameter
     # TODO: this method assumes we're using latin-9
     # TODO: similar code is duplicated in other places
     # CPSForum/skins/forum_default/forum_create.py
@@ -121,31 +130,33 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
         hash_object.update(s)
         id = generateId(hash_object.digest())
 
+    # Word splitting the id based on the following separators: '-' '_' '.'.
+    # This is done because this method prevents words' cut.
+    words = re.split(WORD_SPLITTING_REGEXP, id)
+
     # Removing meaningless words if this has been asked
     if meaningless_words:
-        # Word splitting the id based on the following separators:
-        # '-' '_' '.'
-        words = re.split(WORD_SPLITTING_REGEXP, id)
-
         # Removing meaningless words and obtaining a cleaned words list, but
         # making sure though that we at least have one word left.
         words_cleaned = [w for w in words if w not in meaningless_words]
         if len(words_cleaned):
             words = words_cleaned
 
-        # Preventing word cuts
+    # Doing the truncation if max_chars has been specified
+    if max_chars > 0:
+        # Preventing word cuts if a max_chars truncation has been asked
         id = words[0] # The id needs to contain at least one word
         words = words[1:]
         while words and ((len(id) + len(words[0]) + 1) <= max_chars):
             id = id + WORD_SEPARATOR + words[0]
             words = words[1:]
-    else:
         id = id[:max_chars]
 
     if container is not None:
         # Ensuring that the id is not a portal reserved id (this is a case where
         # acquisition is a pain) and that the id is not used in the given
         # container.
+        # "index_html", "sections" and "workspaces" should always be usable.
         portal = getToolByName(container, 'portal_url').getPortalObject()
         # It's needed to allow index_html for join code
         while (hasattr(portal, id)

@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added in id.generateId the handling of the case when max_chars <= 0 which now
+  causes no truncation.
 Bug fixes:
 ~~~~~~~~~~
 -
