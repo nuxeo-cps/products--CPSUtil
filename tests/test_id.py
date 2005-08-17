@@ -102,6 +102,11 @@ class Test(unittest.TestCase):
             res2 = generateId(s, container=None)
             self.assertEquals(res1, res2, "Results differ for string '%s'" % s)
 
+    def testNonRegression1(self):
+        title = 'S. Fermigier first law of project management'
+        id = generateId(title)
+        self.assertEquals(id, 'S-Fermigier-first-law-of')
+
 
 def test_suite():
     loader = unittest.TestLoader()

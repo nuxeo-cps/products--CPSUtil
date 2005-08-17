@@ -51,9 +51,8 @@ SAFE_CHARS_TRANSLATIONS = string.maketrans(
 WORD_SEPARATOR = "-"
 
 # A regexp that does word splitting  based on the following separators:
-# '-' '_' '.'
-WORD_SPLITTING_REGEXP = re.compile('-*_*\.*\s*')
-
+# '-', '_', '.', or any whitespace
+WORD_SPLITTING_REGEXP = re.compile('[-_.\s]*')
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generatePassword')
@@ -113,26 +112,10 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
     if lower:
         id = id.lower()
 
-    # Avoiding duplication of meaningless chars
-    id = re.sub('-+', '-', id)
-    id = re.sub('_+', '_', id)
-    id = re.sub('\.+', '.', id)
-
-    # Avoiding annoying presence of meaningless chars
-    while id.startswith('-') or id.startswith('_') or id.startswith('.'):
-        id = id[1:]
-    while id.endswith('-') or id.endswith('_') or id.endswith('.'):
-        id = id[:-1]
-
-    # Fallback if empty
-    if len(id) == 0:
-        hash_object = md5.new()
-        hash_object.update(s)
-        id = generateId(hash_object.digest())
-
     # Word splitting the id based on the following separators: '-' '_' '.'.
     # This is done because this method prevents words' cut.
     words = re.split(WORD_SPLITTING_REGEXP, id)
+    words = [w for w in words if w]
 
     # Removing meaningless words if this has been asked
     if meaningless_words:
@@ -142,15 +125,21 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
         if len(words_cleaned):
             words = words_cleaned
 
+    if not words:
+        hash_object = md5.new()
+        hash_object.update(s)
+        id = generateId(hash_object.digest())
     # Doing the truncation if max_chars has been specified
-    if max_chars > 0:
+    elif max_chars > 0:
         # Preventing word cuts if a max_chars truncation has been asked
         id = words[0] # The id needs to contain at least one word
         words = words[1:]
         while words and ((len(id) + len(words[0]) + 1) <= max_chars):
-            id = id + WORD_SEPARATOR + words[0]
+            id += WORD_SEPARATOR + words[0]
             words = words[1:]
         id = id[:max_chars]
+    else:
+        id = WORD_SEPARATOR.join(words)
 
     if container is not None:
         # Ensuring that the id is not a portal reserved id (this is a case where
