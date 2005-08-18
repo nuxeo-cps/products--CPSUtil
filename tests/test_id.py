@@ -102,6 +102,19 @@ class Test(unittest.TestCase):
             res2 = generateId(s, container=None)
             self.assertEquals(res1, res2, "Results differ for string '%s'" % s)
 
+    def testSomeExamples(self):
+        mapping = {
+            'Le ciel est bleu': 'Le-ciel-est-bleu',
+            'Le ciel est bleu ': 'Le-ciel-est-bleu',
+            ' Le ciel est bleu ': 'Le-ciel-est-bleu',
+            'open+source': 'open-source',
+            'open + source': 'open-source',
+            'S. Fermigier first law of project management':
+                'S-Fermigier-first-law-of',
+        }
+        for key, value in mapping.items():
+            self.assertEquals(generateId(key), value)
+
     def testNonRegression1(self):
         title = 'S. Fermigier first law of project management'
         id = generateId(title)

@@ -41,8 +41,8 @@ SAFE_CHARS_FOR_ID = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
 
 SAFE_CHARS_TRANSLATIONS = string.maketrans(
     # XXX: candidates: @°+=`|
-    r""""'/\:; &ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
-    r"""--------AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
+    r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
+    r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 #'# This strange comment is here to make Emacs python mode not choke on the
 # strings above.
 
@@ -50,9 +50,8 @@ SAFE_CHARS_TRANSLATIONS = string.maketrans(
 # be present in the URLs of portal objects and documents.
 WORD_SEPARATOR = "-"
 
-# A regexp that does word splitting  based on the following separators:
-# '-', '_', '.', or any whitespace
-WORD_SPLITTING_REGEXP = re.compile('[-_.\s]*')
+# A regexp that does word splitting 
+WORD_SPLITTING_REGEXP = re.compile('[^a-zA-Z0-9]*')
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generatePassword')
@@ -108,7 +107,7 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
     id = id.replace('¼', 'OE')
     id = id.replace('½', 'oe')
     id = id.replace('ß', 'ss')
-    id = ''.join([c for c in id if c in SAFE_CHARS_FOR_ID])
+    #id = ''.join([c for c in id if c in SAFE_CHARS_FOR_ID])
     if lower:
         id = id.lower()
 

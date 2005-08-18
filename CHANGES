@@ -10,4 +10,4 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- Simplified generateId code and added more tests
