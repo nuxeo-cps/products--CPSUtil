@@ -66,12 +66,14 @@ class HTMLSanitizer(sgmllib.SGMLParser):
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'class', 'accesskey', 'onclick')
 
-    def __init__(self, attributes_to_keep=None, attributes_to_remove=None):
+    def __init__(self, tags_to_keep=None, attributes_to_keep=None, attributes_to_remove=None):
         sgmllib.SGMLParser.__init__(self)
         if attributes_to_keep:
             self.attributes_to_keep = attributes_to_keep
         if attributes_to_remove:
             self.attributes_to_remove = attributes_to_remove
+        if tags_to_keep:
+           self.tags_to_keep = tags_to_keep
         self.result = []
         self.endTagList = []
 
@@ -112,10 +114,10 @@ class HTMLSanitizer(sgmllib.SGMLParser):
         """Append missing closing tags"""
         self.result.extend(self.endTagList)
 
-
-def sanitize(html):
+ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('sanitize')   
+def sanitize(html, tags_to_keep=None):
     """Cleans html"""
-    parser = HTMLSanitizer()
+    parser = HTMLSanitizer(tags_to_keep)
     parser.feed(html)
     parser.close()
     parser.cleanup()
