@@ -2,6 +2,7 @@
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
+# Stefane Fermigier <sf@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -37,21 +38,23 @@ class Test(unittest.TestCase):
         # Testing that the generated strings are free of special characters and
         # lower case.
         s1 = "C'est l'été !"
-        self.assertEquals(generateId(s1), "C-est-l-ete")
+        self.assertEquals(generateId(s1), "c-est-l-ete")
         self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
+        self.assertEquals(generateId(s1, lower=False), "C-est-l-ete")
 
         s2 = "C'est !!! l'été !!!!"
-        self.assertEquals(generateId(s2), "C-est-l-ete")
+        self.assertEquals(generateId(s2), "c-est-l-ete")
         self.assertEquals(generateId(s2, lower=True), "c-est-l-ete")
+        self.assertEquals(generateId(s2, lower=False), "C-est-l-ete")
 
         # Testing the max_chars parameter
         s3 = "On rails CPS is for a loooooooooooooooooooooooooooong time"
         # With max_chars = 0 the length of the generated ID should be the same
         # than this of the input.
         max_chars = 0
-        self.assertEquals(generateId(s3, max_chars=max_chars),
+        self.assertEquals(generateId(s3, max_chars=max_chars, lower=False),
                           s3.replace(' ', '-'))
-        self.assertEquals(len(generateId(s3, max_chars=max_chars)),
+        self.assertEquals(len(generateId(s3, max_chars=max_chars, lower=False)),
                           len(s3))
         # With max_chars > 0 the length of the generated ID should be lower or
         # equal to max_chars.
@@ -59,8 +62,8 @@ class Test(unittest.TestCase):
         self.assert_(len(generateId(s3)) <= max_chars)
 
         # Testing the word_separator parameter
-        self.assertEquals(generateId(s2, word_separator='-'), "C-est-l-ete")
-        self.assertEquals(generateId(s2, word_separator='_'), "C_est_l_ete")
+        self.assertEquals(generateId(s2, lower=False, word_separator='-'), "C-est-l-ete")
+        self.assertEquals(generateId(s2, lower=False, word_separator='_'), "C_est_l_ete")
         self.assertEquals(generateId(s2, lower=True, word_separator='-'),
                           "c-est-l-ete")
         self.assertEquals(generateId(s2, lower=True, word_separator='_'),
@@ -123,13 +126,7 @@ class Test(unittest.TestCase):
                 'S-Fermigier-first-law-of',
         }
         for key, value in mapping.items():
-            self.assertEquals(generateId(key), value)
-
-
-    def testNonRegression1(self):
-        title = 'S. Fermigier first law of project management'
-        id = generateId(title)
-        self.assertEquals(id, 'S-Fermigier-first-law-of')
+            self.assertEquals(generateId(key, lower=False), value)
 
 
 def test_suite():

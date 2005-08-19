@@ -62,7 +62,7 @@ WORD_SPLITTING_REGEXP = re.compile('[^a-zA-Z0-9]*')
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generateId')
-def generateId(s, max_chars=24, lower=False, word_separator='-',
+def generateId(s, max_chars=24, lower=True, word_separator='-',
                portal_type=None, meaningless_words=[], container=None):
     """Generate an id from a given string.
 
@@ -74,7 +74,7 @@ def generateId(s, max_chars=24, lower=False, word_separator='-',
     The optional lower parameter sets to lower-case the generated ID.
 
     The optional word_separator parameter is the separator that will be inserted
-    between words that compose the generated IDs. This separator will be present
+    between words that compose the generated ID. This separator will be present
     in the URLs of portal objects and documents.
 
     The optional portal_type parameter is not used at this time, but might be
