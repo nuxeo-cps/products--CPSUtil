@@ -58,6 +58,14 @@ class Test(unittest.TestCase):
         max_chars = 24
         self.assert_(len(generateId(s3)) <= max_chars)
 
+        # Testing the word_separator parameter
+        self.assertEquals(generateId(s2, word_separator='-'), "C-est-l-ete")
+        self.assertEquals(generateId(s2, word_separator='_'), "C_est_l_ete")
+        self.assertEquals(generateId(s2, lower=True, word_separator='-'),
+                          "c-est-l-ete")
+        self.assertEquals(generateId(s2, lower=True, word_separator='_'),
+                          "c_est_l_ete")
+
 
     def testGenerateIdMeaninglessWordsRemoval(self):
         # Testing that meaningless words are removed
@@ -102,6 +110,7 @@ class Test(unittest.TestCase):
             res2 = generateId(s, container=None)
             self.assertEquals(res1, res2, "Results differ for string '%s'" % s)
 
+
     def testSomeExamples(self):
         mapping = {
             'Le ciel est bleu': 'Le-ciel-est-bleu',
@@ -109,11 +118,13 @@ class Test(unittest.TestCase):
             ' Le ciel est bleu ': 'Le-ciel-est-bleu',
             'open+source': 'open-source',
             'open + source': 'open-source',
+            'open  + source': 'open-source',
             'S. Fermigier first law of project management':
                 'S-Fermigier-first-law-of',
         }
         for key, value in mapping.items():
             self.assertEquals(generateId(key), value)
+
 
     def testNonRegression1(self):
         title = 'S. Fermigier first law of project management'

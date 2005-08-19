@@ -31,27 +31,12 @@ from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 from zLOG import LOG, INFO, DEBUG
 
+
 # This string contain non-misleading characters that can safely be read and used
 # by users. Misleading characters include for example the "l" letter that can be
 # mistaken as the "1" number, without the "0" number that can be mistaken as the
 # "O" letter, etc.
 SAFE_CHARS_FOR_PASSWORD = "-abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ123456789"
-
-SAFE_CHARS_FOR_ID = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_."
-
-SAFE_CHARS_TRANSLATIONS = string.maketrans(
-    # XXX: candidates: @°+=`|
-    r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
-    r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
-#'# This strange comment is here to make Emacs python mode not choke on the
-# strings above.
-
-# This is the separator that will be inserted between words. This separator will
-# be present in the URLs of portal objects and documents.
-WORD_SEPARATOR = "-"
-
-# A regexp that does word splitting 
-WORD_SPLITTING_REGEXP = re.compile('[^a-zA-Z0-9]*')
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generatePassword')
@@ -68,10 +53,17 @@ def generatePassword(min_chars=10, max_chars=20):
     return password
 
 
+ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
+    r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
+    r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
+
+# A regexp that does word splitting using alpha-numerical words
+WORD_SPLITTING_REGEXP = re.compile('[^a-zA-Z0-9]*')
+
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generateId')
-def generateId(s, max_chars=24, lower=False, portal_type=None,
-               meaningless_words=[], container=None):
+def generateId(s, max_chars=24, lower=False, word_separator='-',
+               portal_type=None, meaningless_words=[], container=None):
     """Generate an id from a given string.
 
     This method avoids collisions and prevents words' cut.
@@ -80,6 +72,10 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
     strictly positive number.
 
     The optional lower parameter sets to lower-case the generated ID.
+
+    The optional word_separator parameter is the separator that will be inserted
+    between words that compose the generated IDs. This separator will be present
+    in the URLs of portal objects and documents.
 
     The optional portal_type parameter is not used at this time, but might be
     interesting to generate IDs in special manners for certain portal_types.
@@ -90,24 +86,22 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
     The optional container parameter is used to check if the generated ID is not
     already used in the specified container or does not correspond to a reserved
     word in this container.
+
+    This method is to be used for Latin-9 encoded strings.
     """
-    # TODO: this method should use a word_separator parameter
-    # TODO: this method assumes we're using latin-9
-    # TODO: similar code is duplicated in other places
+    # TODO: similar code is still duplicated in other places like
     # CPSForum/skins/forum_default/forum_create.py
     # CPSSchemas/BasicWidgets.py,
     # CPSWebMail/Attachment.py
-    # CPSWiki
     # etc.
 
-    # Normalization
-    id = s.translate(SAFE_CHARS_TRANSLATIONS)
+    # Changing accented and special characters by ASCII characters
+    id = s.translate(ACCENTED_CHARS_TRANSLATIONS)
     id = id.replace('Æ', 'AE')
     id = id.replace('æ', 'ae')
     id = id.replace('¼', 'OE')
     id = id.replace('½', 'oe')
     id = id.replace('ß', 'ss')
-    #id = ''.join([c for c in id if c in SAFE_CHARS_FOR_ID])
     if lower:
         id = id.lower()
 
@@ -134,11 +128,11 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
         id = words[0] # The id needs to contain at least one word
         words = words[1:]
         while words and ((len(id) + len(words[0]) + 1) <= max_chars):
-            id += WORD_SEPARATOR + words[0]
+            id += word_separator + words[0]
             words = words[1:]
         id = id[:max_chars]
     else:
-        id = WORD_SEPARATOR.join(words)
+        id = word_separator.join(words)
 
     if container is not None:
         # Ensuring that the id is not a portal reserved id (this is a case where
@@ -157,6 +151,7 @@ def generateId(s, max_chars=24, lower=False, portal_type=None,
 
 
 GENERATION_MAX_TRIES = 500
+
 def _generateAnotherId(id):
     """Generate another ID from the given one.
 

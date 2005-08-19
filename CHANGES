@@ -5,9 +5,10 @@ New features:
 ~~~~~~~~~~~~~
 - Added in id.generateId the handling of the case when max_chars <= 0 which now
   causes no truncation.
+- Added in id.generateId a new parameter "word_separator".
 Bug fixes:
 ~~~~~~~~~~
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Simplified generateId code and added more tests
+- Simplified generateId code and added more tests.
