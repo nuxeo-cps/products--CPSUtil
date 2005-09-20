@@ -20,10 +20,11 @@
 # $Id$
 import unittest
 from Testing import ZopeTestCase
-from Products.CPSUtil.integration import isProductPresent, isUserAgentMsie
+from Products.CPSUtil.integration import isProductPresent
+from Products.CPSUtil.integration import getProductVersion
+from Products.CPSUtil.integration import isUserAgentMsie
 
 class Test(unittest.TestCase):
-
 
     def test_isProductPresent(self):
         self.assert_(not isProductPresent('Products.Epoz'))
@@ -39,6 +40,11 @@ class Test(unittest.TestCase):
         self.assert_(isProductPresent('Products.ExternalEditor'))
 
         self.assert_(not isProductPresent('Products.DummyProductWhichDoesntExist'))
+
+
+    def test_getProductVersion(self):
+        self.assert_(getProductVersion('CPSUtil'))
+
 
     def test_isUserAgentMsie(self):
         request = {'HTTP_USER_AGENT': "Mozilla/1.0"}

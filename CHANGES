@@ -6,6 +6,7 @@ New features:
 - Added in id.generateId the handling of the case when max_chars <= 0 which now
   causes no truncation.
 - Added in id.generateId a new parameter "word_separator".
+- Added a new method integration.getProductVersion.
 Bug fixes:
 ~~~~~~~~~~
 - Fixed consistency of id.generateId by making it generate IDs lower-case by

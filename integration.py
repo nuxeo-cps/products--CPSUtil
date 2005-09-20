@@ -21,6 +21,7 @@
 """Utility functions for integrating other or third-party products.
 """
 
+import os.path
 import sys
 from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
@@ -39,6 +40,41 @@ def isProductPresent(product_name):
     present = product_name in sys.modules
     LOG(log_key, DEBUG, "[%s] present = %s" % (product_name, present))
     return present
+
+
+class ProductError(Exception):
+    pass
+
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('isProductPresent')
+def getProductVersion(product_name):
+    """Return the version of the product corresponding to the given product name.
+
+    This method tries first to read a potential version.txt file, and then a
+    potential VERSION file.
+    """
+    basepath = os.path.join(INSTANCE_HOME, 'Products', product_name)
+
+    fpath = os.path.join(basepath, 'version.txt')
+    if os.path.exists(fpath):
+        version = open(fpath).readline().strip()
+        if not version:
+            raise ProductError("No version information available")
+        return version
+
+    fpath = os.path.join(basepath, 'VERSION')
+    if os.path.exists(fpath):
+        for line in file(fpath):
+            if line.lower().strip().startswith('pkg_version'):
+                version = line.split('=')[1]
+                version = version.strip()
+                return version
+        else:
+            raise ProductError("No version information available")
+
+    # No version files at all
+    raise ProductError("Cannot find version file")
+
 
 def isUserAgentMsie(request):
     """Return wether the user agent performing the request is
