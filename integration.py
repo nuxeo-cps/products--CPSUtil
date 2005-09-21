@@ -46,7 +46,7 @@ class ProductError(Exception):
     pass
 
 # Allowing this method to be imported in restricted code
-ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('isProductPresent')
+ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('getProductVersion')
 def getProductVersion(product_name):
     """Return the version of the product corresponding to the given product name.
 
