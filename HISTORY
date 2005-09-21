@@ -1,4 +1,24 @@
 *******************************************
+** CPSUtil V0.7.0 [R1 build 2005/09/21-15:26 by fguillaume]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 27306
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added in id.generateId the handling of the case when max_chars <= 0 which now
+  causes no truncation.
+- Added in id.generateId a new parameter "word_separator".
+- Added a new method integration.getProductVersion.
+Bug fixes:
+~~~~~~~~~~
+- Fixed consistency of id.generateId by making it generate IDs lower-case by
+  default.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Simplified generateId code and added more tests.
+
+*******************************************
 ** CPSUtil V0.6.0 [R1 build 2005/08/05-14:00 by ben]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 25426
 Requires:
