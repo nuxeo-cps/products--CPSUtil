@@ -58,7 +58,7 @@ ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
 # A regexp that does word splitting using alpha-numerical words
-WORD_SPLITTING_REGEXP = re.compile('[^a-zA-Z0-9]*')
+WORD_SPLITTING_REGEXP = re.compile('[^_a-zA-Z0-9]*')
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.id').declarePublic('generateId')

@@ -128,6 +128,15 @@ class Test(unittest.TestCase):
         for key, value in mapping.items():
             self.assertEquals(generateId(key, lower=False), value)
 
+    def testKeepId_01(self):
+        # we want to keep valid id, like user_id in personal members area
+        my_id = 'my_id_01'
+        self.assertEquals(generateId(my_id), my_id)
+
+    def testKeepId_02(self):
+        my_id = 'my-id_01'
+        self.assertEquals(generateId(my_id), my_id)
+
 
 def test_suite():
     loader = unittest.TestLoader()
