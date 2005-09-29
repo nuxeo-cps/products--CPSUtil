@@ -48,9 +48,9 @@ def getHtmlBody(html_content):
     # Substituting the <html><body>xxx</body></html> by xxx.
     # This has the effect of getting the content of the <body> tag of an HTML
     # document.
-    #html_body = re.sub(HTML_BODY_REGEXP, r'\1', html_content)
+    #html_body = HTML_BODY_REGEXP.sub(r'\1', html_content)
     html_body = bodyfinder(html_content)
-    html_body = re.sub(STRIP_ATTRIBUTES_REGEXP, '', html_body)
+    html_body = STRIP_ATTRIBUTES_REGEXP.sub('', html_body)
 
     return html_body
 

@@ -107,7 +107,7 @@ def generateId(s, max_chars=24, lower=True, word_separator='-',
 
     # Word splitting the id based on the following separators: '-' '_' '.'.
     # This is done because this method prevents words' cut.
-    words = re.split(WORD_SPLITTING_REGEXP, id)
+    words = WORD_SPLITTING_REGEXP.split(id)
     words = [w for w in words if w]
 
     # Removing meaningless words if this has been asked
