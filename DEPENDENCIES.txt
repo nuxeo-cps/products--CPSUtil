@@ -1,0 +1,5 @@
+# $Id$
+
+# This product hasn't, and should not have, any dependencies on any other
+# CPS products.
+
