@@ -126,13 +126,6 @@ def execArgs():
                       help="Backup the ZODB that has just been packed "
                            "using the cp command.")
 
-    parser.add_option('-B', '--rdiff-backup',
-                      action='store_true',
-                      dest='rdiff_backup',
-                      default=False,
-                      help="Backup the ZODB that has just been packed "
-                           "using the rdiff-backup utility.")
-
     parser.add_option('-z', '--zodbfile',
                       action='store',
                       dest='zodbfile_path',
@@ -160,8 +153,6 @@ def execArgs():
              options.user_name, options.user_password)
     if options.backup:
         backupZodb(options.zodbfile_path, options.backupdir_path)
-    if options.rdiff_backup:
-        rdiffBackupZodb(options.zodbfile_path, options.backupdir_path)
 
 def packZodb(host_name, host_port, history_days, user_name, user_password):
     urllib._urlopener = AuthenticatedUrlOpener(user_name=user_name,
@@ -181,30 +172,7 @@ def backupZodb(zodb_path, backupdir_path):
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
     log("command = %s" % command)
     os.system(command)
-
-def rdiffBackupZodb(zodb_path, backupdir_path):
-    """Incremental backup of Data.fs.old with point in time recovery
-
-    see http://www.nongnu.org/rdiff-backup/docs.html more details
-    """
-    if os.system('rdiff-backup --version > ' + os.path.devnull) != 0:
-        log('Please install rdiff-backup first:', force=True)
-        log('http://www.nongnu.org/rdiff-backup', force=True)
-        sys.exit(1)
-
-    # XXX: we do backup the Data.fs.old file instead of Data.fs file to avoid
-    # copying a file that is subject to change during the backup and end up with
-    # a corrupted backup
-    zodb_dir_path = zodb_path[:zodb_path.rfind('Data.fs')]
-    include = "--include '%sData.fs.old'" % zodb_dir_path
-    exclude = "--exclude '**'"
-    rdiffbackupdir_path = os.path.join(backupdir_path, 'rdiffbackup')
-
-    command = "rdiff-backup %s %s %s %s" % (include, exclude,
-                                            zodb_dir_path,
-                                            rdiffbackupdir_path)
-    log("command = %s" % command)
-    os.system(command)
+    
 
 def log(message, force=False):
     """Log the given message to stderr.
