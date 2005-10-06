@@ -4,6 +4,7 @@
 # Authors:
 # Julien Anguenot <ja@nuxeo.com>
 # M.-A. Darche <madarche@nuxeo.com>
+# Olivier Grisel <og@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -32,7 +33,7 @@ Or you can even make it call by adding an entry in /etc/crontab or through the
 "crontab -e" command. Really it is up to you.
 
 Starts the pack_zodb script every night at 03h59:
-59 3 * * * /usr/local/bin/cps_housekeeping -rlPb > /dev/null 2>&1
+59 3 * * * /usr/local/bin/cps_housekeeping.py -rlPb > /dev/null 2>&1
 """
 
 import sys
@@ -207,7 +208,7 @@ def backupZodb(zodb_path, backupdir_path):
     
     
 def call_url(url, username, password):
-    """Call urlopen with forced HTTP Basic Auth header"""
+    """Call urllib2.urlopen with forced HTTP Basic Auth header"""
     request = urllib2.Request(url)
     base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
     request.add_header("Authorization", "Basic %s" % base64string)
