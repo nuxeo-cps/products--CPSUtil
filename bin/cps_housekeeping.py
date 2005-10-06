@@ -32,7 +32,7 @@ depending on your needs.
 Or you can even make it call by adding an entry in /etc/crontab or through the
 "crontab -e" command. Really it is up to you.
 
-Starts the pack_zodb script every night at 03h59:
+Starts the cps_housekeeping.py script every night at 03h59:
 59 3 * * * /usr/local/bin/cps_housekeeping.py -rlPb > /dev/null 2>&1
 """
 
