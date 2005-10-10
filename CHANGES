@@ -3,7 +3,8 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- added winToLatin9 and winToUnicode functions to fix windows broken characters
+  in text fields
 Bug fixes:
 ~~~~~~~~~~
 - Better use of compiled regexps.
