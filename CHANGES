@@ -5,6 +5,8 @@ New features:
 ~~~~~~~~~~~~~
 - added winToLatin9 and winToUnicode functions to fix windows broken characters
   in text fields
+- pack_zodb is replaced by the cps_housekeeping.py script with additional options
+  such as purging the repository or the localroles of recently deleted members
 Bug fixes:
 ~~~~~~~~~~
 - Better use of compiled regexps.
