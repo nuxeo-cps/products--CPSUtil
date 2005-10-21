@@ -173,3 +173,32 @@ def _generateAnotherId(id):
         suffix = str(random.randrange(1000, 10000))
         id = prefix + suffix
         return id
+
+
+def cleanFileName(name):
+    """Clean the file name so that it doesn't contain any special characters.
+    """
+    # FIXME: Factorization with generateId should be done.
+
+    # Sometimes the filename is in Unicode
+    if isinstance(name, unicode):
+        name = name.encode('iso-8859-15', 'replace')
+
+    name = name.replace('Æ', 'AE')
+    name = name.replace('æ', 'ae')
+    name = name.replace('¼', 'OE')
+    name = name.replace('½', 'oe')
+    name = name.replace('ß', 'ss')
+    translation_table = string.maketrans(
+        r"'\;/ &:ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ",
+        r"_______AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy")
+    name = name.translate(translation_table)
+    accepted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
+    name = ''.join([c for c in name if c in accepted_chars])
+    while name.startswith('_') or name.startswith('.'):
+        name = name[1:]
+    while name.endswith('_'):
+        name = name[:-1]
+
+    return name
+
