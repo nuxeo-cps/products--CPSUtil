@@ -195,10 +195,6 @@ def cleanFileName(name):
     name = name.translate(translation_table)
     accepted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
     name = ''.join([c for c in name if c in accepted_chars])
-    while name.startswith('_') or name.startswith('.'):
-        name = name[1:]
-    while name.endswith('_'):
-        name = name[:-1]
+    name = name.lstrip('_.').rstrip('_')
 
     return name
-

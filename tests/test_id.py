@@ -145,6 +145,10 @@ class Test(unittest.TestCase):
        self.assertEquals(cleanFileName(u'å'), 'a')
        self.assertEquals(cleanFileName('å'), 'a')
 
+       # check removing of special leading and trailing characters
+       # currently special leading are: '_' and '.'
+       # special trailing is '_'
+       self.assertEquals(cleanFileName('...___....file.zip__'), 'file.zip')
 
 def test_suite():
     loader = unittest.TestLoader()
