@@ -8,6 +8,7 @@ New features:
 - pack_zodb is replaced by the cps_housekeeping.py script with additional options
   such as purging the repository or the localroles of recently deleted members
 - Factorized out a toAscii method.
+- added scheduled notifications support to cps_housekeeping.py script
 Bug fixes:
 ~~~~~~~~~~
 - Better use of compiled regexps.

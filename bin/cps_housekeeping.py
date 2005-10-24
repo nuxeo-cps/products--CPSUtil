@@ -21,7 +21,7 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""A script to perform various housekeeping tasks on CPS by calling Zope through 
+"""A script to perform various housekeeping tasks on CPS by calling Zope through
 HTTPS and optionally.
 
 This script should be used directly on the server running Zope.
@@ -49,6 +49,7 @@ DEFAULT_HOST_PORT = 9673
 DEFAULT_INSTANCE_ID = 'cps'
 DEFAULT_USER_NAME = 'admin'
 DEFAULT_USER_PASSWORD = 'admin'
+DEFAULT_NOTIFICATION_FREQ = None
 DEFAULT_HISTORY_DAYS = 0
 DEFAULT_ZODB_PATH = '/var/lib/zope2.7/instance/cps/var/Data.fs'
 DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
@@ -56,6 +57,7 @@ DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
 ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack?days:float=%d'
 PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
 PURGE_REPOSITORY_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
+SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
 
@@ -88,7 +90,7 @@ def execArgs():
                       default=DEFAULT_HOST_PORT,
                       help="Use NUMBER for the server port to use. "
                       "Defaults to %s" % DEFAULT_HOST_PORT)
-              
+
     parser.add_option('-i', '--instance-id',
                       action='store',
                       dest='instance_id',
@@ -124,20 +126,31 @@ def execArgs():
                       default=DEFAULT_USER_PASSWORD,
                       help="Use PASSWORD for the password to Zope. "
                       "Defaults to '%s'" % DEFAULT_USER_PASSWORD)
-                      
+
 
     parser.add_option('-r', '--purge-repository',
                       action='store_true',
                       dest='purge_repository',
                       default=False,
                       help="Purge the repository to remove orphan documents")
-                      
+
     parser.add_option('-l', '--purge-localroles',
                       action='store_true',
                       dest='purge_localroles',
                       default=False,
                       help="Clean the localroles of deleted members")
-                      
+
+    parser.add_option('-s', '--send-notifications',
+                      action='store',
+                      dest='notifications',
+                      type='choice',
+                      metavar='FREQ',
+                      choices=['daily','weekly', 'monthly'],
+                      default=DEFAULT_NOTIFICATION_FREQ,
+                      help="Send email notifications of frequence FREQ of "
+                      "[daily|weekly|monthly]. Defaults to %s " %
+                      str(DEFAULT_NOTIFICATION_FREQ))
+
     parser.add_option('-P', '--pack-zodb',
                       action='store_true',
                       dest='pack_zodb',
@@ -173,7 +186,7 @@ def execArgs():
     (options, args) = parser.parse_args()
     global verbose
     verbose = options.verbose
- 
+
     if options.purge_repository:
         url = PURGE_REPOSITORY_URL_PATTERN % (options.host_name,
                                               options.host_port,
@@ -188,6 +201,14 @@ def execArgs():
         call_url(url, options.user_name, options.user_password)
         log("Successfully purged localroles on host %s" % options.host_name)
 
+    if options.notifications:
+        url = SEND_NOTIFICATIONS_PATTERN % (options.host_name,
+                                            options.host_port,
+                                            options.instance_id,
+                                            options.notifications)
+        call_url(url, options.user_name, options.user_password)
+        log("Successfully sent notifications on host %s" % options.host_name)
+
     if options.pack_zodb:
         url = ZODB_PACKING_URL_PATTERN % (options.host_name,
                                           options.host_port,
@@ -197,7 +218,6 @@ def execArgs():
 
     if options.backup:
         backupZodb(options.zodbfile_path, options.backupdir_path)
-      
 
 def backupZodb(zodb_path, backupdir_path):
     time_string = strftime(TIME_FORMAT, gmtime())
@@ -205,8 +225,7 @@ def backupZodb(zodb_path, backupdir_path):
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
     log("command = %s" % command)
     os.system(command)
-    
-    
+
 def call_url(url, username, password):
     """Call urllib2.urlopen with forced HTTP Basic Auth header"""
     request = urllib2.Request(url)
