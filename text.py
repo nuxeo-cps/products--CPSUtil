@@ -17,8 +17,33 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""Utility functions for manipulating texts.
+"""Utility functions for manipulating text.
 """
+
+import string
+
+ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
+    r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
+    r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
+
+def toAscii(s):
+    """Change accented and special characters by ASCII characters."""
+    s = s.translate(ACCENTED_CHARS_TRANSLATIONS)
+    s = s.replace('Æ', 'AE')
+    s = s.replace('æ', 'ae')
+    s = s.replace('¼', 'OE')
+    s = s.replace('½', 'oe')
+    s = s.replace('ß', 'ss')
+    return s
+
+
+def truncateText(text, size=25):
+    """Middle truncature."""
+    if text is None or len(text) < size:
+        return text
+    mid_size = (size-3)/2
+    return text[:mid_size] + '...' + text[-mid_size:]
+
 
 # Broken MS characters and the corresponding UTF8 characters according to openweb:
 # http://openweb.eu.org/articles/caracteres_illegaux/
@@ -26,7 +51,7 @@
 WINCHAR_MAP = {
    0x80: 0x20ac, # euro symbol
    0x81: 0x00,
-   0x82: 0x201a, 
+   0x82: 0x201a,
    0x83: 0x0192,
    0x84: 0x201e,
    0x85: 0x2026, # ...
@@ -60,7 +85,7 @@ WINCHAR_MAP = {
 
 def winToUnicode(text):
     """Encode a broken Microsoft Windows encoded string into unicode
-    
+
     Return None for None string for cpsmcat compatibility
     """
     if text is None:
@@ -76,10 +101,3 @@ def winToLatin9(text, errors='xmlcharrefreplace'):
     Return None for None string for cpsmcat compatibility
     """
     return winToUnicode(text).encode('iso-8859-15', errors)
-
-def truncateText(text, size=25):
-    """Middle truncature."""
-    if text is None or len(text) < size:
-        return text
-    mid_size = (size-3)/2
-    return text[:mid_size] + '...' + text[-mid_size:]

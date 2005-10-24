@@ -31,6 +31,7 @@ from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 from zLOG import LOG, INFO, DEBUG
 
+from text import toAscii
 
 # This string contain non-misleading characters that can safely be read and used
 # by users. Misleading characters include for example the "l" letter that can be
@@ -52,10 +53,6 @@ def generatePassword(min_chars=10, max_chars=20):
         password += random.choice(SAFE_CHARS_FOR_PASSWORD)
     return password
 
-
-ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
-    r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
-    r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
 # A regexp that does word splitting using alpha-numerical words
 WORD_SPLITTING_REGEXP = re.compile('[^_a-zA-Z0-9]*')
@@ -91,17 +88,9 @@ def generateId(s, max_chars=24, lower=True, word_separator='-',
     """
     # TODO: similar code is still duplicated in other places like
     # CPSForum/skins/forum_default/forum_create.py
-    # CPSSchemas/BasicWidgets.py,
     # CPSWebMail/Attachment.py
-    # etc.
 
-    # Changing accented and special characters by ASCII characters
-    id = s.translate(ACCENTED_CHARS_TRANSLATIONS)
-    id = id.replace('Æ', 'AE')
-    id = id.replace('æ', 'ae')
-    id = id.replace('¼', 'OE')
-    id = id.replace('½', 'oe')
-    id = id.replace('ß', 'ss')
+    id = toAscii(s)
     if lower:
         id = id.lower()
 
@@ -175,26 +164,21 @@ def _generateAnotherId(id):
         return id
 
 
-def cleanFileName(name):
-    """Clean the file name so that it doesn't contain any special characters.
-    """
-    # FIXME: Factorization with generateId should be done.
+SAFE_CHARS_FOR_FILE_NANME = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
 
-    # Sometimes the filename is in Unicode
+def generateFileName(name):
+    """Generate a safe file name (without any special characters) from the
+    given name.
+    """
+    # Sometimes the given filename is in Unicode
     if isinstance(name, unicode):
         name = name.encode('iso-8859-15', 'replace')
 
-    name = name.replace('Æ', 'AE')
-    name = name.replace('æ', 'ae')
-    name = name.replace('¼', 'OE')
-    name = name.replace('½', 'oe')
-    name = name.replace('ß', 'ss')
-    translation_table = string.maketrans(
-        r"'\;/ &:ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ",
-        r"_______AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy")
+    name = toAscii(name)
+    translation_table = string.maketrans(r"'\;/ &:",
+                                         r"_______")
     name = name.translate(translation_table)
-    accepted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
-    name = ''.join([c for c in name if c in accepted_chars])
+    name = ''.join([c for c in name if c in SAFE_CHARS_FOR_FILE_NANME])
     name = name.lstrip('_.').rstrip('_')
 
     return name

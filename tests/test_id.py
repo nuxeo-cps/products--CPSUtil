@@ -20,7 +20,7 @@
 #
 # $Id$
 import unittest
-from Products.CPSUtil.id import generatePassword, generateId, cleanFileName
+from Products.CPSUtil.id import generatePassword, generateId, generateFileName
 
 class Test(unittest.TestCase):
 
@@ -138,17 +138,18 @@ class Test(unittest.TestCase):
         my_id = 'my-id_01'
         self.assertEquals(generateId(my_id), my_id)
 
-    def test_cleanFileName(self):
-       self.assertEquals(cleanFileName("My Document.doc"), 'My_Document.doc')
-       self.assertEquals(cleanFileName("MyDocument.sxw"), 'MyDocument.sxw')
-       self.assertEquals(cleanFileName("Procédures finales.sxw"), 'Procedures_finales.sxw')
-       self.assertEquals(cleanFileName(u'å'), 'a')
-       self.assertEquals(cleanFileName('å'), 'a')
+    def testGenerateFileName(self):
+       self.assertEquals(generateFileName("My Document.doc"), 'My_Document.doc')
+       self.assertEquals(generateFileName("MyDocument.sxw"), 'MyDocument.sxw')
+       self.assertEquals(generateFileName("Procédures finales.sxw"),
+                         'Procedures_finales.sxw')
+       self.assertEquals(generateFileName(u'å'), 'a')
+       self.assertEquals(generateFileName('å'), 'a')
 
        # check removing of special leading and trailing characters
        # currently special leading are: '_' and '.'
        # special trailing is '_'
-       self.assertEquals(cleanFileName('...___....file.zip__'), 'file.zip')
+       self.assertEquals(generateFileName('...___....file.zip__'), 'file.zip')
 
 def test_suite():
     loader = unittest.TestLoader()
