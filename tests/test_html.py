@@ -1,6 +1,8 @@
 # -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
-# Author: Tarek Ziadé <tz@nuxeo.com>
+# Authors:
+# Tarek Ziadé <tz@nuxeo.com>
+# M.-A. Darche <madarche@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -20,27 +22,56 @@
 import unittest
 from Products.CPSUtil.html import sanitize
 
-class HTMLSanitizerTests(unittest.TestCase):
+class Test(unittest.TestCase):
 
-    def tests(self):
+    def testHtmlSanitizing(self):
         res = sanitize('<html>ftgyuhjik</html>')
         self.assertEquals(res, 'ftgyuhjik')
 
-        res = sanitize('<html>ftg<b>yuh  </b>jik</html>')
-        self.assertEquals(res, 'ftg<b>yuh  </b>jik')
+        res = sanitize('<html>ftg<strong>yuh</strong> jik</html>')
+        self.assertEquals(res, 'ftg<strong>yuh</strong> jik')
+
+        res = sanitize('<html>ftg<strong>yuh  </strong>jik</html>')
+        self.assertEquals(res, 'ftg<strong>yuh  </strong>jik')
 
         res = sanitize('yu<script langage="javascript">h</script></c>')
         self.assertEquals(res, 'yuh')
 
+        res = sanitize('dfrtgyhju<span class="myclass">ghj</span>')
+        self.assertEquals(res, 'dfrtgyhju<span>ghj</span>')
+
         res = sanitize('dfrtgyhju<span class="myclass" >ghj</span>')
         self.assertEquals(res, 'dfrtgyhju<span>ghj</span>')
+
+        res = sanitize('debian <div>fsf dfrtgyhju<span class="myclass" >ghj</span></di>')
+        self.assertEquals(res, 'debian <div>fsf dfrtgyhju<span>ghj</span></div>')
 
         res = sanitize('<a href="../../../../../../../view" accesskey="U" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
         self.assertEquals(res, '<a href="../../../../../../../view" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
 
+        # Testing tag replacements
+        res = sanitize('ftg<b>yuh</b>jik abcde')
+        self.assertEquals(res, 'ftg<strong>yuh</strong>jik abcde')
+
+        res = sanitize('<span>ftg<b>yuh</b>jik abcde')
+        self.assertEquals(res, '<span>ftg<strong>yuh</strong>jik abcde</span>')
+
+        res = sanitize('<html>ftg<b>yuh</b>jik</html>')
+        self.assertEquals(res, 'ftg<strong>yuh</strong>jik')
+
+        res = sanitize('ftg<i>yuh</i>jik')
+        self.assertEquals(res, 'ftg<em>yuh</em>jik')
+
+        res = sanitize('ftg<i>yuh </i>jik')
+        self.assertEquals(res, 'ftg<em>yuh </em>jik')
+
+        res = sanitize('ftg<i>  yuh</i>jik')
+        self.assertEquals(res, 'ftg<em>  yuh</em>jik')
+
+
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(HTMLSanitizerTests),
+        unittest.makeSuite(Test),
         ))
 
 if __name__ == '__main__':

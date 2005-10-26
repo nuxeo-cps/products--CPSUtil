@@ -21,11 +21,11 @@
 """Utility functions for manipulating HTML, XHTML.
 """
 import re
-import sgmllib
+from sgmllib import SGMLParser
 from htmlentitydefs import entitydefs
 
-from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
+from AccessControl import ModuleSecurityInfo
 from Products.CMFDefault.utils import bodyfinder
 
 # Regexp of the form xxx<body>xxx</body>xxx.
@@ -34,7 +34,6 @@ from Products.CMFDefault.utils import bodyfinder
 HTML_BODY_REGEXP = re.compile('.*<body.*?>(.*)</body>.*', re.DOTALL)
 
 STRIP_ATTRIBUTES_REGEXP = re.compile('xml:lang=".*?"\s?', re.DOTALL)
-
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('getHtmlBody')
@@ -54,20 +53,27 @@ def getHtmlBody(html_content):
 
     return html_body
 
-# inspired from Alex Martelli's "Python Cookbook"
-class HTMLSanitizer(sgmllib.SGMLParser):
+
+# Inspired from Alex Martelli's "Python Cookbook"
+class HTMLSanitizer(SGMLParser):
     """Clean up entered text to avoid dangerous tags like forms, style, etc
     """
     tags_to_keep = ('p', 'br', 'span', 'div', 'ul', 'ol', 'li',
                     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a',
-                    'em', 'strong', 'i', 'd', 'dl', 'dd', 'dd',
-                    'table', 'tr', 'td', 'b')
-    tolerant_tags = ('br', 'p')
+                    'em', 'strong', 'd', 'dl', 'dd', 'dd',
+                    'table', 'tr', 'td')
+    tolerant_tags = ('p', 'br')
+    # <b> and <i> are not allowed in XHTML 1.0 Strict, so we replace them with
+    # semantical equivalents.
+    tag_replacements = {'b': 'strong',
+                        'i': 'em',
+        }
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'class', 'accesskey', 'onclick')
 
-    def __init__(self, tags_to_keep=None, attributes_to_keep=None, attributes_to_remove=None):
-        sgmllib.SGMLParser.__init__(self)
+    def __init__(self, tags_to_keep=None,
+                 attributes_to_keep=None, attributes_to_remove=None):
+        SGMLParser.__init__(self)
         if attributes_to_keep:
             self.attributes_to_keep = attributes_to_keep
         if attributes_to_remove:
@@ -89,6 +95,8 @@ class HTMLSanitizer(sgmllib.SGMLParser):
 
     def unknown_starttag(self, tag, attrs):
         """Remove unwanted tag, using tags_to_keep"""
+        # First replacing the tag by another one if needed
+        tag = self.tag_replacements.get(tag, tag)
         if tag in self.tags_to_keep:
             self.result.append('<%s' % tag)
             for k, v in attrs:
@@ -104,6 +112,8 @@ class HTMLSanitizer(sgmllib.SGMLParser):
                 self.endTagList.insert(0, end_tag)
 
     def unknown_endtag(self, tag):
+        # First replacing the tag by another one if needed
+        tag = self.tag_replacements.get(tag, tag)
         if tag in self.tags_to_keep:
             end_tag = '</%s>' % tag
             self.result.append(end_tag)
@@ -114,7 +124,7 @@ class HTMLSanitizer(sgmllib.SGMLParser):
         """Append missing closing tags"""
         self.result.extend(self.endTagList)
 
-ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('sanitize')   
+ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('sanitize')
 def sanitize(html, tags_to_keep=None):
     """Cleans html"""
     parser = HTMLSanitizer(tags_to_keep)
@@ -122,5 +132,3 @@ def sanitize(html, tags_to_keep=None):
     parser.close()
     parser.cleanup()
     return ''.join(parser.result)
-
-

@@ -12,6 +12,7 @@ New features:
 Bug fixes:
 ~~~~~~~~~~
 - Better use of compiled regexps.
+- Made html.sanitize be XHTML 1.0 Strict compliant.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 - Moved the cleanFileName method from CPSSchemas to CPSUtil.
