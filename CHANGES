@@ -3,16 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added winToLatin9 and winToUnicode functions to fix windows broken characters
-  in text fields
-- pack_zodb is replaced by the cps_housekeeping.py script with additional options
-  such as purging the repository or the localroles of recently deleted members
-- Factorized out a toAscii method.
-- Added scheduled notifications support to cps_housekeeping.py script
+-
 Bug fixes:
 ~~~~~~~~~~
-- Better use of compiled regexps.
-- Made html.sanitize be XHTML 1.0 Strict compliant.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Moved the cleanFileName method from CPSSchemas to CPSUtil.
+-
