@@ -34,7 +34,7 @@ def isProductPresent(product_name):
 
     Examples:
       * in Python code integration.isProductPresent('Products.ExternalEditor')
-      * in ZEXPR modules["Products.CPSUtil.utils"].isProductPresent("Products.ExternalEditor")
+      * in ZEXPR modules['Products.CPSUtil.integration'].isProductPresent('Products.ExternalEditor')
     """
     log_key = 'isProductPresent'
     present = product_name in sys.modules
