@@ -40,14 +40,21 @@ class Timer:
 
     will log::
 
-      DEBUG Timer: myTimer
-                     something 1 0.873s 51.57%
-                     something 2 0.820s 48.43%
-                    ------------
-                      Total time 1.693s
+      ... DEBUG Timer myTimer
+      ======================== ======= =======
+                   something 1  0.873s  51.57%
+                   something 2  0.820s  48.43%
+      ------------------------ ------- -------
+                    Total time  1.693s
+      ======================== ======= =======
+
     """
-    def __init__(self, message=None):
+    def __init__(self, message=None, level=None):
         self.message = message
+        if level is None:
+            self.level = DEBUG
+        else:
+            self.level = level
         self.t = []
         self.mark('init')
 
@@ -59,20 +66,23 @@ class Timer:
         t = self.t[:]
         if len(t) < 2:
             return self.message or 'no marker'
-        t2 = []
+        deco = '%30s ======= =======' % ('=' * 25)
+        text = [self.message or '']
+        text.append(deco)
         x = t.pop(0)
         total = t[-1][0] - x[0]
         while t:
             y = t.pop(0)
             dt = y[0]-x[0]
-            t2.append('%30s %.3fs %.2f%%' % (y[1], dt, 100.0*dt/total ))
+            text.append('%30s %6.3fs %6.2f%%' % (y[1], dt, 100.0*dt/total ))
             x = y
-        t2.append('%30s' % '------------')
-        t2.append('%30s %.3fs' % ('Total time', total))
-        return (self.message or '') + '\n' + '\n'.join(t2)
+        text.append(deco.replace('=', '-'))
+        text.append('%30s %6.3fs' % ('Total time', total))
+        text.append(deco)
+        return '\n'.join(text)
 
     def log(self, mark=None):
         """Log all the marks."""
         if mark is not None:
             self.mark(mark)
-        LOG('Timer', DEBUG, str(self))
+        LOG('Timer', self.level, str(self))

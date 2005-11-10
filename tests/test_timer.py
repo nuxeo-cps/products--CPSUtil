@@ -21,7 +21,7 @@ from Products.CPSUtil.timer import Timer
 
 class TimerTestCase(unittest.TestCase):
 
-    def test_chono(self):
+    def test_timer(self):
         t = Timer('foo')
         for i in range(10):
             for j in range(200):
