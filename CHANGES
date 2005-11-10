@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- adding timer.Timer for basic profiling
 Bug fixes:
 ~~~~~~~~~~
 -
