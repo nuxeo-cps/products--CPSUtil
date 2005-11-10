@@ -32,11 +32,11 @@ class Timer:
     """Very simple timer that output elapsed time in the log.
 
     >>> from Products.CPSUtil.timer import Timer
-    >>> c = Timer('myTimer')
+    >>> t = Timer('myTimer')
     >>> #do something
-    >>> c.mark('something 1')
+    >>> t.mark('something 1')
     >>> #do something
-    >>> c.log('something 2')
+    >>> t.log('something 2')
 
     will log::
 
