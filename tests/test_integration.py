@@ -27,14 +27,14 @@ from Products.CPSUtil.integration import isUserAgentMsie
 class Test(unittest.TestCase):
 
     def test_isProductPresent(self):
-        self.assert_(not isProductPresent('Products.Epoz'))
+        self.assert_(not isProductPresent('Products.CPSDocument'))
         self.assert_(not isProductPresent('Products.ExternalEditor'))
 
         ZopeTestCase.installProduct('CPSCore', quiet=1)
         self.assert_(isProductPresent('Products.CPSCore'))
 
-        ZopeTestCase.installProduct('Epoz', quiet=1)
-        self.assert_(isProductPresent('Products.Epoz'))
+        ZopeTestCase.installProduct('CPSDocument', quiet=1)
+        self.assert_(isProductPresent('Products.CPSDocument'))
 
         ZopeTestCase.installProduct('ExternalEditor', quiet=1)
         self.assert_(isProductPresent('Products.ExternalEditor'))
