@@ -49,6 +49,14 @@ class Test(unittest.TestCase):
         res = sanitize('<a href="../../../../../../../view" accesskey="U" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
         self.assertEquals(res, '<a href="../../../../../../../view" title="wii" _base_href="http://localhost:29980/cps2/sections/wii/we/">wii</a>')
 
+        markup = '<address>Paris</address><blockquote><p>Paix longue</p></blockquote>'
+        res = sanitize(markup)
+        self.assertEquals(res, markup)
+
+        markup = '<q>Paix courte</q><cite>22.3.4</cite><abbr>CNRS</abbr><acronym>LASER</acronym>'
+        res = sanitize(markup)
+        self.assertEquals(res, markup)
+
         # Testing tag replacements
         res = sanitize('ftg<b>yuh</b>jik abcde')
         self.assertEquals(res, 'ftg<strong>yuh</strong>jik abcde')

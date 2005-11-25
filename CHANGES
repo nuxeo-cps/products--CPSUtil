@@ -3,9 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- adding timer.Timer for basic profiling
-- adding basic bin/update_metadata.py script to generate .metada files for
+- Added timer.Timer for basic profiling
+- Added basic bin/update_metadata.py script to generate .metada files for
   skin files. Feel free to improve.
+- Added more semantic allowed markup in the HTMLSanitizer.
 Bug fixes:
 ~~~~~~~~~~
 -

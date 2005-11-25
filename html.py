@@ -61,6 +61,7 @@ class HTMLSanitizer(SGMLParser):
     tags_to_keep = ('p', 'br', 'span', 'div', 'ul', 'ol', 'li',
                     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a',
                     'em', 'strong', 'd', 'dl', 'dd', 'dd',
+                    'address', 'q', 'blockquote', 'cite', 'abbr', 'acronym',
                     'table', 'tr', 'td')
     tolerant_tags = ('p', 'br')
     # <b> and <i> are not allowed in XHTML 1.0 Strict, so we replace them with
