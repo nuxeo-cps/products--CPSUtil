@@ -1,4 +1,8 @@
+# -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# Authors:
+# Benoit Delbosc <ben@nuxeo.com>
+# Tarek Ziadé <tz@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -15,7 +19,9 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""Simple Timer."""
+"""Timers and benching utilities.
+"""
+
 import sys
 from time import time
 
@@ -86,3 +92,65 @@ class Timer:
         if mark is not None:
             self.mark(mark)
         LOG('Timer', self.level, str(self))
+
+
+# TOLERANCE in Pystones
+kPS = 1000
+TOLERANCE = 0.5*kPS
+
+try:
+    from test import pystone
+    local_stones = pystone.pystones()
+except ImportError:
+    local_stones = None
+
+def pystoneit(function, *args, **kw):
+    """Measure an absolute time based on pystone measurement.
+
+    This can be used to bench some code and get a absolute scoring.
+
+    Example of usage:
+    >>> import timing
+    >>> timing.local_stones
+    (1.23, 40650.406504065038)
+    >>> def o():
+    ...     a = ''
+    ...     for i in range(50000):
+    ...         a = '3' * 10
+    ...     return a
+    ...
+    >>> o()
+    '3333333333'
+    >>> timing.pystoneit(o)
+    2171.3598996304308
+
+    The result can be used in unit test to make assertions
+    and prevent performance regressions:
+
+    >>> if timing.pystoneit(o) > 3*timing.kPS:
+    ...   raise AssertionError('too slow !')
+    ...
+    >>> if timing.pystoneit(o) > 2*timing.kPS:
+    ...   raise AssertionError('too slow !')
+    ...
+    Traceback (most recent call last):
+    File "<stdin>", line 2, in ?
+    AssertionError: too slow !
+
+    Raising an assertion error in Unit tests
+    leads to a regular test failure (F)
+    """
+    if not local_stones:
+        raise Exception("The pystone module is not available. "
+                        "Check your Zope instance test module.")
+    start_time = time.time()
+    try:
+        function(*args, **kw)
+    finally:
+        total_time = time.time() - start_time
+        if total_time == 0:
+            pystone_total_time = 0
+        else:
+            pystone_rate = local_stones[0] / local_stones[1]
+            pystone_total_time = total_time / pystone_rate
+    return pystone_total_time
