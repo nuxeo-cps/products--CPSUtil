@@ -20,7 +20,7 @@
 """Utility functions for manipulating text.
 """
 
-import string
+import string, codecs
 
 ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""¿¡¬√ƒ≈«»… ÀÃÕŒœ—“”‘’÷ÿŸ⁄€‹›‡·‚„‰ÂÁËÈÍÎÏÌÓÔÒÚÛÙıˆ¯˘˙˚¸˝ˇ""",
@@ -45,59 +45,78 @@ def truncateText(text, size=25):
     return text[:mid_size] + '...' + text[-mid_size:]
 
 
-# Broken MS characters and the corresponding UTF8 characters according to openweb:
-# http://openweb.eu.org/articles/caracteres_illegaux/
+# This table gives rough latin9 equivalents for Unicode characters coming from
+# the MS Windows western charset (cp1522) that won't get directly translated
+# to latin9.
+# see also http://openweb.eu.org/articles/caracteres_illegaux/
 
-WINCHAR_MAP = {
-   0x80: 0x20ac, # euro symbol
-   0x81: 0x00,
-   0x82: 0x201a,
-   0x83: 0x0192,
-   0x84: 0x201e,
-   0x85: 0x2026, # ...
-   0x86: 0x2020,
-   0x87: 0x2021,
-   0x88: 0x02c6,
-   0x89: 0x2030,
-   0x8a: 0x0160,
-   0x8b: 0x2039,
-   0x8c: 0x0152,
-   0x8d: 0x00,
-   0x8e: 0x017d,
-   0x8f: 0x00,
-   0x90: 0x00,
-   0x91: 0x2018,
-   0x92: 0x2019, # '
-   0x93: 0x201c,
-   0x94: 0x201d,
-   0x95: 0x2022,
-   0x96: 0x2013,
-   0x97: 0x2014,
-   0x98: 0x02dc,
-   0x99: 0x2122,
-   0x9a: 0x0161,
-   0x9b: 0x203a, # OE
-   0x9c: 0x0153, # oe
-   0x9d: 0x00,
-   0x9e: 0x017e,
-   0x9f: 0x0178,
+win2latin9_approx = { # below are cp1252 codes
+u'\u201a' : u',',    # 0x82 lower single quote
+u'\u201e' : u'"',    # 0x84 lower double quote (german?)
+u'\u02c6' : u'^',    # 0x88 small upper ^
+u'\u2039' : u'<',    # 0x8b small <
+u'\u2018' : u'`',    # 0x91 single curly backquote
+u'\u2019' : u"'",    # 0x92 single curly quote
+u'\u201c' : u'"',    # 0x93 double curly backquote
+u'\u201d' : u'"',    # 0x94 double curly quote
+u'\u2013' : u'\xad', # 0x96 small dash
+u'\u2014' : u'-',    # 0x97 dash
+u'\u02dc' : u'~',    # 0x98 upper tilda
+u'\u203a' : u'>',    # 0x9b small >
+u'\xb4'   : u"'",    # 0xb4 almost horizontal single quote
+u'\u2026' : u'...',  # 0x85 dots in one char
 }
 
-def winToUnicode(text):
-    """Encode a broken Microsoft Windows encoded string into unicode
+def winToLatin9_errors(exc):
+    """ Fallback by approximation for latin9 encoding of unicode objects.
 
-    Return None for None string for cpsmcat compatibility
+    Mostly, this is about Unicode objects obtained from MS Windows Western
+    Europe strings (codec identifier 'cp1252').
+
+    This works as an error handler (registered at import time of the present
+    module). 
+
+    An example going all the way from a Windows string
+
+    >>> wintext = 'L\x92apostrophe est jolie \x85'
+    >>> unitext = wintext.decode('cp1252')
+    >>> unitext
+    u'L\u2019apostrophe est jolie \u2026'
+    >>> unitext.encode('iso-8859-15', 'latin9_fallback')
+    "L'apostrophe est jolie ..."
+    
+    >>> u'L\u2019apostrophe'.encode('iso-8859-15', 'latin9_fallback')
+    "L'apostrophe"
+
+    >>> u'1 maps to 3\u2026 See ?'.encode('iso-8859-15', 'latin9_fallback')
+    '1 maps to 3... See ?'
+
+    If we can't find an approximate equivalent, we fallback to
+    xmlcharrefreplace, that all modern browsers can handle:
+
+    >>> u'\u2032'.encode('iso-8859-15', 'latin9_fallback')
+    '&#8242;'
+
+    
+    xmlcharrefreplace will be called for any block of non latin9 translatables
+    chars once one in the block cannot be approximated. 
+    >>> u'ab\u2032\u2026cd\u2014'.encode('iso-8859-15', 'latin9_fallback')
+    'ab&#8242;&#8230;cd-'
+
+    Cf http://docs.python.org/lib/module-codecs.html#l2h-984) for more on
+    Unicode.encode error handlers
     """
-    if text is None:
-        return None
-    if isinstance(text, str):
-        text = unicode(text,'latin1')
-    return text.translate(WINCHAR_MAP)
 
-def winToLatin9(text, errors='xmlcharrefreplace'):
-    """Encode a broken Microsoft Windows encoded string into iso-8859-15
+    res = u''
+    inp = exc.args[1]
+    try:
+        for i in range(exc.start, exc.end):
+            res += win2latin9_approx[inp[i]]
+    except KeyError:
+        return codecs.lookup_error('xmlcharrefreplace')(exc)
+    return res, exc.end # we made at worst one to many mappings
 
-    Take 'xmlcharrefreplace' on default value for errors for modern browser
-    Return None for None string for cpsmcat compatibility
-    """
-    return winToUnicode(text).encode('iso-8859-15', errors)
+
+
+## Register the fallback
+codecs.register_error('latin9_fallback', winToLatin9_errors)

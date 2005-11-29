@@ -19,40 +19,11 @@
 #
 # $Id$
 import unittest
-from Products.CPSUtil.text import winToUnicode, winToLatin9
+from Testing.ZopeTestCase import doctest
 
-class WindowsBrokenCodesTestCase(unittest.TestCase):
-    
-    
-    def test_string(self):
-        
-        # from a (windows encoded) string
-        res = winToLatin9("L\x92apostrophe")
-        self.assertEquals(res, "L&#8217;apostrophe")
-        
-        res = winToLatin9("3\x8050")
-        self.assertEquals(res, "3¤50")
-
-        # from unicode
-        res = winToLatin9(u"L\x92apostrophe")
-        self.assertEquals(res, "L&#8217;apostrophe")
-        
-        res = winToLatin9(u"3\x8050")
-        self.assertEquals(res, "3¤50")    
-        
-        
-    def test_unicode(self):
-        
-        res = winToUnicode(u"L\x92apostrophe")
-        self.assertEquals(res, u"L\u2019apostrophe")
-        
-        res = winToUnicode(u"3\x8050")
-        self.assertEquals(res, u"3¤50") 
-        
-    
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(WindowsBrokenCodesTestCase),
+        doctest.DocTestSuite('Products.CPSUtil.text'),
         ))
 
 if __name__ == '__main__':
