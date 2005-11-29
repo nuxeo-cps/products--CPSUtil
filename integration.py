@@ -25,7 +25,7 @@ import os.path
 import sys
 import re
 from AccessControl import ModuleSecurityInfo
-from zLOG import LOG, INFO, DEBUG
+from zLOG import LOG, TRACE, DEBUG, INFO
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('isProductPresent')
@@ -39,7 +39,7 @@ def isProductPresent(product_name):
     """
     log_key = 'isProductPresent'
     present = product_name in sys.modules
-    LOG(log_key, DEBUG, "[%s] present = %s" % (product_name, present))
+    LOG(log_key, TRACE, "[%s] present = %s" % (product_name, present))
     return present
 
 
@@ -77,6 +77,8 @@ def getProductVersion(product_name):
     raise ProductError("Cannot find version file")
 
 
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('isUserAgentMsie')
 def isUserAgentMsie(request):
     """Return whether the user agent performing the request is
     an MSIE user agent.
@@ -90,6 +92,8 @@ def isUserAgentMsie(request):
         return False
 
 GECKO_REGEXP = re.compile('Gecko/\d{8}')
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.integration').declarePublic('isUserAgentGecko')
 def isUserAgentGecko(request):
     """Return whether the user agent performing the request is
     a Gecko based (that is from the Mozilla family) user agent.
