@@ -23,6 +23,7 @@
 
 import os.path
 import sys
+import re
 from AccessControl import ModuleSecurityInfo
 from zLOG import LOG, INFO, DEBUG
 
@@ -77,11 +78,25 @@ def getProductVersion(product_name):
 
 
 def isUserAgentMsie(request):
-    """Return wether the user agent performing the request is
-    an MSIE user agent"""
+    """Return whether the user agent performing the request is
+    an MSIE user agent.
+
+    But note that code should rely as less as possible on user agent detection.
+    """
     user_agent = request.get('HTTP_USER_AGENT')
     if user_agent.find('MSIE') != -1:
         return True
     else:
         return False
 
+GECKO_REGEXP = re.compile('Gecko/\d{8}')
+def isUserAgentGecko(request):
+    """Return whether the user agent performing the request is
+    a Gecko based (that is from the Mozilla family) user agent.
+
+    cf. http://www.mozilla.org/build/revised-user-agent-strings.html
+
+    But note that code should rely as less as possible on user agent detection.
+    """
+    user_agent = request.get('HTTP_USER_AGENT')
+    return GECKO_REGEXP.search(user_agent) is not None

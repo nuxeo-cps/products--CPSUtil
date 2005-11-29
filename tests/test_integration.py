@@ -23,6 +23,7 @@ from Testing import ZopeTestCase
 from Products.CPSUtil.integration import isProductPresent
 from Products.CPSUtil.integration import getProductVersion
 from Products.CPSUtil.integration import isUserAgentMsie
+from Products.CPSUtil.integration import isUserAgentGecko
 
 class Test(unittest.TestCase):
 
@@ -39,11 +40,29 @@ class Test(unittest.TestCase):
         self.assert_(getProductVersion('CPSUtil'))
 
 
-    def test_isUserAgentMsie(self):
-        request = {'HTTP_USER_AGENT': "Mozilla/1.0"}
-        self.assert_(not isUserAgentMsie(request))
-        request = {'HTTP_USER_AGENT': "MSIE"}
-        self.assert_(isUserAgentMsie(request))
+    def test_userAgentStrings(self):
+        for (user_agent, is_msie, is_gecko) in (
+            ('MSIE', True, False),
+            ('Mozilla/1.0', False, False),
+            ('Mozilla/5.001 (windows; U; NT4.0; en-us) Gecko/25250101',
+             False, True),
+            ('Mozilla/5.001 (Macintosh; N; PPC; ja) Gecko/25250101 MegaCorpBrowser/1.0 (MegaCorp, Inc.)',
+             False, True),
+            ('Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) Gecko/25250101 Netscape/5.432b1 (C-MindSpring)',
+             False, True),
+            ('TinyBrowser/2.0 (TinyBrowser Comment) Gecko/20201231',
+             False, True),
+            ):
+            request = {'HTTP_USER_AGENT': user_agent}
+            res_is_msie = isUserAgentMsie(request)
+            res_is_gecko = isUserAgentGecko(request)
+            self.assertEquals(res_is_msie, is_msie,
+                              'Failed on MSIE detection with "%s"'
+                              % user_agent)
+            self.assertEquals(res_is_gecko, is_gecko,
+                              'Failed on Gecko detection with "%s"'
+                              % user_agent)
+
 
 
 def test_suite():
