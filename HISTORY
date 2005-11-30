@@ -1,4 +1,22 @@
 *******************************************
+** CPSUtil V0.9.0 [R1 build 2005/11/30-08:51 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 30092
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added timer.Timer for basic profiling
+- Added a pystone measurement method.
+- Added the "isUserAgentGecko" method.
+Bug fixes:
+~~~~~~~~~~
+- Added more semantic allowed markup in the HTMLSanitizer.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.8.1 [R1 build 2005/11/08-16:55 by fguillaume]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 29274
 Requires:
