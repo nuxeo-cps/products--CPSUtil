@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
             # Only running this test is the pystone module can be used
             from test import pystone
             res = timer.pystoneit(self.dummyMethodToBench)
-            isinstance(res, float)
+            self.assert_(isinstance(res, float))
         except ImportError:
             pass
 
