@@ -148,7 +148,7 @@ def pystoneit(function, *args, **kw):
         raise Exception("The pystone module is not available. "
                         "Check your Zope instance test module.")
     start_time = time()
-    LOG('pystoneit', DEBUG, "function = %s" % str(function))
+    #LOG('pystoneit', TRACE, "function = %s" % str(function))
     try:
         function(*args, **kw)
     finally:
