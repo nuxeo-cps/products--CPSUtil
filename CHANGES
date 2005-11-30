@@ -4,12 +4,11 @@ Requires:
 New features:
 ~~~~~~~~~~~~~
 - Added timer.Timer for basic profiling
-- Added more semantic allowed markup in the HTMLSanitizer.
 - Added a pystone measurement method.
 - Added the "isUserAgentGecko" method.
 Bug fixes:
 ~~~~~~~~~~
--
+- Added more semantic allowed markup in the HTMLSanitizer.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -
