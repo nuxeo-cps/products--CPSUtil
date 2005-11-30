@@ -3,6 +3,7 @@
 # Authors:
 # Benoit Delbosc <ben@nuxeo.com>
 # Tarek Ziadé <tz@nuxeo.com>
+# M.-A. Darche <madarche@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -24,6 +25,7 @@
 
 import sys
 from time import time
+from AccessControl import ModuleSecurityInfo
 
 try:
     from zLOG import LOG, DEBUG
@@ -100,18 +102,20 @@ TOLERANCE = 0.5*kPS
 
 try:
     from test import pystone
-    local_stones = pystone.pystones()
+    local_pystones = pystone.pystones()
 except ImportError:
-    local_stones = None
+    local_pystones = None
 
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.timer').declarePublic('pystoneit')
 def pystoneit(function, *args, **kw):
     """Measure an absolute time based on pystone measurement.
 
     This can be used to bench some code and get a absolute scoring.
 
     Example of usage:
-    >>> import timing
-    >>> timing.local_stones
+    >>> from Products.CPSUtil import timer
+    >>> timer.local_pystones
     (1.23, 40650.406504065038)
     >>> def o():
     ...     a = ''
@@ -121,16 +125,16 @@ def pystoneit(function, *args, **kw):
     ...
     >>> o()
     '3333333333'
-    >>> timing.pystoneit(o)
+    >>> timer.pystoneit(o)
     2171.3598996304308
 
     The result can be used in unit test to make assertions
     and prevent performance regressions:
 
-    >>> if timing.pystoneit(o) > 3*timing.kPS:
+    >>> if timer.pystoneit(o) > 3*timer.kPS:
     ...   raise AssertionError('too slow !')
     ...
-    >>> if timing.pystoneit(o) > 2*timing.kPS:
+    >>> if timer.pystoneit(o) > 2*timer.kPS:
     ...   raise AssertionError('too slow !')
     ...
     Traceback (most recent call last):
@@ -140,17 +144,17 @@ def pystoneit(function, *args, **kw):
     Raising an assertion error in Unit tests
     leads to a regular test failure (F)
     """
-    if not local_stones:
+    if not local_pystones:
         raise Exception("The pystone module is not available. "
                         "Check your Zope instance test module.")
-    start_time = time.time()
+    start_time = time()
     try:
         function(*args, **kw)
     finally:
-        total_time = time.time() - start_time
+        total_time = time() - start_time
         if total_time == 0:
             pystone_total_time = 0
         else:
-            pystone_rate = local_stones[0] / local_stones[1]
+            pystone_rate = local_pystones[0] / local_pystones[1]
             pystone_total_time = total_time / pystone_rate
     return pystone_total_time
