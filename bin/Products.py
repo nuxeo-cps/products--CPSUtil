@@ -69,25 +69,29 @@ __path__ = [
     join(INSTANCE_HOME, 'Products'),
     ]
 
+# We will need the standard Zope modules to be able to import Products
+zope_lib = join(SOFTWARE_HOME, 'lib', 'python')
+if zope_lib not in sys.path:
+    sys.path.insert(0, join(SOFTWARE_HOME, 'lib', 'python'))
+
+
 # Initially: no products loaded
 __all__ = []
 
 # Fake __ac_permissions
 __ac_permissions__ = ()
 
-# We will need the standard Zope modules to be able to import Products
-sys.path.insert(0, join(SOFTWARE_HOME, 'lib', 'python'))
 g = globals()
 
 clean_sys_path = False
 
 for products_dir in __path__:
-    for product_id in os.listdir(products_dir):
-        if products_dir not in sys.path:
-            # temporary adding this dir to the sys.path
-            sys.path.insert(0, products_dir)
-            clean_sys_path = products_dir
+    if products_dir not in sys.path:
+        # temporary adding this dir to the sys.path
+        sys.path.insert(0, products_dir)
+        clean_sys_path = products_dir
 
+    for product_id in os.listdir(products_dir):
         product_path = join(products_dir, product_id)
         if os.path.exists(join(product_path, '__init__.py')):
             if VERBOSE:
@@ -96,10 +100,10 @@ for products_dir in __path__:
             g[product_id] = product
             __all__.append(product)
 
-        if clean_sys_path:
-            # cleaning the sys.path
-            sys.path.remove(clean_sys_path)
-            clean_sys_path = False
+    if clean_sys_path:
+        # cleaning the sys.path
+        sys.path.remove(clean_sys_path)
+        clean_sys_path = False
 
 
 
