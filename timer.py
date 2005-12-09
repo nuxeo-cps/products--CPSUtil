@@ -100,11 +100,21 @@ class Timer:
 kPS = 1000
 TOLERANCE = 0.5*kPS
 
+sys_path = sys.path[:]
 try:
-    from test import pystone
-    local_pystones = pystone.pystones()
-except ImportError:
-    local_pystones = None
+    # Avoid importing from the test.py in ZOPE_HOME
+    import os.path
+    zope_home = os.path.abspath(ZOPE_HOME)
+    if zope_home in sys.path:
+        sys.path.remove(zope_home)
+    try:
+        from test import pystone
+        local_pystones = pystone.pystones()
+    except ImportError:
+        local_pystones = None
+finally:
+    sys.path[:] = sys_path
+
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.timer').declarePublic('pystoneit')
