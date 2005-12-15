@@ -28,3 +28,8 @@ import text
 import html
 
 registerDirectory('skins', globals())
+
+# for eggification
+def initialize(self):
+    return "done"
+
