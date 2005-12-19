@@ -51,6 +51,8 @@ class PersistableFileUpload(FileUpload):
     def close(self):
         return self.file.close()
     # also: 'fileno', 'flush', 'isatty', 'truncate', 'write', 'writelines'
+    def __repr__(self):
+        return '<PersistableFileUpload %r at 0x%x>' % (self.filename, id(self))
 
 def persistentFixup(ob):
     """Make sure an object is persistable in a session
@@ -151,7 +153,7 @@ def makeFileUploadFromOFSFile(ofsfile, filename=None):
         return None
     io = OFSFileIO(ofsfile)
     if filename is None:
-        filename = ofsfile.title
+        filename = ofsfile.getId()
     headers = {'content-type': ofsfile.content_type}
     fs = SimpleFieldStorage(io, filename, headers)
     return FileUpload(fs)
