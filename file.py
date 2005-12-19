@@ -154,3 +154,4 @@ def makeFileUploadFromOFSFile(ofsfile, filename=None):
         filename = ofsfile.title
     headers = {'content-type': ofsfile.content_type}
     fs = SimpleFieldStorage(io, filename, headers)
+    return FileUpload(fs)
