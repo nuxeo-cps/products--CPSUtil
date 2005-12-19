@@ -147,6 +147,8 @@ def readPdata(pdata, pos, n=-1):
 def makeFileUploadFromOFSFile(ofsfile, filename=None):
     """Make a file upload from an OFS.File object.
     """
+    if ofsfile is None:
+        return None
     io = OFSFileIO(ofsfile)
     if filename is None:
         filename = ofsfile.title
