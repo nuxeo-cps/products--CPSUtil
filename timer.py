@@ -29,8 +29,9 @@ from time import time
 from AccessControl import ModuleSecurityInfo
 
 # XXX temporary fix toward zope.testrunner bug on Zope-2.9.x
-zhome = os.environ.get('ZOPE_HOME')
-sys.path.remove(zhome+'/bin')
+path2remove = os.path.join(os.environ.get('ZOPE_HOME'), 'bin')
+if path2remove in sys.path:
+    sys.path.remove(path2remove)
 
 try:
     from zLOG import LOG, DEBUG
