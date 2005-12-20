@@ -23,9 +23,14 @@
 """Timers and benching utilities.
 """
 
+import os
 import sys
 from time import time
 from AccessControl import ModuleSecurityInfo
+
+# XXX temporary fix toward zope.testrunner bug on Zope-2.9.x
+zhome = os.environ.get('ZOPE_HOME')
+sys.path.remove(zhome+'/bin')
 
 try:
     from zLOG import LOG, DEBUG
