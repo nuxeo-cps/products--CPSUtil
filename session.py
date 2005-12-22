@@ -19,6 +19,7 @@
 """Session utilities.
 """
 
+from AccessControl import ModuleSecurityInfo
 from Acquisition import aq_parent
 from Products.Transience.Transience import TransientObjectContainer
 from Products.Transience.Transience import getCurrentTimeslice
@@ -26,6 +27,7 @@ from Products.Transience.Transience import getCurrentTimeslice
 SESSION = 'SESSION'
 
 
+ModuleSecurityInfo('Products.CPSUtil.session').declarePublic('sessionHasKey')
 def sessionHasKey(request, key):
     """Check if the request's session has a given key
 

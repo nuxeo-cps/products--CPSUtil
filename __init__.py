@@ -26,6 +26,7 @@ import id
 import integration
 import text
 import html
+import session
 
 registerDirectory('skins', globals())
 
