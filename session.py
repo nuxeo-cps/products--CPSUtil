@@ -27,7 +27,22 @@ from Products.Transience.Transience import getCurrentTimeslice
 SESSION = 'SESSION'
 
 
-ModuleSecurityInfo('Products.CPSUtil.session').declarePublic('sessionHasKey')
+_marker = object()
+
+ModuleSecurityInfo('Products.CPSUtil.session').declarePublic('sessionGet')
+def sessionGet(request, key, default=_marker):
+    """Get a key from the session.
+
+    Returns the default if it's not found.
+
+    Tries to avoid creating the session unnecessarily.
+    """
+    if sessionHasKey(request, key):
+        return request[SESSION][key]
+    if default is not _marker:
+        return default
+    raise KeyError("Session doesn't have %r" % (key,))
+
 def sessionHasKey(request, key):
     """Check if the request's session has a given key
 
