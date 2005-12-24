@@ -21,15 +21,16 @@
 Provide the opportunity to react after a ZMI properties change.
 """
 
-from ExtensionClass import Base
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.permissions import ManageProperties
 from Products.CMFCore.Expression import Expression
 
+from Products.GenericSetup.utils import PropertyManagerHelpers
 
-class PropertiesPostProcessor(Base):
+
+class PropertiesPostProcessor(object):
     """
     Provide the opportunity to react after a ZMI properties change.
 
@@ -96,3 +97,13 @@ class PropertiesPostProcessor(Base):
             setattr(self, attr, v)
 
 InitializeClass(PropertiesPostProcessor)
+
+
+class PostProcessingPropertyManagerHelpers(PropertyManagerHelpers):
+    """PropertyManagerHelpers that post-processes properties
+    """
+    def _initProperties(self, node):
+        super(PostProcessingPropertyManagerHelpers, self)._initProperties(node)
+        ob = self.context
+        if isinstance(ob, PropertiesPostProcessor):
+            ob._postProcessProperties()
