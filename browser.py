@@ -33,8 +33,12 @@ class BaseAddView(AddWithPresettingsViewBase):
     """
 
     _dir_name = None # to be overridden
-
     description = u"No description." # to be overridden
+
+    _id_attr = 'name'
+
+    def _getFileName(self, file_id):
+        return self._dir_name + '/' + file_id
 
     def getProfileInfos(self):
         stool = getToolByName(self, _SETUP_TOOL_NAME, None)
@@ -47,12 +51,12 @@ class BaseAddView(AddWithPresettingsViewBase):
             context = stool._getImportContext(info['id'])
             file_ids = context.listDirectory(self._dir_name)
             for file_id in file_ids or ():
-                filename = self._dir_name + '/' + file_id
+                filename = self._getFileName(file_id)
                 body = context.readDataFile(filename)
                 if body is None:
                     continue
                 root = parseString(body).documentElement
-                obj_id = root.getAttribute('name')
+                obj_id = root.getAttribute(self._id_attr)
                 if not obj_id:
                     obj_id = root.getAttribute('id')
                 if root.getAttribute('meta_type') != self.klass.meta_type:
@@ -74,15 +78,13 @@ class BaseAddView(AddWithPresettingsViewBase):
         context = stool._getImportContext(profile_id)
         file_ids = context.listDirectory(self._dir_name)
         for file_id in file_ids or ():
-            filename = self._dir_name + '/' + file_id
+            filename = self._getFileName(file_id)
             body = context.readDataFile(filename)
             if body is None:
                 continue
 
             root = parseString(body).documentElement
-            new_id = root.getAttribute('name')
-            if not new_id:
-                new_id = root.getAttribute('id')
+            new_id = root.getAttribute(self._id_attr)
             if new_id != obj_path[0]:
                 continue
 
