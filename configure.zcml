@@ -1,0 +1,23 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five">
+
+  <!-- GenericSetup adapters -->
+
+  <adapter
+      factory=".cachemanagersetup.RAMCacheManagerXMLAdapter"
+      provides="Products.GenericSetup.interfaces.IBody"
+      for=".interfaces.IRAMCacheManager
+           Products.GenericSetup.interfaces.ISetupEnviron"
+      />
+
+  <!-- Interfaces implemented by standard Zope components -->
+
+  <five:implements
+      class="Products.StandardCacheManagers.RAMCacheManager.RAMCacheManager"
+      interface="Products.CPSUtil.interfaces.IRAMCacheManager"
+      />
+
+</configure>
+
+

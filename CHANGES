@@ -4,6 +4,8 @@ Requires:
 New features:
 ~~~~~~~~~~~~~
 - added 'scriptaculous' skin, that contains scriptaculous and prototype scripts
+- added I/O support for Cacheable and RAMCacheManager instances in
+  cachemanagersetup.py
 Bug fixes:
 ~~~~~~~~~~
 - Fixed pystoneit and added unit tests for it.
