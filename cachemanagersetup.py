@@ -41,9 +41,9 @@ class CacheableHelpers:
         ob = self.context
         if not isCacheable(ob):
             return
-        manager_id = ob.ZCacheable_getManagerId()
+        name = str(ob.ZCacheable_getManagerId())
         node = self._doc.createElement('cache-manager')
-        node.setAttribute('id', str(manager_id))
+        node.setAttribute('name', name)
         return node
 
     def _initCacheableManagerAssociation(self, node):
@@ -51,23 +51,20 @@ class CacheableHelpers:
         if not isCacheable(ob):
             return
 
-        do_set_manager_id = False
         for child in node.childNodes:
             if child.nodeName != 'cache-manager':
                 continue
-            do_set_manager_id = True
-            new_manager_id = child.getAttribute('id')
-
-        if do_set_manager_id:
-            if not new_manager_id or new_manager_id == 'None':
-                new_manager_id = None
+            name = child.getAttribute('name')
+            if not name or name == 'None':
+                name = None
             ob.ZCacheable_invalidate()
-            ob.ZCacheable_setManagerId(new_manager_id)
+            ob.ZCacheable_setManagerId(name)
+            break
 
 class RAMCacheManagerXMLAdapter(XMLAdapterBase, PropertyManagerHelpers):
     """XML importer and exporter for RAMCacheManager instances
 
-    RAMCacheManagers are not PropertyManagers so that we cannot directly reuse
+    RAMCacheManagers are not PropertyManagers so we cannot directly reuse
     PropertyManagerHelpers methods.
     """
 
@@ -105,7 +102,9 @@ class RAMCacheManagerXMLAdapter(XMLAdapterBase, PropertyManagerHelpers):
         fragment.appendChild(node)
 
         # export settings
-        for setting_id, setting_value in self.context._settings.items():
+        items = self.context._settings.items()
+        items.sort()
+        for setting_id, setting_value in items:
             node = self._doc.createElement('property')
             node.setAttribute('name', setting_id)
 

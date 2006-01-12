@@ -15,7 +15,7 @@
 
   <five:implements
       class="Products.StandardCacheManagers.RAMCacheManager.RAMCacheManager"
-      interface="Products.CPSUtil.interfaces.IRAMCacheManager"
+      interface=".interfaces.IRAMCacheManager"
       />
 
 </configure>
