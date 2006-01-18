@@ -114,6 +114,12 @@ class Test(unittest.TestCase):
             self.assertEquals(res1, res2, "Results differ for string '%s'" % s)
 
 
+    def testGenerateIdEmpty(self):
+        # These are random, so they should differ.
+        res1 = generateId('', container=None)
+        res2 = generateId('', container=None)
+        self.assertNotEquals(res1, res2)
+
     def testSomeExamples(self):
         mapping = {
             'Le ciel est bleu': 'Le-ciel-est-bleu',

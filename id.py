@@ -90,6 +90,10 @@ def generateId(s, max_chars=24, lower=True, word_separator='-',
     # CPSForum/skins/forum_default/forum_create.py
     # CPSWebMail/Attachment.py
 
+    if not s:
+        # Generate a random id
+        s = ''.join([random.choice(string.letters) for i in range(8)])
+
     id = toAscii(s)
     if lower:
         id = id.lower()
