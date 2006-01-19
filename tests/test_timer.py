@@ -37,6 +37,11 @@ class Test(unittest.TestCase):
         #print t
         t.log()
 
+    def test_zero_division_safeness(self):
+        foo_timer = Timer('foo')
+        foo_timer.t = [(1.0, 'fake_mark') , (1.0, 'fake_mark')]
+        foo_timer.__repr__()
+
 
     def test_pystoneit(self):
         try:

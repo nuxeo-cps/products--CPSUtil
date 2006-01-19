@@ -88,7 +88,12 @@ class Timer:
         while t:
             y = t.pop(0)
             dt = y[0]-x[0]
-            text.append('%30s %6.3fs %6.2f%%' % (y[1], dt, 100.0*dt/total ))
+            if total:
+                text.append('%30s %6.3fs %6.2f%%' % (y[1], dt, 100.0*dt/total))
+            else:
+                # on windows, some users experimented total == 0 which reiggers
+                # ZeroDivisionErrors: http://svn.nuxeo.org/trac/pub/ticket/1273
+                text.append('%30s %6.3fs  undef ' % (y[1], dt))
             x = y
         text.append(deco.replace('=', '-'))
         text.append('%30s %6.3fs' % ('Total time', total))
