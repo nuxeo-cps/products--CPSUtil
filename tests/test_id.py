@@ -20,7 +20,20 @@
 #
 # $Id$
 import unittest
+
+from OFS.Folder import Folder
+from Acquisition import aq_inner, aq_parent
+
 from Products.CPSUtil.id import generatePassword, generateId, generateFileName
+
+class FakeUrlTool(Folder):
+
+    def __init__(self):
+        Folder.__init__(self, 'portal_url')
+
+    def getPortalObject(self):
+        return self.aq_inner.aq_parent
+
 
 class Test(unittest.TestCase):
 
@@ -112,6 +125,29 @@ class Test(unittest.TestCase):
             res1 = generateId(s, container=None)
             res2 = generateId(s, container=None)
             self.assertEquals(res1, res2, "Results differ for string '%s'" % s)
+
+
+    def testGenerateIdUnicity(self):
+        # unicity is tested under a context
+        portal = Folder('portal')
+        portal._setObject('portal_url', FakeUrlTool())
+        portal._setObject('index_html', Folder('index_html'))
+        portal._setObject('folder', Folder('folder'))
+        folder = portal.folder
+
+        # acceptable id
+        res1 = generateId('content', container=folder)
+        folder._setObject(res1, Folder(res1))
+        res2 = generateId('content', container=folder)
+        self.assertNotEquals(res1, res2, "id generated already exists: " + res1)
+
+        # special ids
+        # index_html is accepted
+        self.assertEquals(generateId('index_html', container=folder),
+                          'index_html')
+        # portal_url is not accepted (prevent acquisition related problems)
+        self.assertNotEquals(generateId('portal_url', container=folder),
+                             'portal_url')
 
 
     def testGenerateIdEmpty(self):
