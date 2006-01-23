@@ -3,18 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- added 'scriptaculous' skin, that contains scriptaculous and prototype scripts
-- added I/O support for Cacheable and RAMCacheManager instances in
-  cachemanagersetup.py
-- helpers for GenericSetup in genericsetup.py
+-
 Bug fixes:
 ~~~~~~~~~~
-- Fixed pystoneit and added unit tests for it.
-- Work with Zope 2.9 where a spurious test.py in ZOPE_HOME may prevent
-  from test import pystone
-- #1273: fixed ZeroDivisionError in Timer.__repr__
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- added new fake Products module to help your python dev tools feel at home when
-  running on zope-oriented source code
-- added an installer
+-
