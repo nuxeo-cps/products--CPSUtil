@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Adding generic test case for exports/imports based on GenericSetup tests.
 Bug fixes:
 ~~~~~~~~~~
 -
