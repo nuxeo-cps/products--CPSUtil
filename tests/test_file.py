@@ -20,15 +20,13 @@
 import unittest
 
 import rfc822
-from cStringIO import StringIO
-from cgi import FieldStorage
-from ZPublisher.HTTPRequest import FileUpload
 import cPickle
-from OFS.Image import Pdata
+from cStringIO import StringIO
 
 from Products.CPSUtil.file import readPdata
 from Products.CPSUtil.file import OFSFileIO
 from Products.CPSUtil.file import persistentFixup
+from Products.CPSUtil.file import makeFileUploadFromOFSFile
 
 
 class FakeOFSFile(object):
@@ -65,6 +63,7 @@ class FileTest(unittest.TestCase):
         ]
 
     def makePdata(self):
+        from OFS.Image import Pdata
         pdata = Pdata('abcdef')
         p2 = Pdata('ghijkl')
         p3 = Pdata('mnopqr')
@@ -125,6 +124,9 @@ class FileTest(unittest.TestCase):
 class PersistentFixupTest(unittest.TestCase):
 
     def test_persistentFixup(self):
+        from cgi import FieldStorage
+        from ZPublisher.HTTPRequest import FileUpload
+
         ds = {}
         somelist = [4, 5]
         somedict = {1: 2, 3: somelist}
@@ -150,10 +152,34 @@ class PersistentFixupTest(unittest.TestCase):
         # Now picklable
         pickler.dump(ds)
 
+class FileUploadTests(unittest.TestCase):
+
+    def test_makeFileUploadFromOFSFile(self):
+        from OFS.Image import File
+
+        fu = makeFileUploadFromOFSFile(None)
+        self.assertEquals(fu, None)
+
+        f = File('fid', 'ftitle', 'fcontent')
+        f.content_type = 'x-test/cps'
+        fu = makeFileUploadFromOFSFile(f)
+        self.assertEquals(fu.filename, 'ftitle')
+        self.assertEquals(fu.headers['content-type'], 'x-test/cps')
+        self.assertEquals(fu.read(), 'fcontent')
+        self.assertEquals(fu.tell(), len('fcontent'))
+        self.assertEquals(fu.read(), '')
+        fu.seek(0)
+        self.assertEquals(fu.tell(), 0)
+        self.assertEquals(fu.read(), 'fcontent')
+        fu.seek(0, 2)
+        self.assertEquals(fu.tell(), len('fcontent'))
+
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(FileTest))
     suite.addTest(unittest.makeSuite(PersistentFixupTest))
+    suite.addTest(unittest.makeSuite(FileUploadTests))
     return suite
 
 if __name__ == '__main__':
