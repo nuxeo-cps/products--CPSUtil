@@ -1,4 +1,20 @@
 *******************************************
+** CPSUtil V0.10.1 [R1 build 2006/02/17-20:28 by fermigier]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 32986
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Adding generic test case for exports/imports based on GenericSetup tests.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.10.0 [R1 build 2006/01/23-17:12 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 31955
 Requires:
