@@ -1,0 +1,58 @@
+#!/usr/bin/python
+#
+# $Id$
+"""A script to use in /etc/init.d/ to start and stop the multiple Zope instances
+(simple and ZEO instances alike) that might be hosted on a server.
+
+Steps to have this script functional:
+
+- Be sure that "effective-user zope" is present in etc/zope.conf of each
+  instance.
+
+- Copy this script in /etc/init.d/
+
+- Register this script in the various runlevels of the server.
+
+  Usually Zope instances should be started from runlevel 2 to 5 and stopped in
+  levels 0, 1 and 6.
+
+  On a Debian server the registration should be done with the following
+  command (the 92 number is the order number to start the instances after the
+  Apache httpd service):
+  
+  update-rc.d -f zope start 92 2 3 4 5 . stop 92 0 1 6 .
+
+  On a RedHat or Fedora server the registration should be done with the
+  following command:
+
+  TODO
+
+"""
+
+import sys, os
+
+INSTANCES = [
+    '/usr/local/zope/instance/mysite.net',
+    '/usr/local/zope/instance/myothersite.net',
+    '/usr/local/zope/instance/myothersite.com',
+    '/usr/local/zope/instance/myothersite.org',
+]
+
+
+if len(sys.argv) > 1:
+    arg = sys.argv[1]
+else:
+    arg = ''
+
+if not arg in ('start', 'stop', 'restart', 'status'):
+    print "Usage: /etc/init.d/zope {start|stop|restart|status}"
+    sys.exit(1)
+
+for instance in INSTANCES:
+    print instance, ":"
+    for cmd in ('zopectl', 'zeoctl'):
+        full_cmd = "%s/bin/%s" % (instance, cmd)
+        if os.path.exists(full_cmd):
+            break
+    os.system("%s %s" % (full_cmd, arg))
+
