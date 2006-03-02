@@ -19,7 +19,7 @@ Steps to have this script functional:
 - Be sure that "effective-user zope" is present in etc/zope.conf of each
   instance.
 
-- Copy this script in /etc/init.d/
+- Copy this script into /etc/init.d/
 
 - Register this script in the various runlevels of the server.
 
@@ -32,7 +32,7 @@ Steps to have this script functional:
   On a Debian server the registration should be done with the following
   command:
   
-  update-rc.d -f zope start 92 2 3 4 5 . stop 92 0 1 6 .
+  update-rc.d -f zopes start 92 2 3 4 5 . stop 92 0 1 6 .
 
   The 92 number is the order number to start the instances after the Apache
   httpd service.
@@ -43,7 +43,7 @@ Steps to have this script functional:
   On a RedHat or Fedora server the registration should be done with the
   following command:
 
-  chkconfig --add zope
+  chkconfig --add zopes
 
   This command line can only work if chkconfig and description comment lines are
   present at the beginning of the script:
@@ -51,17 +51,17 @@ Steps to have this script functional:
   #chkconfig: 2345 80 01
   #description: Zope servers
 
-  Those lines denote that script will start for runlevels 2, 3, 4 and 5. Start
-  priority will be set to 80 and stop priority will be 01.
+  Those lines denote that the script will start from runlevels 2 to 5.
+  Start priority will be set to 80 and stop priority will be 01.
 
-  To see info about our service:
-  $ chkconfig --list zope
-  zope         0:off   1:off   2:on    3:on    4:on    5:on    6:off
+  To see info about this service:
+  $ chkconfig --list zopes
+  zopes         0:off   1:off   2:on    3:on    4:on    5:on    6:off
 
   One can manually switch on/off service to/from runlevel with --levels on/off
-  $ chkconfig --level 2 zope off
-  $ chkconfig --list zope
-  zope         0:off   1:off   2:off   3:on    4:on    5:on    6:off
+  $ chkconfig --level 2 zopes off
+  $ chkconfig --list zopes
+  zopes         0:off   1:off   2:off   3:on    4:on    5:on    6:off
 """
 
 import sys, os
@@ -80,7 +80,7 @@ else:
     arg = ''
 
 if not arg in ('start', 'stop', 'restart', 'status'):
-    print "Usage: /etc/init.d/zope {start|stop|restart|status}"
+    print "Usage: /etc/init.d/zopes {start|stop|restart|status}"
     sys.exit(1)
 
 for instance in INSTANCES:
