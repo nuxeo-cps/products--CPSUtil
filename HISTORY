@@ -1,4 +1,22 @@
 *******************************************
+** CPSUtil V0.11.0 [R1 build 2006/03/03-17:31 by ben]
+** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 33855
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added bin/zopes a script to use in /etc/init.d/ to start and stop the multiple
+  Zope instances (simple and ZEO instances alike) that might be hosted on a
+  server.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.10.1 [R1 build 2006/02/17-20:28 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPSUtil/trunk Revision: 32986
 Requires:

@@ -3,9 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added bin/zopes a script to use in /etc/init.d/ to start and stop the multiple
-  Zope instances (simple and ZEO instances alike) that might be hosted on a
-  server.
+-
 Bug fixes:
 ~~~~~~~~~~
 -
