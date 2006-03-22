@@ -1,6 +1,7 @@
 # (C) Copyright 2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # - Anahide Tchertchian <at@nuxeo.com>
+# - Georges Racinet <gracinet@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -25,13 +26,22 @@ import unittest
 from difflib import ndiff
 from tarfile import TarFile
 from StringIO import StringIO
+
+from xml.dom.minidom import parseString
+
 from Testing import ZopeTestCase
+from Products.GenericSetup.testing import DummySetupEnviron
+from Products.GenericSetup.testing import DummyLogger
+
+from zope.app import zapi
 from Products.Five import zcml
 from Products.GenericSetup import BASE
 from Products.GenericSetup import profile_registry
 from Products.CPSCore.setuptool import CPSSetupTool
 
 import Products
+
+from Products.GenericSetup.interfaces import IBody
 
 # XXX AT: do not use the TarballTester from GenericSetup to avoid taking care
 # of blank lines and to get better error messages
@@ -123,4 +133,66 @@ class ExportImportTestCase(ZopeTestCase.ZopeTestCase, TarballTester):
             data = self._getFileData(dir_path, entry_name)
             self._checkTarballItemData(fileish, entry_name, data)
 
+#
+# adapters unit tests
+#
 
+#monkey patching because most of CPS' XML adapters use it for custom log level
+#should end up in GenericSetup.testing at some point
+
+def dummylog(self, level, msg, *args, **kwargs):
+    self._messages.append((level, self._id, msg))
+DummyLogger.log = dummylog
+
+class TestXMLAdapter(unittest.TestCase):
+    """A base class to test XML adapters to IBody.
+
+    Subclasses need to initiate the ZCML configuration. This can be done by
+    using a layer like CPSZCMLLayer (from CPSDefault.tests.CPSTestCase) or
+    by subclassing the zcmlSetUp method.
+
+    The object being adapted is returned by the buildObject method. It can
+    afterwards been accessed as the 'object' attribute.
+    """
+
+    target_interface = IBody
+
+    def zcmlSetUp(self):
+        """Optional setup step to load zcml configuration.
+
+        Can be implemented by subclasses."""
+        pass
+
+    def setUp(self):
+
+        self.zcmlSetUp()
+        self.object = self.buildObject()
+        self.environ = DummySetupEnviron()
+
+        self.adapted = zapi.getMultiAdapter((self.object, self.environ),
+                                            self.target_interface)
+
+    def buildObject(self):
+        """Build the object we are working on.
+
+        To be implemented by subclasses."""
+
+        raise NotImplementedError
+
+    def setPurge(self, should_purge):
+        """Set purge mode according to boolean argument."""
+        self.environ._should_purge = should_purge
+
+    def importString(self, xml):
+        """Make the adapter import the given xml string.
+
+        You can use it like this:
+        self.importString('<?xml version="1.0"?>'
+                           ' <object name="the_schema">'
+                           '  <field name="the_field"'
+                           '         meta_type="CPS Int Field"/>'
+                           ' </object>')
+        """
+        root = parseString(xml).documentElement
+        # launch the import: node is a new style class property
+        self.adapted.node = root
