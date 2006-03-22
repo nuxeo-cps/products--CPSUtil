@@ -194,5 +194,4 @@ class TestXMLAdapter(unittest.TestCase):
                            ' </object>')
         """
         root = parseString(xml).documentElement
-        # launch the import: node is a new style class property
-        self.adapted.node = root
+        self.adapted._importNode(root)
