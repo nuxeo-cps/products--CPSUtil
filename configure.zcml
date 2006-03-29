@@ -1,5 +1,6 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:five="http://namespaces.zope.org/five">
 
   <!-- GenericSetup adapters -->
@@ -17,6 +18,29 @@
       class="Products.StandardCacheManagers.RAMCacheManager.RAMCacheManager"
       interface=".interfaces.IRAMCacheManager"
       />
+
+  <!-- XML export as ZMI tab -->
+
+  <browser:page
+      for="zope.app.interface.Interface"
+      name="manage_export"
+      class=".browser.manageexportview.ManageExportView"
+      template="browser/manageExport.zpt"
+      permission="zope2.ViewManagementScreens"/>
+
+  <browser:page
+        for="zope.app.interface.Interface"
+	name="manage_export.xml"
+	class=".browser.manageexportview.ManageExportView"
+	attribute="exportXml"
+	permission="zope2.ViewManagementScreens"/>
+
+  <browser:page
+        for="zope.app.interface.Interface"
+	name="manage_export_python"
+	class=".browser.manageexportview.ManageExportView"
+	attribute="exportPy"
+	permission="zope2.ViewManagementScreens"/>
 
 </configure>
 
