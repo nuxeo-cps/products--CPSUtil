@@ -47,7 +47,7 @@ class ManageExportView(BrowserView):
         return self.getXml()
 
     def hasPythonExport(self):
-        return callable(getattr(aq_base(self.context), 'manage_export'))
+        return callable(getattr(aq_base(self.context), 'manage_export', None))
 
     def exportPy(self):
         # We should change the request slightly but who cares?
