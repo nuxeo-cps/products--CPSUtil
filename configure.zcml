@@ -23,21 +23,21 @@
 
   <browser:page
       for="zope.app.interface.Interface"
-      name="manage_export"
+      name="manage_genericSetupExport.html"
       class=".browser.manageexportview.ManageExportView"
       template="browser/manageExport.zpt"
       permission="zope2.ViewManagementScreens"/>
 
   <browser:page
         for="zope.app.interface.Interface"
-	name="manage_export.xml"
+	name="manage_genericSetupExport.xml"
 	class=".browser.manageexportview.ManageExportView"
 	attribute="exportXml"
 	permission="zope2.ViewManagementScreens"/>
 
   <browser:page
         for="zope.app.interface.Interface"
-	name="manage_export_python"
+	name="manage_cpsInstallerExport.html"
 	class=".browser.manageexportview.ManageExportView"
 	attribute="exportPy"
 	permission="zope2.ViewManagementScreens"/>
