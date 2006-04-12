@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- Added the needed script and configuration file for zope instance rotation.
 Bug fixes:
 ~~~~~~~~~~
 -
