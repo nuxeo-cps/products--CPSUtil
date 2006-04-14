@@ -3,7 +3,7 @@
 # Author:
 # M.-A. Darche <madarche@nuxeo.com>
 #
-# $Id: id.py 31771 2006-01-18 17:55:16Z fguillaume $
+# $Id$
 
 test -x /usr/sbin/logrotate || exit 0
 /usr/sbin/logrotate /usr/local/zopes/instance/cps/etc/logrotate.conf
