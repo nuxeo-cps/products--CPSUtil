@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # Julien Anguenot <ja@nuxeo.com>
 # M.-A. Darche <madarche@nuxeo.com>
@@ -29,8 +29,8 @@ This script should be used directly on the server running Zope.
 Place this script in /etc/cron.daily/, /etc/cron.weekly/, /etc/cron.monthly/
 depending on your needs.
 
-Or you can even make it call by adding an entry in /etc/crontab or through the
-"crontab -e" command. Really it is up to you.
+Or you can make it called through an entry in /etc/crontab or through the
+"crontab -e" command.
 
 Starts the cps_housekeeping.py script every night at 03h59:
 59 3 * * * /usr/local/bin/cps_housekeeping.py -rlPb > /dev/null 2>&1
@@ -40,6 +40,7 @@ import sys
 import os
 import base64
 import urllib2
+import re
 from time import strftime, gmtime
 from optparse import OptionParser
 
@@ -51,8 +52,9 @@ DEFAULT_USER_NAME = 'admin'
 DEFAULT_USER_PASSWORD = 'admin'
 DEFAULT_NOTIFICATION_FREQ = None
 DEFAULT_HISTORY_DAYS = 0
-DEFAULT_ZODB_PATH = '/var/lib/zope2.7/instance/cps/var/Data.fs'
+DEFAULT_ZODB_PATH = '/usr/local/zope/instance/cps/var/Data.fs'
 DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
+DEFAULT_ZODB_BACKUPS_KEEP_COUNT = 7
 
 ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack?days:float=%d'
 PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
@@ -60,6 +62,8 @@ PURGE_REPOSITORY_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDe
 SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
+ZODB_BACKUP_FILENAME_REGEXP = re.compile(r'\d+-\d{2}-\d{2}_\d{2}:\d{2}-.+')
+
 
 def execArgs():
     """Analyze command line arguments.
@@ -100,15 +104,6 @@ def execArgs():
                       help="Use ID for CPS instance id to use. "
                       "Defaults to %s" % DEFAULT_INSTANCE_ID)
 
-    parser.add_option('-d', '--days',
-                      action='store',
-                      dest='days',
-                      type='float',
-                      metavar='NUMBER',
-                      default=DEFAULT_HISTORY_DAYS,
-                      help="Use NUMBER for the days to keep in history. "
-                      "Defaults to %s" % DEFAULT_HISTORY_DAYS)
-
     parser.add_option('-u', '--user',
                       action='store',
                       dest='user_name',
@@ -127,7 +122,6 @@ def execArgs():
                       help="Use PASSWORD for the password to Zope. "
                       "Defaults to '%s'" % DEFAULT_USER_PASSWORD)
 
-
     parser.add_option('-r', '--purge-repository',
                       action='store_true',
                       dest='purge_repository',
@@ -140,29 +134,20 @@ def execArgs():
                       default=False,
                       help="Clean the localroles of deleted members")
 
-    parser.add_option('-s', '--send-notifications',
-                      action='store',
-                      dest='notifications',
-                      type='choice',
-                      metavar='FREQ',
-                      choices=['daily','weekly', 'monthly'],
-                      default=DEFAULT_NOTIFICATION_FREQ,
-                      help="Send email notifications of frequence FREQ of "
-                      "[daily|weekly|monthly]. Defaults to %s " %
-                      str(DEFAULT_NOTIFICATION_FREQ))
-
     parser.add_option('-P', '--pack-zodb',
                       action='store_true',
                       dest='pack_zodb',
                       default=False,
                       help="Pack the ZODB")
 
-    parser.add_option('-b', '--backup',
-                      action='store_true',
-                      dest='backup',
-                      default=False,
-                      help="Backup the ZODB that has just been packed "
-                           "using the cp command.")
+    parser.add_option('-d', '--days',
+                      action='store',
+                      dest='days',
+                      type='float',
+                      metavar='NUMBER',
+                      default=DEFAULT_HISTORY_DAYS,
+                      help="Use NUMBER for the days to keep in history. "
+                      "Defaults to %s" % DEFAULT_HISTORY_DAYS)
 
     parser.add_option('-z', '--zodbfile',
                       action='store',
@@ -173,15 +158,42 @@ def execArgs():
                       help="The FILE path to the ZODB. "
                       "The default is %s" % DEFAULT_ZODB_PATH)
 
+    parser.add_option('-b', '--backup',
+                      action='store_true',
+                      dest='backup',
+                      default=False,
+                      help="Backup the ZODB that has just been packed "
+                           "using the cp command.")
+
     parser.add_option('-k', '--backupdir',
                       action='store',
                       dest='backupdir_path',
                       type='string',
                       metavar='FILE',
                       default=DEFAULT_ZODB_BACKUP_DIR_PATH,
-                      help="The FILE path to the directory used for storing "
+                      help="The FILE path of the directory used for storing "
                       "ZODB backups. "
                       "The default is %s" % DEFAULT_ZODB_BACKUP_DIR_PATH)
+
+    parser.add_option('-B', '--keep-backups-count',
+                      action='store',
+                      dest='backups_keep_count',
+                      type='int',
+                      metavar='NUMBER',
+                      default=DEFAULT_ZODB_BACKUPS_KEEP_COUNT,
+                      help="The NUMBER of ZODB backups to keep. "
+                      "The default is %s" % DEFAULT_ZODB_BACKUPS_KEEP_COUNT)
+
+    parser.add_option('-s', '--send-notifications',
+                      action='store',
+                      dest='notifications',
+                      type='choice',
+                      metavar='FREQ',
+                      choices=['daily','weekly', 'monthly'],
+                      default=DEFAULT_NOTIFICATION_FREQ,
+                      help="Send email notifications of frequence FREQ of "
+                      "[daily|weekly|monthly]. Defaults to %s " %
+                      str(DEFAULT_NOTIFICATION_FREQ))
 
     (options, args) = parser.parse_args()
     global verbose
@@ -217,14 +229,30 @@ def execArgs():
         log("Successfully packed ZODB on host %s" % options.host_name)
 
     if options.backup:
-        backupZodb(options.zodbfile_path, options.backupdir_path)
+        backupZodb(options.zodbfile_path, options.backupdir_path,
+                   options.backups_keep_count)
+        log("Successful backup of the ZODB")
 
-def backupZodb(zodb_path, backupdir_path):
+
+def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     time_string = strftime(TIME_FORMAT, gmtime())
-    zodb_backup_path = os.path.join(backupdir_path, time_string)
+    file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
+    zodb_backup_path = os.path.join(backupdir_path, file_name)
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
     log("command = %s" % command)
     os.system(command)
+    if backups_keep_count > 0:
+        log("Removing old backups...")
+        file_names = os.listdir(backupdir_path)
+        file_names = [x for x in file_names
+                      if ZODB_BACKUP_FILENAME_REGEXP.match(x)]
+        file_names.sort()
+        file_names_to_delete = file_names[:-backups_keep_count]
+        for file_name in file_names_to_delete:
+            file_path = os.path.join(backupdir_path, file_name)
+            log("Removing = %s..." % file_name)
+            os.remove(file_path)
+
 
 def call_url(url, username, password):
     """Call urllib2.urlopen with forced HTTP Basic Auth header"""
@@ -247,11 +275,13 @@ def call_url(url, username, password):
         log('Unable to open %s, aborting' % url, True)
         sys.exit(1)
 
+
 def log(message, force=False):
     """Log the given message to stderr.
     """
     if force or verbose:
         print >> sys.stderr, message
+
 
 # Shell conversion
 if __name__ == '__main__':
