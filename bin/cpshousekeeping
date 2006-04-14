@@ -32,8 +32,8 @@ depending on your needs.
 Or you can make it called through an entry in /etc/crontab or through the
 "crontab -e" command.
 
-Starts the cps_housekeeping.py script every night at 03h59:
-59 3 * * * /usr/local/bin/cps_housekeeping.py -rlPb > /dev/null 2>&1
+Starts the cpshousekeeping script every night at 03h59:
+59 3 * * * /usr/local/bin/cpshousekeeping -rlPb > /dev/null 2>&1
 """
 
 import sys
