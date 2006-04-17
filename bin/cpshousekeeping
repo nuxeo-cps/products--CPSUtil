@@ -44,25 +44,24 @@ import re
 from time import strftime, gmtime
 from optparse import OptionParser
 
-# Default values that correspond to the values found on Debian Sarge systems
 DEFAULT_HOST_NAME = 'localhost'
-DEFAULT_HOST_PORT = 9673
+DEFAULT_HOST_PORT = 8080
 DEFAULT_INSTANCE_ID = 'cps'
 DEFAULT_USER_NAME = 'admin'
 DEFAULT_USER_PASSWORD = 'admin'
-DEFAULT_NOTIFICATION_FREQ = None
 DEFAULT_HISTORY_DAYS = 0
 DEFAULT_ZODB_PATH = '/usr/local/zope/instance/cps/var/Data.fs'
 DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
 DEFAULT_ZODB_BACKUPS_KEEP_COUNT = 7
+DEFAULT_NOTIFICATION_FREQ = None
 
 ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack?days:float=%d'
 PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
 PURGE_REPOSITORY_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
-SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
 ZODB_BACKUP_FILENAME_REGEXP = re.compile(r'\d+-\d{2}-\d{2}_\d{2}:\d{2}-.+')
+SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s"
 
 
 def execArgs():
