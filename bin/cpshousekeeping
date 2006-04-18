@@ -33,7 +33,7 @@ Or you can make it called through an entry in /etc/crontab or through the
 "crontab -e" command.
 
 Starts the cpshousekeeping script every night at 03h59:
-59 3 * * * /usr/local/bin/cpshousekeeping -vrlPb -u admin -w 'xxx' --host localhost -p 8080 -i cps -z /usr/local/zope/instance/cps/var/Data.fs > /dev/null 2>&1
+59 3 * * * /usr/local/bin/cpshousekeeping -vrlPb -u admin -w 'xxx' --host localhost -p 8080 -i cps -z /usr/local/zope/instance/cps/var/Data.fs -k /var/backups/zodb/www.mysite.net > /dev/null 2>&1
 """
 
 import sys
