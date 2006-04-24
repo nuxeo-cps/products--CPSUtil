@@ -17,8 +17,13 @@
 #
 # $Id$
 from zope.interface import Interface
+from Products.GenericSetup.interfaces import IBody, ISetupEnviron
 
 class IRAMCacheManager(Interface):
     """Standard Zope RAM Cache Manager
     """
+class IForceBodySetupEnviron(ISetupEnviron):
+    """To force body export.
 
+    Used by adapters who don't normally export bodies, just nodes
+    Example: widget XML adapter."""

@@ -27,9 +27,10 @@ from Products.Five.browser import BrowserView
 from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.context import BaseContext
 from Products.GenericSetup.interfaces import IBody, ISetupEnviron
+from Products.CPSUtil.interfaces import IForceBodySetupEnviron
 
 class SimpleContext(BaseContext):
-    implements(ISetupEnviron)
+    implements(IForceBodySetupEnviron)
 
 class ManageExportView(BrowserView):
 

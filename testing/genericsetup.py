@@ -169,7 +169,10 @@ class TestXMLAdapter(unittest.TestCase):
         self.object = self.buildObject()
         self.environ = DummySetupEnviron()
 
-        self.adapted = zapi.getMultiAdapter((self.object, self.environ),
+        self.adapted = self.adapt(self.object)
+
+    def adapt(self, obj):
+        return zapi.getMultiAdapter((obj, self.environ),
                                             self.target_interface)
 
     def buildObject(self):
