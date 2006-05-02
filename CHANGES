@@ -3,11 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added the needed script and configuration file for zope instance rotation.
-- Added a "--keep-backups-count" option to the cpshousekeeping script with a
-  default value of 7 backups to keep.
-- Moved all the web standards (XML, XHTML, HTML, CSS) testing methods from
-  CPSTestCase into CPSUtil.tests.web_conformance.
+-
 Bug fixes:
 ~~~~~~~~~~
 -

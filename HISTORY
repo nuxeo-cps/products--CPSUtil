@@ -1,4 +1,24 @@
 *******************************************
+** CPSUtil V0.13.0 [R1 build 2006/05/02-15:52 by gracinet]
+** SVN URL: http://svn/pub/CPSUtil/trunk Revision: 45163
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added the needed script and configuration file for zope instance rotation.
+- Added a "--keep-backups-count" option to the cpshousekeeping script with a
+  default value of 7 backups to keep.
+- Moved all the web standards (XML, XHTML, HTML, CSS) testing methods from
+  CPSTestCase into CPSUtil.tests.web_conformance.
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.12.0 [R1 build 2006/04/10-16:05 by gracinet]
 ** SVN URL: http://svn/pub/CPSUtil/trunk Revision: 35065
 Requires:
