@@ -28,6 +28,7 @@ import re
 import tempfile
 import popen2
 
+CSS_VALIDATOR_JAR_PATH = '/usr/local/share/java/css-validator.jar'
 
 #
 # TODO: duplication -> refactor
@@ -163,13 +164,12 @@ def isValidCss(css, css_profile='css21',
     f = os.fdopen(fd, 'wc')
     f.write(css)
     f.close()
-    css_validator_jar_path = '/usr/local/share/java/css-validator.jar'
-    if not os.access(css_validator_jar_path, os.R_OK):
+    if not os.access(CSS_VALIDATOR_JAR_PATH, os.R_OK):
         print ("isValidCSS: %s not present or not readable "
                "=> no CSS validation occured" % css_validator_jar_path)
         return is_valid, errors
     cmd = ('%s -jar %s -html -%s %s'
-           % (java_binary_path, css_validator_jar_path,
+           % (java_binary_path, CSS_VALIDATOR_JAR_PATH,
               css_profile, file_path))
     stdout, stdin, stderr = popen2.popen3(cmd)
     result = stdout.read()
@@ -186,13 +186,9 @@ def _getBinaryPath(binary_name):
     """Return the path for the given binary if it can be found and if it is
     executable.
     """
-    binary_search_path = [
-        '/usr/local/bin',
-        '/bin',
-        '/usr/bin',
-    ]
+    binary_search_path = os.environ['PATH'].split(os.pathsep)
     binary_path = None
-    mode   = os.R_OK | os.X_OK
+    mode = os.R_OK | os.X_OK
     for p in binary_search_path:
         path = os.path.join(p, binary_name)
         if os.access(path, mode):
