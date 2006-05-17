@@ -18,9 +18,29 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""A module which provides unit tests for web standards conformance.
+"""A module which provides unit test methods for web standards conformance.
 
 The tested web standards are XML, XHTML, HTML and CSS.
+
+The code in this module relies on many packages and executables present on the
+host Unix system.
+
+The XML, XHTML and HTML validation methods rely on the following packages that
+need to be installed (the package names are for a Debian-based system):
+xml-core xmllint w3c-dtd-xhtml sgml-base sgml-data
+
+Without the packages containing the different standard schemas (DTD, etc.), that
+is w3c-dtd-xhtml sgml-base sgml-data, it is not possible to use xmllint with the
+"--no-net" option since xmllint will need to fetch the schemas over the network by
+itself instead of fetching them in the local XML and SGML catalogs.
+
+The CSS validation methods rely on an installed JVM and the JAR of the
+W3C CSS validator present at this precise location:
+/usr/local/share/java/css-validator.jar
+
+A binary distribution of the W3C CSS validator (css-validator.jar) can be found
+at http://www.illumit.com/css-validator/ or build with Ant from
+http://dev.w3.org/cvsweb/2002/css-validator/
 """
 
 import os
