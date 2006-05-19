@@ -1,4 +1,20 @@
 *******************************************
+** CPSUtil V0.13.1 [R1 build 2006/05/19-12:41 by fermigier]
+** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 45740
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Hardened code for the CSS validation.
+
+*******************************************
 ** CPSUtil V0.13.0 [R1 build 2006/05/02-15:52 by gracinet]
 ** SVN URL: http://svn/pub/CPSUtil/trunk Revision: 45163
 Requires:
