@@ -1,5 +1,5 @@
 # -*- coding: ISO-8859-15 -*-
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -75,7 +75,7 @@ def winToLatin9_errors(exc):
     Europe strings (codec identifier 'cp1252').
 
     This works as an error handler (registered at import time of the present
-    module). 
+    module).
 
     An example going all the way from a Windows string
 
@@ -85,7 +85,7 @@ def winToLatin9_errors(exc):
     u'L\u2019apostrophe est jolie \u2026'
     >>> unitext.encode('iso-8859-15', 'latin9_fallback')
     "L'apostrophe est jolie ..."
-    
+
     >>> u'L\u2019apostrophe'.encode('iso-8859-15', 'latin9_fallback')
     "L'apostrophe"
 
@@ -98,9 +98,9 @@ def winToLatin9_errors(exc):
     >>> u'\u2032'.encode('iso-8859-15', 'latin9_fallback')
     '&#8242;'
 
-    
+
     xmlcharrefreplace will be called for any block of non latin9 translatables
-    chars once one in the block cannot be approximated. 
+    chars once one in the block cannot be approximated.
     >>> u'ab\u2032\u2026cd\u2014'.encode('iso-8859-15', 'latin9_fallback')
     'ab&#8242;&#8230;cd-'
 
