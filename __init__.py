@@ -1,4 +1,4 @@
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -18,10 +18,10 @@
 #
 # $Id$
 
-# Making sure that the ModuleSecurityInfo info statements of the following
-# modules are taken into account.
 from Products.CMFCore.DirectoryView import registerDirectory
 
+# Making sure that the ModuleSecurityInfo info statements of the following
+# modules are taken into account.
 import id
 import integration
 import text
