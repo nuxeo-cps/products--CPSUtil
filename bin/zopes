@@ -12,7 +12,8 @@
 #
 # $Id$
 """A script to use in /etc/init.d/ to start and stop the multiple Zope instances
-(simple and ZEO instances alike) that might be hosted on a server.
+(monolithic, ZEO client, ZEO server and ZAsync client instances alike) that might
+be hosted on a server.
 
 Steps to have this script functional:
 
@@ -97,7 +98,8 @@ if not arg in ('start', 'stop', 'restart', 'status'):
 
 for instance, affinity in INSTANCES:
     print instance, ":"
-    for cmd in ('zopectl', 'zeoctl'):
+    # use only the first ctl script out of the following
+    for cmd in ('zasyncctl', 'zopectl', 'zeoctl'):
         full_cmd = "%s/bin/%s" % (instance, cmd)
         if os.path.exists(full_cmd):
             break
