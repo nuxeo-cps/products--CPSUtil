@@ -66,11 +66,15 @@ Steps to have this script functional:
 
 import sys, os
 
+# Using affinity to optimize Zope setup on a multi-CPU box with taskset
+USE_AFFINITY = False
+
+# list of instance path to manage and CPU number (if USE_AFFINITY is True)
 INSTANCES = [
-    '/usr/local/zope/instance/mysite.net',
-    '/usr/local/zope/instance/myothersite.net',
-    '/usr/local/zope/instance/myothersite.com',
-    '/usr/local/zope/instance/myothersite.org',
+    ('/usr/local/zope/instance/mysite.net',      0),
+    ('/usr/local/zope/instance/myothersite.net', 0),
+    ('/usr/local/zope/instance/myothersite.com', 1),
+    ('/usr/local/zope/instance/myothersite.org', 1),
 ]
 
 
@@ -83,11 +87,13 @@ if not arg in ('start', 'stop', 'restart', 'status'):
     print "Usage: /etc/init.d/zopes {start|stop|restart|status}"
     sys.exit(1)
 
-for instance in INSTANCES:
+for instance, affinity in INSTANCES:
     print instance, ":"
     for cmd in ('zopectl', 'zeoctl'):
         full_cmd = "%s/bin/%s" % (instance, cmd)
         if os.path.exists(full_cmd):
             break
+    if USE_AFFINITY:
+        full_cmd = "taskset -c %d %s" % (affinity, full_cmd)
     os.system("%s %s" % (full_cmd, arg))
 
