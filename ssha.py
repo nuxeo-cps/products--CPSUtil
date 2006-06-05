@@ -47,3 +47,7 @@ def sshaDigest(passphrase, salt=None):
     crypt = '{SSHA}' + encoded
     return crypt
 
+if __name__ == "__main__":
+    import sys
+    print sshaDigest(sys.argv[1])
+

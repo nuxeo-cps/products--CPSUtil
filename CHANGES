@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- make ssha.py a commandline tool as well as a lib
 Bug fixes:
 ~~~~~~~~~~
 - Fixed misplaced comments.
