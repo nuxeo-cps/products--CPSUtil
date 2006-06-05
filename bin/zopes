@@ -31,7 +31,7 @@ Steps to have this script functional:
 
   On a Debian server the registration should be done with the following
   command:
-  
+
   update-rc.d -f zopes start 92 2 3 4 5 . stop 92 0 1 6 .
 
   The 92 number is the order number to start the instances after the Apache
