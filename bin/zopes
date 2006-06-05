@@ -21,6 +21,12 @@ Steps to have this script functional:
 
 - Copy this script into /etc/init.d/
 
+- Edit the value of the INSTANCES variable to match your instances home path
+
+- Optionally enable the CPU affinity support by setting the USE_AFFINITY
+  variable to True. You need the ``taskset`` installed on your system.
+  This is part of the ``schedutils`` package and works on 2.6+ kernels only.
+
 - Register this script in the various runlevels of the server.
 
   Usually Zope instances should be started from runlevel 2 to 5 and stopped in
@@ -30,9 +36,9 @@ Steps to have this script functional:
   ------
 
   On a Debian server the registration should be done with the following
-  command:
+  command::
 
-  update-rc.d -f zopes start 92 2 3 4 5 . stop 92 0 1 6 .
+    $ update-rc.d -f zopes start 92 2 3 4 5 . stop 92 0 1 6 .
 
   The 92 number is the order number to start the instances after the Apache
   httpd service.
@@ -41,9 +47,9 @@ Steps to have this script functional:
   ------
 
   On a RedHat or Fedora server the registration should be done with the
-  following command:
+  following command::
 
-  chkconfig --add zopes
+    $ chkconfig --add zopes
 
   This command line can only work if chkconfig and description comment lines are
   present at the beginning of the script:
@@ -54,14 +60,16 @@ Steps to have this script functional:
   Those lines denote that the script will start from runlevels 2 to 5.
   Start priority will be set to 80 and stop priority will be 01.
 
-  To see info about this service:
-  $ chkconfig --list zopes
-  zopes         0:off   1:off   2:on    3:on    4:on    5:on    6:off
+  To see info about this service::
 
-  One can manually switch on/off service to/from runlevel with --levels on/off
-  $ chkconfig --level 2 zopes off
-  $ chkconfig --list zopes
-  zopes         0:off   1:off   2:off   3:on    4:on    5:on    6:off
+    $ chkconfig --list zopes
+    zopes         0:off   1:off   2:on    3:on    4:on    5:on    6:off
+
+  One can manually switch on/off service to/from runlevel with --levels on/off::
+
+    $ chkconfig --level 2 zopes off
+    $ chkconfig --list zopes
+    zopes         0:off   1:off   2:off   3:on    4:on    5:on    6:off
 """
 
 import sys, os
