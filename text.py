@@ -28,7 +28,15 @@ ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
 def toAscii(s):
-    """Change accented and special characters by ASCII characters."""
+    """Change accented and special characters by ASCII characters.
+
+    >>> toAscii('caf\xe9')
+    'cafe'
+    >>> toAscii(u'caf\xe9-\u1234')
+    'cafe-?'
+    """
+    if isinstance(s, unicode):
+        s = s.encode('latin1', 'replace')
     s = s.translate(ACCENTED_CHARS_TRANSLATIONS)
     s = s.replace('Æ', 'AE')
     s = s.replace('æ', 'ae')
