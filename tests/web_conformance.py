@@ -186,7 +186,7 @@ def isValidCss(css, css_profile='css21',
     f.close()
     if not os.access(CSS_VALIDATOR_JAR_PATH, os.R_OK):
         print ("isValidCSS: %s not present or not readable "
-               "=> no CSS validation occured" % css_validator_jar_path)
+               "=> no CSS validation occured" % CSS_VALIDATOR_JAR_PATH)
         return is_valid, errors
     cmd = ('%s -jar %s -html -%s %s'
            % (java_binary_path, CSS_VALIDATOR_JAR_PATH,
