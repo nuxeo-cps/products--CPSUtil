@@ -20,7 +20,11 @@
 """
 
 import cgi
-from TAL.TALDefs import attrEscape
+try:
+    from zope.tal.taldefs import attrEscape
+except ImportError:
+    # BBB: before Zope 2.10
+    from TAL.TALDefs import attrEscape
 from xml.dom.minidom import Node
 
 from Products.GenericSetup.utils import _LineWrapper
