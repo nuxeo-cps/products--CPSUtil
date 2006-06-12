@@ -36,7 +36,7 @@ def toAscii(s):
     'cafe-?'
     """
     if isinstance(s, unicode):
-        s = s.encode('latin1', 'replace')
+        s = s.encode('latin9', 'replace')
     s = s.translate(ACCENTED_CHARS_TRANSLATIONS)
     s = s.replace('Æ', 'AE')
     s = s.replace('æ', 'ae')
