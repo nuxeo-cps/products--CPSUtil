@@ -34,3 +34,11 @@ registerDirectory('skins', globals())
 def initialize(self):
     return "done"
 
+# Enable XML Export tab in ZMI for a few objects by monkey patching
+
+export_option = (
+    {'label': 'Export', 'action': 'manage_genericSetupExport.html'},
+    )
+
+from Products.StandardCacheManagers.RAMCacheManager import RAMCacheManager
+RAMCacheManager.manage_options += export_option

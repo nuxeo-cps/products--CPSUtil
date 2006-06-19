@@ -7,6 +7,7 @@ New features:
 - add CPU affinity support to the bin/zopes init script
 - add zasyncctl support to the bin/zopes init script
 - Made toAscii work with unicode input.
+- ZMI XML export tag for RAM Cache Managers
 Bug fixes:
 ~~~~~~~~~~
 - Fixed misplaced comments.

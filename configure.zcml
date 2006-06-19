@@ -19,6 +19,10 @@
       interface=".interfaces.IRAMCacheManager"
       />
 
+  <five:traversable
+      class="Products.StandardCacheManagers.RAMCacheManager.RAMCacheManager"
+      />
+
   <!-- XML export as ZMI tab -->
 
   <browser:page
