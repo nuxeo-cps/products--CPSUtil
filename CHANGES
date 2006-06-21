@@ -3,14 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- make ssha.py a commandline tool as well as a lib
-- add CPU affinity support to the bin/zopes init script
-- add zasyncctl support to the bin/zopes init script
-- Made toAscii work with unicode input.
-- ZMI XML export tag for RAM Cache Managers
+-
 Bug fixes:
 ~~~~~~~~~~
-- Fixed misplaced comments.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

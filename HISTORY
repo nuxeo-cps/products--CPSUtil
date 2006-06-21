@@ -1,4 +1,24 @@
 *******************************************
+** CPSUtil V0.14.0 [R1 build 2006/06/21-17:03 by gracinet]
+** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 46689
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- make ssha.py a commandline tool as well as a lib
+- add CPU affinity support to the bin/zopes init script
+- add zasyncctl support to the bin/zopes init script
+- Made toAscii work with unicode input.
+- ZMI XML export tag for RAM Cache Managers
+Bug fixes:
+~~~~~~~~~~
+- Fixed misplaced comments.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.13.1 [R1 build 2006/05/19-12:41 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 45740
 Requires:
