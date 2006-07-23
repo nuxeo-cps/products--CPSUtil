@@ -24,11 +24,18 @@ from datetime import datetime
 from pytz import FixedOffset
 
 
+def withLocalTimezone(date):
+    """Turn a timezone-naive datetime into one with the local timezone.
+    """
+    if date.tzinfo is None:
+        if time.localtime()[8]: # DST?
+            offset = time.altzone
+        else:
+            offset = time.timezone
+        date = date.replace(tzinfo=FixedOffset(-offset/60))
+    return date
+
 def localNow():
     """Get the current datetime with the local timezone.
     """
-    if time.localtime()[8]: # DST?
-        offset = time.altzone
-    else:
-        offset = time.timezone
-    return datetime.now().replace(tzinfo=FixedOffset(-offset/60))
+    return withLocalTimezone(datetime.now())
