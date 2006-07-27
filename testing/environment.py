@@ -46,8 +46,5 @@ def isTestingEnvironment():
     """Test if we're in a test environment
     """
     config = getConfiguration()
-    if getattr(config, 'testing', False):
-        testing = True
-    else:
-        testing = False
+    testing = getattr(config, 'testing', False)
     return testing
