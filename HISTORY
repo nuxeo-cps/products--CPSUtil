@@ -1,4 +1,20 @@
 *******************************************
+** CPSUtil V0.14.1 [R1 build 2006/07/31-13:29 by fermigier]
+** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 47588
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Adding testing environment utilities
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.14.0 [R1 build 2006/06/21-17:03 by gracinet]
 ** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 46689
 Requires:
