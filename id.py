@@ -134,9 +134,9 @@ def generateId(s, max_chars=24, lower=True, word_separator='-',
         # "index_html", "sections" and "workspaces" should always be usable.
         portal = getToolByName(container, 'portal_url').getPortalObject()
         # It's needed to allow index_html for join code
-        while (hasattr(portal, id)
-               and id not in ('index_html', 'sections', 'workspaces')
-               or hasattr(container.aq_explicit, id)):
+        while ((portal.hasObject(id)
+                and id not in ('index_html', 'sections', 'workspaces'))
+               or container.hasObject(id)):
             # The id is reserved we need to compute another id
             id = _generateAnotherId(id)
 
