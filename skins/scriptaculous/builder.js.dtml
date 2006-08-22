@@ -4,7 +4,6 @@
 <dtml-call "REQUEST.RESPONSE.setHeader( 'Cache-Control', 'max-age=36000, must-revalidate' )">
 <dtml-call "REQUEST.RESPONSE.setHeader( 'Expires', expires.toZone('GMT').rfc822() )" >
 </dtml-let>
-
 // Copyright (c) 2005 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
 //
 // See scriptaculous.js for full license.
