@@ -9,4 +9,5 @@ Bug fixes:
 -
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
--
+- moving CPSSchemas.BasicWidget.renderHtmlTag in CPSUtil.html and making it
+  public

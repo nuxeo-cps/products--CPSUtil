@@ -133,3 +133,33 @@ def sanitize(html, tags_to_keep=None):
     parser.close()
     parser.cleanup()
     return ''.join(parser.result)
+
+
+ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
+def renderHtmlTag(tagname, **kw):
+    """Render an HTML tag."""
+    # The "class" key cannot be used since it is a reserved word in python, so
+    # to set the "class" attribute one has to specify the "css_class" key.
+    if kw.get('css_class'):
+        kw['class'] = kw['css_class']
+        del kw['css_class']
+    if kw.has_key('contents'):
+        contents = kw['contents']
+        del kw['contents']
+    else:
+        contents = None
+    attrs = []
+    for key, value in kw.items():
+        if value is None:
+            continue
+        if key in ('value', 'alt') or value != '':
+            attrs.append('%s=%s' % (key, quoteattr(str(value))))
+    res = '<%s %s' % (tagname, ' '.join(attrs))
+    if contents is not None:
+        res += '>%s</%s>' % (contents, tagname)
+    elif tagname in ('input', 'img', 'br', 'hr'):
+        res += ' />'
+    else:
+        res += '>'
+    return res
+
