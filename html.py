@@ -22,9 +22,8 @@
 """
 import re
 from sgmllib import SGMLParser
-from htmlentitydefs import entitydefs
+from xml.sax.saxutils import quoteattr
 
-from zLOG import LOG, INFO, DEBUG
 from AccessControl import ModuleSecurityInfo
 from Products.CMFDefault.utils import bodyfinder
 
