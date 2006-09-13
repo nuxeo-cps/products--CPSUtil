@@ -3,7 +3,7 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
--
+- added helpers for xmlrpc works
 Bug fixes:
 ~~~~~~~~~~
 -
