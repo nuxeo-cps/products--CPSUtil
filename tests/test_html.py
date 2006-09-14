@@ -1,5 +1,5 @@
 # -*- coding: ISO-8859-15 -*-
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # Tarek Ziadé <tz@nuxeo.com>
 # M.-A. Darche <madarche@nuxeo.com>
@@ -19,6 +19,7 @@
 # 02111-1307, USA.
 #
 # $Id$
+
 import unittest
 from Products.CPSUtil.html import sanitize
 
@@ -75,6 +76,10 @@ class Test(unittest.TestCase):
 
         res = sanitize('ftg<i>  yuh</i>jik')
         self.assertEquals(res, 'ftg<em>  yuh</em>jik')
+
+        res = sanitize("<p>TITRE VI : DISPOSITIONS DIVERSES.<br /> Chapitre III : Informations sur les marchés. Section 1 : Observatoire économique de l'achat public.</p>",
+                       tags_to_keep=[])
+        self.assertEquals(res, "TITRE VI : DISPOSITIONS DIVERSES. Chapitre III : Informations sur les marchés. Section 1 : Observatoire économique de l'achat public.")
 
 
 def test_suite():

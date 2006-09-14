@@ -1,4 +1,4 @@
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Tarek Ziade <tziade@nuxeo.com>
@@ -54,6 +54,10 @@ def getHtmlBody(html_content):
 
 
 # Inspired from Alex Martelli's "Python Cookbook"
+#
+# XXX MAD : This class should be based on the HTMLParser class instead and
+# should be made able to deal with valid XHTML tags such as <br/> instead of
+# being only able to deal with <br /> tags.
 class HTMLSanitizer(SGMLParser):
     """Clean up entered text to avoid dangerous tags like forms, style, etc
     """
@@ -74,12 +78,12 @@ class HTMLSanitizer(SGMLParser):
     def __init__(self, tags_to_keep=None,
                  attributes_to_keep=None, attributes_to_remove=None):
         SGMLParser.__init__(self)
-        if attributes_to_keep:
-            self.attributes_to_keep = attributes_to_keep
-        if attributes_to_remove:
-            self.attributes_to_remove = attributes_to_remove
-        if tags_to_keep:
+        if tags_to_keep is not None:
            self.tags_to_keep = tags_to_keep
+        if attributes_to_keep is not None:
+            self.attributes_to_keep = attributes_to_keep
+        if attributes_to_remove is not None:
+            self.attributes_to_remove = attributes_to_remove
         self.result = []
         self.endTagList = []
 
@@ -94,7 +98,7 @@ class HTMLSanitizer(SGMLParser):
         self.result.append('&%s%s' % (name, x))
 
     def unknown_starttag(self, tag, attrs):
-        """Remove unwanted tag, using tags_to_keep"""
+        """Remove unwanted tag, using tags_to_keep."""
         # First replacing the tag by another one if needed
         tag = self.tag_replacements.get(tag, tag)
         if tag in self.tags_to_keep:
@@ -125,9 +129,13 @@ class HTMLSanitizer(SGMLParser):
         self.result.extend(self.endTagList)
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('sanitize')
-def sanitize(html, tags_to_keep=None):
+def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
+             attributes_to_remove=None):
     """Cleans html"""
-    parser = HTMLSanitizer(tags_to_keep)
+    parser = HTMLSanitizer(tags_to_keep,
+                           attributes_to_keep,
+                           attributes_to_remove,
+                           )
     parser.feed(html)
     parser.close()
     parser.cleanup()
