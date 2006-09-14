@@ -1,4 +1,21 @@
 *******************************************
+** CPSUtil V0.14.2 [R1 build 2006/09/14-20:25 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 48978
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+- Added helpers for xmlrpc works.
+Bug fixes:
+~~~~~~~~~~
+- Made the HTMLSanitizer be able to strip HTML content from all tags.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Moving CPSSchemas.BasicWidget.renderHtmlTag in CPSUtil.html and making it
+  publica.
+
+*******************************************
 ** CPSUtil V0.14.1 [R1 build 2006/07/31-13:29 by fermigier]
 ** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 47588
 Requires:

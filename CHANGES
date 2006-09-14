@@ -3,11 +3,10 @@ Requires:
 -
 New features:
 ~~~~~~~~~~~~~
-- Added helpers for xmlrpc works.
+-
 Bug fixes:
 ~~~~~~~~~~
-- Made the HTMLSanitizer be able to strip HTML content from all tags.
+-
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Moving CPSSchemas.BasicWidget.renderHtmlTag in CPSUtil.html and making it
-  publica.
+-
