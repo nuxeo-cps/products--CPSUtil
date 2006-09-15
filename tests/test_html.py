@@ -30,6 +30,16 @@ class Test(unittest.TestCase):
         res = sanitize('ftgyuhjik')
         self.assertEquals(res, 'ftgyuhjik')
 
+        # Broken tags should not break the sanitizer.
+        # A better sanitizer would sanitizes those broken tags instead of giving
+        # up and returning the text uncleaned.
+        res = sanitize('<!12345>')
+        self.assertEquals(res, '<!12345>')
+        res = sanitize('<foo@bar.org>')
+        self.assertEquals(res, '<foo@bar.org>')
+        res = sanitize('AAAAAAAA <foo@bar.org>BB')
+        self.assertEquals(res, 'AAAAAAAA <foo@bar.org>BB')
+
         res = sanitize('<a>ftgyuhjik</a>')
         self.assertEquals(res, '<a>ftgyuhjik</a>')
 

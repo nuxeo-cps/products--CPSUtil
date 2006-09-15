@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Made the HTMLSanitizer not crash with invalid tags but unfortunately error
+  recovery is limited by the Python module itself.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
-- Added another test for the CPSUtil.html module.
+-

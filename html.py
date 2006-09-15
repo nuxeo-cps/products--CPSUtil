@@ -23,7 +23,7 @@
 
 import re
 from xml.sax.saxutils import quoteattr
-from HTMLParser import HTMLParser
+from HTMLParser import HTMLParser, HTMLParseError
 
 from AccessControl import ModuleSecurityInfo
 from Products.CMFDefault.utils import bodyfinder
@@ -150,8 +150,13 @@ def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
                               attributes_to_keep,
                               attributes_to_remove,
                               )
-    sanitizer.feed(html)
-    return sanitizer.getResult()
+    res = html
+    try:
+        sanitizer.feed(html)
+        res = sanitizer.getResult()
+    except HTMLParseError, TypeError:
+        pass
+    return res
 
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
@@ -181,4 +186,5 @@ def renderHtmlTag(tagname, **kw):
     else:
         res += '>'
     return res
+
 
