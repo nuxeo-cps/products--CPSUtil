@@ -33,6 +33,9 @@ class Test(unittest.TestCase):
         res = sanitize('<a>ftgyuhjik</a>')
         self.assertEquals(res, '<a>ftgyuhjik</a>')
 
+        res = sanitize('AAA<br>BBB')
+        self.assertEquals(res, 'AAA<br/>BBB')
+
         res = sanitize('<html>ftgyuhjik</html>')
         self.assertEquals(res, 'ftgyuhjik')
 
