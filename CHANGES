@@ -6,7 +6,8 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
--
+- Made CPSUtil.html.sanitize XHTML aware.
+- Made CPSUtil.html.HTMLSanitizer be reusable.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
 -

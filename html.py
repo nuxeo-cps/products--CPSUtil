@@ -20,9 +20,10 @@
 # $Id$
 """Utility functions for manipulating HTML, XHTML.
 """
+
 import re
-from sgmllib import SGMLParser
 from xml.sax.saxutils import quoteattr
+from HTMLParser import HTMLParser
 
 from AccessControl import ModuleSecurityInfo
 from Products.CMFDefault.utils import bodyfinder
@@ -54,30 +55,30 @@ def getHtmlBody(html_content):
 
 
 # Inspired from Alex Martelli's "Python Cookbook"
-#
-# XXX MAD : This class should be based on the HTMLParser class instead and
-# should be made able to deal with valid XHTML tags such as <br/> instead of
-# being only able to deal with <br /> tags.
-class HTMLSanitizer(SGMLParser):
+class HTMLSanitizer(HTMLParser):
     """Clean up entered text to avoid dangerous tags like forms, style, etc
     """
-    tags_to_keep = ('p', 'br', 'span', 'div', 'ul', 'ol', 'li',
-                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a',
-                    'em', 'strong', 'd', 'dl', 'dd', 'dd',
+    tags_to_keep = ('div', 'p', 'span', 'br', 'hr',
+                    'a',
+                    'ul', 'ol', 'li',
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                    'em', 'strong',
+                    'dl', 'dt', 'dd',
                     'address', 'q', 'blockquote', 'cite', 'abbr', 'acronym',
-                    'table', 'tr', 'td')
-    tolerant_tags = ('p', 'br')
+                    'table', 'thead', 'tbody', 'th', 'tr', 'td', 'hr',
+                    )
+    tags_empty = ('br', 'hr', 'img', 'input')
     # <b> and <i> are not allowed in XHTML 1.0 Strict, so we replace them with
     # semantical equivalents.
     tag_replacements = {'b': 'strong',
                         'i': 'em',
         }
     attributes_to_keep = ()
-    attributes_to_remove = ('style', 'class', 'accesskey', 'onclick')
+    attributes_to_remove = ('style', 'accesskey', 'onclick')
 
     def __init__(self, tags_to_keep=None,
                  attributes_to_keep=None, attributes_to_remove=None):
-        SGMLParser.__init__(self)
+        HTMLParser.__init__(self)
         if tags_to_keep is not None:
            self.tags_to_keep = tags_to_keep
         if attributes_to_keep is not None:
@@ -86,6 +87,16 @@ class HTMLSanitizer(SGMLParser):
             self.attributes_to_remove = attributes_to_remove
         self.result = []
         self.endTagList = []
+
+    def reset(self):
+        HTMLParser.reset(self)
+        self.result = []
+        self.endTagList = []
+
+    def getResult(self):
+        self.close()
+        self.cleanup()
+        return ''.join(self.result)
 
     def handle_data(self, data):
         self.result.append(data)
@@ -97,7 +108,7 @@ class HTMLSanitizer(SGMLParser):
         x = ';' * self.entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 
-    def unknown_starttag(self, tag, attrs):
+    def handle_starttag(self, tag, attrs):
         """Remove unwanted tag, using tags_to_keep."""
         # First replacing the tag by another one if needed
         tag = self.tag_replacements.get(tag, tag)
@@ -110,15 +121,17 @@ class HTMLSanitizer(SGMLParser):
                     continue
                 if k[0:2].lower() != 'on' and v[0:10] != 'javascript':
                     self.result.append(' %s="%s"' % (k, v))
-            self.result.append('>')
-            if tag not in self.tolerant_tags:
+            if tag in self.tags_empty:
+                self.result.append('/>')
+            else:
+                self.result.append('>')
                 end_tag = '</%s>' % tag
                 self.endTagList.insert(0, end_tag)
 
-    def unknown_endtag(self, tag):
-        # First replacing the tag by another one if needed
+    def handle_endtag(self, tag):
+        # First eplacing the tag by another one if needed
         tag = self.tag_replacements.get(tag, tag)
-        if tag in self.tags_to_keep:
+        if tag in self.tags_to_keep and tag not in self.tags_empty:
             end_tag = '</%s>' % tag
             self.result.append(end_tag)
             if end_tag in self.endTagList:
@@ -128,18 +141,17 @@ class HTMLSanitizer(SGMLParser):
         """Append missing closing tags"""
         self.result.extend(self.endTagList)
 
+
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('sanitize')
 def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
              attributes_to_remove=None):
     """Cleans html"""
-    parser = HTMLSanitizer(tags_to_keep,
-                           attributes_to_keep,
-                           attributes_to_remove,
-                           )
-    parser.feed(html)
-    parser.close()
-    parser.cleanup()
-    return ''.join(parser.result)
+    sanitizer = HTMLSanitizer(tags_to_keep,
+                              attributes_to_keep,
+                              attributes_to_remove,
+                              )
+    sanitizer.feed(html)
+    return sanitizer.getResult()
 
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
