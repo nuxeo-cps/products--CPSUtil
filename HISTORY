@@ -1,4 +1,21 @@
 *******************************************
+** CPSUtil V0.15.0 [R1 build 2006/09/15-10:28 by madarche]
+** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 48982
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+- Made CPSUtil.html.sanitize XHTML aware.
+- Made CPSUtil.html.HTMLSanitizer be reusable.
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+-
+
+*******************************************
 ** CPSUtil V0.14.2 [R1 build 2006/09/14-20:25 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 48978
 Requires:
