@@ -23,6 +23,7 @@
 
 import re
 from xml.sax.saxutils import quoteattr
+from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
 
 from AccessControl import ModuleSecurityInfo
@@ -55,8 +56,12 @@ def getHtmlBody(html_content):
 
 
 # Inspired from Alex Martelli's "Python Cookbook"
-class HTMLSanitizer(HTMLParser):
-    """Clean up entered text to avoid dangerous tags like forms, style, etc
+class XhtmlSanitizer(HTMLParser):
+    """Clean up entered text to avoid dangerous tags like forms, style, etc.
+
+    This class is not able to do error recovery due to limitation of the Python
+    HTMLParser module itself. If invalid tags (such as <xxx@xxx>, <!xxx>, etc.)
+    are found the parser crashes.
     """
     tags_to_keep = ('div', 'p', 'span', 'br', 'hr',
                     'a',
@@ -142,19 +147,120 @@ class HTMLSanitizer(HTMLParser):
         self.result.extend(self.endTagList)
 
 
+# Inspired from Alex Martelli's "Python Cookbook"
+class HTMLSanitizer(SGMLParser):
+    """Clean up entered text to avoid dangerous tags like forms, style, etc.
+
+    This class does not know how to deal with valid XHTML tags such as <br/>,
+    <hr/>, <input/>, etc. It only knows how to deal with tags such as <br />,
+    <hr />, etc.
+
+    Use this class only for ultra-dirty HTML contents with broken tags, for
+    example only to remove tags from tag soup to then be able to index the
+    content.
+    """
+    tags_to_keep = ('p', 'br', 'span', 'div', 'ul', 'ol', 'li',
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a',
+                    'em', 'strong', 'd', 'dl', 'dd', 'dd',
+                    'address', 'q', 'blockquote', 'cite', 'abbr', 'acronym',
+                    'table', 'tr', 'td')
+    tolerant_tags = ('p', 'br')
+    # <b> and <i> are not allowed in XHTML 1.0 Strict, so we replace them with
+    # semantical equivalents.
+    tag_replacements = {'b': 'strong',
+                        'i': 'em',
+        }
+    attributes_to_keep = ()
+    attributes_to_remove = ('style', 'accesskey', 'onclick')
+
+    def __init__(self, tags_to_keep=None,
+                 attributes_to_keep=None, attributes_to_remove=None):
+        SGMLParser.__init__(self)
+        if tags_to_keep is not None:
+           self.tags_to_keep = tags_to_keep
+        if attributes_to_keep is not None:
+            self.attributes_to_keep = attributes_to_keep
+        if attributes_to_remove is not None:
+            self.attributes_to_remove = attributes_to_remove
+        self.result = []
+        self.endTagList = []
+
+    def reset(self):
+        SGMLParser.reset(self)
+        self.result = []
+        self.endTagList = []
+
+    def getResult(self):
+        self.close()
+        self.cleanup()
+        return ''.join(self.result)
+
+    def handle_data(self, data):
+        self.result.append(data)
+
+    def handle_charref(self, name):
+        self.result.append('&#%s' % name)
+
+    def handle_entyref(self, name):
+        x = ';' * self.entitydefs.has_key(name)
+        self.result.append('&%s%s' % (name, x))
+
+    def unknown_starttag(self, tag, attrs):
+        """Remove unwanted tag, using tags_to_keep."""
+        # First replacing the tag by another one if needed
+        tag = self.tag_replacements.get(tag, tag)
+        if tag in self.tags_to_keep:
+            self.result.append('<%s' % tag)
+            for k, v in attrs:
+                if self.attributes_to_keep and not k in self.attributes_to_keep:
+                    continue
+                if self.attributes_to_remove and k in self.attributes_to_remove:
+                    continue
+                if k[0:2].lower() != 'on' and v[0:10] != 'javascript':
+                    self.result.append(' %s="%s"' % (k, v))
+            self.result.append('>')
+            if tag not in self.tolerant_tags:
+                end_tag = '</%s>' % tag
+                self.endTagList.insert(0, end_tag)
+
+    def unknown_endtag(self, tag):
+        # First replacing the tag by another one if needed
+        tag = self.tag_replacements.get(tag, tag)
+        if tag in self.tags_to_keep:
+            end_tag = '</%s>' % tag
+            self.result.append(end_tag)
+            if end_tag in self.endTagList:
+                self.endTagList.remove(end_tag)
+
+    def cleanup(self):
+        """Append missing closing tags"""
+        self.result.extend(self.endTagList)
+
+
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('sanitize')
 def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
-             attributes_to_remove=None):
-    """Cleans html"""
-    sanitizer = HTMLSanitizer(tags_to_keep,
-                              attributes_to_keep,
-                              attributes_to_remove,
-                              )
+             attributes_to_remove=None, sgml=False):
+    """Cleans html.
+
+    Use sgml=True is you want to use an SGML-based parser. This is to be used
+    for ultra-dirty HTML contents with broken tags, for example only to remove
+    tags from tag soup to then be able to index the content.
+    """
+    if not sgml:
+        sanitizer = XhtmlSanitizer(tags_to_keep,
+                                   attributes_to_keep,
+                                   attributes_to_remove,
+                                   )
+    else:
+        sanitizer = HTMLSanitizer(tags_to_keep,
+                                  attributes_to_keep,
+                                  attributes_to_remove,
+                                  )
     res = html
     try:
         sanitizer.feed(html)
         res = sanitizer.getResult()
-    except HTMLParseError, TypeError:
+    except (HTMLParseError, SGMLParseError, TypeError):
         pass
     return res
 

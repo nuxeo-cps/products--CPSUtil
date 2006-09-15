@@ -6,7 +6,7 @@ New features:
 -
 Bug fixes:
 ~~~~~~~~~~
-- Made the HTMLSanitizer not crash with invalid tags but unfortunately error
+- Made the XhtmlSanitizer not crash with invalid tags but unfortunately error
   recovery is limited by the Python module itself.
 New internal features:
 ~~~~~~~~~~~~~~~~~~~~~~
