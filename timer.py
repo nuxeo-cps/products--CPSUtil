@@ -27,6 +27,7 @@ import os
 import sys
 from time import time
 from AccessControl import ModuleSecurityInfo
+from Products.PythonScripts.Utility import allow_class
 
 # XXX temporary fix toward zope.testrunner bug on Zope-2.9.x
 path2remove = os.path.join(os.environ.get('ZOPE_HOME'), 'bin')
@@ -42,6 +43,8 @@ except ImportError:
         sys.stdout.write(level + ' ' + name + ': ' + message + '\n')
         sys.stdout.flush()
 
+# Allowing this class to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.timer').declarePublic('Timer')
 class Timer:
     """Very simple timer that output elapsed time in the log.
 
@@ -105,6 +108,7 @@ class Timer:
         if mark is not None:
             self.mark(mark)
         LOG('Timer', self.level, str(self))
+allow_class(Timer)
 
 
 # TOLERANCE in Pystones
