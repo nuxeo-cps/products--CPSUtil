@@ -1,3 +1,23 @@
+===========================================================
+Package: CPSUtil 0.16.0
+===========================================================
+First release built by: ben at: 2006-09-26T15:46:45
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.16.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@49204
+
+Requires:
+~~~~~~~~~
+-
+New features:
+~~~~~~~~~~~~~
+-
+Bug fixes:
+~~~~~~~~~~
+-
+New internal features:
+~~~~~~~~~~~~~~~~~~~~~~
+- Enable Timer usage from python script.
+
 *******************************************
 ** CPSUtil V0.15.1 [R1 build 2006/09/15-15:57 by madarche]
 ** SVN URL: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk Revision: 48992
