@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 0.17.0
+===========================================================
+First release built by: ogrisel at: 2006-10-10T11:45:04
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.17.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@49442
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- fixed svn keyword
+
+===========================================================
 Package: CPSUtil 0.16.0
 ===========================================================
 First release built by: ben at: 2006-09-26T15:46:45
