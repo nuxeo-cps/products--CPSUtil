@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
-- [packaging] bundleman svn property
+- #1761: AJAX edit: wrong behaviour with <select> and empty values
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

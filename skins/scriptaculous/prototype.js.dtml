@@ -1550,17 +1550,25 @@ Form.Element.Serializers = {
     var value = '', opt, index = element.selectedIndex;
     if (index >= 0) {
       opt = element.options[index];
-      value = opt.value || opt.text;
+      value = opt.value
+      if (value == null) {
+        value = opt.text;
+	}
     }
     return [element.name, value];
   },
 
   selectMany: function(element) {
     var value = [];
+    var attr = '';
     for (var i = 0; i < element.length; i++) {
       var opt = element.options[i];
       if (opt.selected)
-        value.push(opt.value || opt.text);
+        attr = opt.value
+	if (attr == null) {
+	  attr = opt.text;
+	}
+        value.push(attr);
     }
     return [element.name, value];
   }
