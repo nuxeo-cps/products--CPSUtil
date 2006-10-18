@@ -1563,12 +1563,13 @@ Form.Element.Serializers = {
     var attr = '';
     for (var i = 0; i < element.length; i++) {
       var opt = element.options[i];
-      if (opt.selected)
+      if (opt.selected) {
         attr = opt.value;
-	if (attr == null) {
-	  attr = opt.text;
+        if (attr == null) {
+          attr = opt.text;
 	}
         value.push(attr);
+      }
     }
     return [element.name, value];
   }
