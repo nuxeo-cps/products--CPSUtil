@@ -1550,7 +1550,7 @@ Form.Element.Serializers = {
     var value = '', opt, index = element.selectedIndex;
     if (index >= 0) {
       opt = element.options[index];
-      value = opt.value
+      value = opt.value;
       if (value == null) {
         value = opt.text;
 	}
@@ -1564,7 +1564,7 @@ Form.Element.Serializers = {
     for (var i = 0; i < element.length; i++) {
       var opt = element.options[i];
       if (opt.selected)
-        attr = opt.value
+        attr = opt.value;
 	if (attr == null) {
 	  attr = opt.text;
 	}
