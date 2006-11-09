@@ -6,6 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
+- #1775: added bullet (Unicode 2022) to latin9_fallback codec
 - #1761: AJAX edit: wrong behaviour with <select> and empty values
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~

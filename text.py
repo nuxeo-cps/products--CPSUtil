@@ -74,6 +74,7 @@ u'\u02dc' : u'~',    # 0x98 upper tilda
 u'\u203a' : u'>',    # 0x9b small >
 u'\xb4'   : u"'",    # 0xb4 almost horizontal single quote
 u'\u2026' : u'...',  # 0x85 dots in one char
+u'\u2022' : u'.',    # bullet
 }
 
 def winToLatin9_errors(exc):
