@@ -3,6 +3,12 @@
 # Author:
 # M.-A. Darche <madarche@nuxeo.com>
 #
+# To have the log files of the Zope instance rotated:
+# 1. Copy the logrotate.conf configuration file in
+#    /usr/local/zopes/instance/cps/etc
+# 2. Copy the logrotate-zope script in /etc/cron.hourly/ to have it called
+#    every hour, so the check on file size is done every hour.
+#
 # $Id$
 
 test -x /usr/sbin/logrotate || exit 0
