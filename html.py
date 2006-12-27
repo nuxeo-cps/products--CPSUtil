@@ -22,7 +22,7 @@
 """
 
 import re
-from xml.sax.saxutils import quoteattr
+from zope.tal.taldefs import attrEscape
 from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
 
@@ -283,7 +283,12 @@ def renderHtmlTag(tagname, **kw):
         if value is None:
             continue
         if key in ('value', 'alt') or value != '':
-            attrs.append('%s=%s' % (key, quoteattr(str(value))))
+            if not isinstance(value, basestring):
+                value = str(value)
+            if key == 'name' and not ':' in value:
+                # unicode string needed
+                value = value + ':utf8:ustring'
+            attrs.append('%s="%s"' % (key, attrEscape(value)))
     res = '<%s %s' % (tagname, ' '.join(attrs))
     if contents is not None:
         res += '>%s</%s>' % (contents, tagname)
