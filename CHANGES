@@ -6,7 +6,8 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- Improved the sample logrotate.conf so that cron jobs don't output anything if
+  everything is doing fine.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
