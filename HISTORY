@@ -1,4 +1,25 @@
 ===========================================================
+Package: CPSUtil 0.17.3
+===========================================================
+First release built by: ben at: 2007-01-08T10:49:33
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.17.3
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@50767
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Improved the sample logrotate.conf so that cron jobs don't output anything if
+  everything is doing fine.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.17.2
 ===========================================================
 First release built by: ben at: 2006-12-26T11:22:56
