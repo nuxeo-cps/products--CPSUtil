@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- cpshousekeeping: added more verbose log messages.
 Bug fixes
 ~~~~~~~~~
 -

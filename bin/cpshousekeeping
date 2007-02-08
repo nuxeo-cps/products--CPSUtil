@@ -1,10 +1,10 @@
 #!/usr/bin/python
 #
-# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
 # Authors:
-# Julien Anguenot <ja@nuxeo.com>
 # M.-A. Darche <madarche@nuxeo.com>
 # Olivier Grisel <og@nuxeo.com>
+# Julien Anguenot <ja@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -199,41 +199,46 @@ def execArgs():
     verbose = options.verbose
 
     if options.purge_repository:
+        log("Purging the document repository of host %s ..." %
+            options.host_name)
         url = PURGE_REPOSITORY_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
         call_url(url, options.user_name, options.user_password)
-        log("Successfully purged repository on host %s" % options.host_name)
+        log("Successfully purged repository of host %s" % options.host_name)
 
     if options.purge_localroles:
+        log("Purging the local roles of host %s ..." % options.host_name)
         url = PURGE_LOCALROLES_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
         call_url(url, options.user_name, options.user_password)
-        log("Successfully purged localroles on host %s" % options.host_name)
+        log("Successfully purged localroles of host %s" % options.host_name)
 
     if options.notifications:
+        log("Sending notifications of host %s ..." % options.host_name)
         url = SEND_NOTIFICATIONS_PATTERN % (options.host_name,
                                             options.host_port,
                                             options.instance_id,
                                             options.notifications)
         call_url(url, options.user_name, options.user_password)
-        log("Successfully sent notifications on host %s" % options.host_name)
+        log("Successfully sent notifications of host %s" % options.host_name)
 
     if options.pack_zodb:
+        log("Trying to pack the ZODB of host %s ..." % options.host_name)
         url = ZODB_PACKING_URL_PATTERN % (options.host_name,
                                           options.host_port,
                                           options.days)
         call_url(url, options.user_name, options.user_password)
-        log("Successfully packed ZODB on host %s" % options.host_name)
+        log("Successfully packed ZODB of host %s" % options.host_name)
 
     if options.backup:
         backupZodb(options.zodbfile_path, options.backupdir_path,
                    options.backups_keep_count)
-        log("Successful backup of the ZODB")
 
 
 def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
+    log("Checking for backups ...")
     time_string = strftime(TIME_FORMAT, gmtime())
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
     zodb_backup_path = os.path.join(backupdir_path, file_name)
@@ -241,7 +246,7 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     log("command = %s" % command)
     os.system(command)
     if backups_keep_count > 0:
-        log("Removing old backups...")
+        log("There are some backups to remove ...")
         file_names = os.listdir(backupdir_path)
         file_names = [x for x in file_names
                       if ZODB_BACKUP_FILENAME_REGEXP.match(x)]
@@ -249,8 +254,9 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
         file_names_to_delete = file_names[:-backups_keep_count]
         for file_name in file_names_to_delete:
             file_path = os.path.join(backupdir_path, file_name)
-            log("Removing = %s..." % file_name)
+            log("Removing = %s ..." % file_name)
             os.remove(file_path)
+    log("Successful backup of the ZODB")
 
 
 def call_url(url, username, password):
