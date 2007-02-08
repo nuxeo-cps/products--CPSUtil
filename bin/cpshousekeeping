@@ -162,7 +162,7 @@ def execArgs():
                       dest='backup',
                       default=False,
                       help="Backup the ZODB that has just been packed "
-                           "using the cp command.")
+                           """using the "cp" command.""")
 
     parser.add_option('-k', '--backupdir',
                       action='store',
@@ -225,17 +225,26 @@ def execArgs():
         log("Successfully sent notifications of host %s" % options.host_name)
 
     if options.pack_zodb:
-        log("Trying to pack the ZODB of host %s ..." % options.host_name)
-        url = ZODB_PACKING_URL_PATTERN % (options.host_name,
-                                          options.host_port,
-                                          options.days)
-        call_url(url, options.user_name, options.user_password)
-        log("Successfully packed ZODB of host %s" % options.host_name)
+        packZodb(options.zodbfile_path, options.days,
+                 options.host_name, options.host_port,
+                 options.user_name, options.user_password)
 
     if options.backup:
         backupZodb(options.zodbfile_path, options.backupdir_path,
                    options.backups_keep_count)
 
+
+def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
+    log("Trying to pack the ZODB %s of host %s ..." % (zodb_path, host_name))
+    if verbose:
+        zodb_size = os.path.getsize(zodb_path)
+        log("ZODB size is %s" % getHumanReadableSize(zodb_size))
+    url = ZODB_PACKING_URL_PATTERN % (host_name, host_port, days)
+    call_url(url, user_name, user_password)
+    log("Successfully packed ZODB of host %s" % host_name)
+    if verbose:
+        zodb_size = os.path.getsize(zodb_path)
+        log("ZODB size now is %s" % getHumanReadableSize(zodb_size))
 
 def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     log("Checking for backups ...")
@@ -254,13 +263,14 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
         file_names_to_delete = file_names[:-backups_keep_count]
         for file_name in file_names_to_delete:
             file_path = os.path.join(backupdir_path, file_name)
-            log("Removing = %s ..." % file_name)
+            log("Removing = %s ..." % file_path)
             os.remove(file_path)
     log("Successful backup of the ZODB")
 
 
 def call_url(url, username, password):
-    """Call urllib2.urlopen with forced HTTP Basic Auth header"""
+    """Call urllib2.urlopen with forced HTTP Basic Auth header.
+    """
     request = urllib2.Request(url)
     base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
     request.add_header("Authorization", "Basic %s" % base64string)
@@ -279,6 +289,40 @@ def call_url(url, username, password):
     except IOError:
         log('Unable to open %s, aborting' % url, True)
         sys.exit(1)
+
+
+def getHumanReadableSize(octet_size):
+    """Returns a string that is a human readable file size.
+    """
+    mega = 1024*1024
+    kilo = 1024
+
+    if octet_size is None or octet_size <= 0:
+        return "0"
+    elif octet_size >= mega:
+        if octet_size == mega:
+            return "1M"
+        else:
+            msize = float(octet_size/float(mega))
+            msize = float('%.02f' % msize)
+            return "%sM" % msize
+    elif octet_size >= kilo:
+
+        if octet_size == kilo:
+            return "1K"
+        else:
+            ksize = float(octet_size/float(kilo))
+            ksize = float('%.02f' % ksize)
+            return "%sK" % ksize
+    else:
+        return str(octet_size)
+
+
+def getSpaceLeftOnDevice():
+    """TODO
+    $ df -h | grep '^/dev/' | awk '{print $4}'
+    """
+    pass
 
 
 def log(message, force=False):
