@@ -235,6 +235,10 @@ def execArgs():
 
 
 def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
+    """TODO : packZodb should WARN and not perform this action if there isn't
+    enough space left on the device where the ZODB is.
+    The method should check if there is 2x the size of the ZODB left.
+    """
     log("Trying to pack the ZODB %s of host %s ..." % (zodb_path, host_name))
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
@@ -247,6 +251,9 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
         log("ZODB size now is %s" % getHumanReadableSize(zodb_size))
 
 def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
+    """TODO : backupZodb should WARN and not perform this action if there isn't
+    enough space left on target device.
+    """
     log("Checking for backups ...")
     time_string = strftime(TIME_FORMAT, gmtime())
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
