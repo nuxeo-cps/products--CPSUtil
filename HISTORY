@@ -1,4 +1,25 @@
 ===========================================================
+Package: CPSUtil 0.18.0
+===========================================================
+First release built by: gracinet at: 2007-02-08T19:08:12
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.18.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@51054
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- cpshousekeeping: added more verbose log messages especially concerning the
+  size of the ZODB.
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.17.3
 ===========================================================
 First release built by: ben at: 2007-01-08T10:49:33

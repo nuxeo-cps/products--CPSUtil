@@ -3,8 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- cpshousekeeping: added more verbose log messages especially concerning the
-  size of the ZODB.
+-
 Bug fixes
 ~~~~~~~~~
 -
