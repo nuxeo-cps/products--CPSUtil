@@ -204,7 +204,7 @@ def execArgs():
         url = PURGE_REPOSITORY_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
-        call_url(url, options.user_name, options.user_password)
+        callUrl(url, options.user_name, options.user_password)
         log("Successfully purged repository of host %s" % options.host_name)
 
     if options.purge_localroles:
@@ -212,7 +212,7 @@ def execArgs():
         url = PURGE_LOCALROLES_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
-        call_url(url, options.user_name, options.user_password)
+        callUrl(url, options.user_name, options.user_password)
         log("Successfully purged localroles of host %s" % options.host_name)
 
     if options.notifications:
@@ -221,7 +221,7 @@ def execArgs():
                                             options.host_port,
                                             options.instance_id,
                                             options.notifications)
-        call_url(url, options.user_name, options.user_password)
+        callUrl(url, options.user_name, options.user_password)
         log("Successfully sent notifications of host %s" % options.host_name)
 
     if options.pack_zodb:
@@ -239,16 +239,18 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
     enough space left on the device where the ZODB is.
     The method should check if there is 2x the size of the ZODB left.
     """
-    log("Trying to pack the ZODB %s of host %s ..." % (zodb_path, host_name))
+    log("Packing ZODB %s of host %s ..." % (zodb_path, host_name))
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
-        log("ZODB size is %s" % getHumanReadableSize(zodb_size))
+        log("ZODB size is %s" % getHumanReadableSize(zodb_size),
+	    increment=1)
     url = ZODB_PACKING_URL_PATTERN % (host_name, host_port, days)
-    call_url(url, user_name, user_password)
-    log("Successfully packed ZODB of host %s" % host_name)
+    callUrl(url, user_name, user_password)
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
-        log("ZODB size now is %s" % getHumanReadableSize(zodb_size))
+        log("ZODB size now is %s" % getHumanReadableSize(zodb_size),
+	    increment=1)
+    log("Successfully packed ZODB of host %s" % host_name)
 
 def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     """TODO : backupZodb should WARN and not perform this action if there isn't
@@ -259,10 +261,10 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
     zodb_backup_path = os.path.join(backupdir_path, file_name)
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
-    log("command = %s" % command)
+    log("command = %s" % command, increment=1)
     os.system(command)
     if backups_keep_count > 0:
-        log("There are some backups to remove ...")
+        log("There are some backups to remove ...", increment=1)
         file_names = os.listdir(backupdir_path)
         file_names = [x for x in file_names
                       if ZODB_BACKUP_FILENAME_REGEXP.match(x)]
@@ -270,12 +272,12 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
         file_names_to_delete = file_names[:-backups_keep_count]
         for file_name in file_names_to_delete:
             file_path = os.path.join(backupdir_path, file_name)
-            log("Removing = %s ..." % file_path)
+            log("Removing = %s ..." % file_path, increment=1)
             os.remove(file_path)
     log("Successful backup of the ZODB")
 
 
-def call_url(url, username, password):
+def callUrl(url, username, password):
     """Call urllib2.urlopen with forced HTTP Basic Auth header.
     """
     request = urllib2.Request(url)
@@ -332,9 +334,10 @@ def getSpaceLeftOnDevice():
     pass
 
 
-def log(message, force=False):
+def log(message, force=False, increment=0):
     """Log the given message to stderr.
     """
+    message =  '    ' * increment + message
     if force or verbose:
         print >> sys.stderr, message
 
