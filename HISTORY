@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 0.18.1
+===========================================================
+First release built by: div at: 2007-02-19T18:36:00
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.18.1
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@51117
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- cpshousekeeping : better output.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.18.0
 ===========================================================
 First release built by: gracinet at: 2007-02-08T19:08:12
