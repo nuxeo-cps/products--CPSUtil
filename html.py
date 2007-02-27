@@ -51,7 +51,11 @@ def getHtmlBody(html_content):
     #html_body = HTML_BODY_REGEXP.sub(r'\1', html_content)
     html_body = bodyfinder(html_content)
     html_body = STRIP_ATTRIBUTES_REGEXP.sub('', html_body)
-
+    if isinstance(html_body, str):
+        try:
+            html_body = html_body.decode('iso-8859-15')
+        except UnicodeDecodeError:
+            raise
     return html_body
 
 

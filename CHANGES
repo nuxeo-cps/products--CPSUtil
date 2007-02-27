@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- Convert the files content to unicode
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
