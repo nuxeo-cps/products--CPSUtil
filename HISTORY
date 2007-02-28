@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 0.18.1-rel1271525924
+===========================================================
+First release built by: div at: 2007-02-28T08:46:59
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.18.1-rel1271525924
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/branches/rel1271525924@51271
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Convert the files content to unicode
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.18.0-rel1271525924
 ===========================================================
 First release built by: ben at: 2007-02-21T16:47:33
