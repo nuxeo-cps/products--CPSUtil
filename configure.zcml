@@ -12,6 +12,13 @@
            Products.GenericSetup.interfaces.ISetupEnviron"
       />
 
+  <adapter
+      factory=".cachemanagersetup.AcceleratedHTTPCacheManagerXMLAdapter"
+      provides="Products.GenericSetup.interfaces.IBody"
+      for=".interfaces.IAcceleratedHTTPCacheManager
+           Products.GenericSetup.interfaces.ISetupEnviron"
+      />
+
   <!-- Interfaces implemented by standard Zope components -->
 
   <five:implements
@@ -21,6 +28,15 @@
 
   <five:traversable
       class="Products.StandardCacheManagers.RAMCacheManager.RAMCacheManager"
+      />
+
+  <five:implements
+      class="Products.StandardCacheManagers.AcceleratedHTTPCacheManager.AcceleratedHTTPCacheManager"
+      interface=".interfaces.IAcceleratedHTTPCacheManager"
+      />
+
+  <five:traversable
+      class="Products.StandardCacheManagers.AcceleratedHTTPCacheManager.AcceleratedHTTPCacheManager"
       />
 
   <!-- XML export as ZMI tab -->
@@ -47,5 +63,3 @@
 	permission="zope2.ViewManagementScreens"/>
 
 </configure>
-
-
