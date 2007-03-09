@@ -1,4 +1,4 @@
-# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -41,4 +41,7 @@ export_option = (
     )
 
 from Products.StandardCacheManagers.RAMCacheManager import RAMCacheManager
+from Products.StandardCacheManagers.AcceleratedHTTPCacheManager import AcceleratedHTTPCacheManager
+
 RAMCacheManager.manage_options += export_option
+AcceleratedHTTPCacheManager.manage_options += export_option
