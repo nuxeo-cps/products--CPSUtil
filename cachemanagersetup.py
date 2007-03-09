@@ -270,6 +270,10 @@ class AcceleratedHTTPCacheManagerXMLAdapter(XMLAdapterBase, PropertyManagerHelpe
 
             new_settings[prop_id] = prop_value
 
+        # Workaround a bug in AcceleratedHTTPCacheManager.manage_editProps()
+        if new_settings['anonymous_only'] == '0':
+            del new_settings['anonymous_only']
+
         ob.manage_editProps(title, new_settings)
 
 
