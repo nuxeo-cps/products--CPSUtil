@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 0.19.0
+===========================================================
+First release built by: div at: 2007-03-14T12:27:33
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.19.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@51329
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- Added support for Zope Accelerated HTTP Cache Manager in cachemanagersetup.
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.18.1
 ===========================================================
 First release built by: div at: 2007-02-19T18:36:00

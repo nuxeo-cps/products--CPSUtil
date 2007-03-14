@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- Added support for Zope Accelerated HTTP Cache Manager in cachemanagersetup.
+-
 Bug fixes
 ~~~~~~~~~
 -
