@@ -57,6 +57,7 @@ DEFAULT_NOTIFICATION_FREQ = None
 
 ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack?days:float=%d'
 PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
+PURGE_LOCALROLES_FORCED_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles?lazy:boolean=False"
 PURGE_REPOSITORY_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
@@ -83,7 +84,7 @@ def execArgs():
                       metavar='NAME',
                       default=DEFAULT_HOST_NAME,
                       help="Use NAME for the server to connect to. "
-                      "Defaults to %s" % DEFAULT_HOST_NAME)
+                      "Defaults to '%s'." % DEFAULT_HOST_NAME)
 
     parser.add_option('-p', '--port',
                       action='store',
@@ -92,7 +93,7 @@ def execArgs():
                       metavar='NUMBER',
                       default=DEFAULT_HOST_PORT,
                       help="Use NUMBER for the server port to use. "
-                      "Defaults to %s" % DEFAULT_HOST_PORT)
+                      "Defaults to %s." % DEFAULT_HOST_PORT)
 
     parser.add_option('-i', '--instance-id',
                       action='store',
@@ -101,7 +102,7 @@ def execArgs():
                       metavar='ID',
                       default=DEFAULT_INSTANCE_ID,
                       help="Use ID for CPS instance id to use. "
-                      "Defaults to %s" % DEFAULT_INSTANCE_ID)
+                      "Defaults to '%s'." % DEFAULT_INSTANCE_ID)
 
     parser.add_option('-u', '--user',
                       action='store',
@@ -110,7 +111,7 @@ def execArgs():
                       metavar='NAME',
                       default=DEFAULT_USER_NAME,
                       help="Use NAME for the user name to Zope. "
-                      "Defaults to '%s'" % DEFAULT_USER_NAME)
+                      "Defaults to '%s'." % DEFAULT_USER_NAME)
 
     parser.add_option('-w', '--password',
                       action='store',
@@ -119,25 +120,32 @@ def execArgs():
                       metavar='PASSWORD',
                       default=DEFAULT_USER_PASSWORD,
                       help="Use PASSWORD for the password to Zope. "
-                      "Defaults to '%s'" % DEFAULT_USER_PASSWORD)
+                      "Defaults to '%s'." % DEFAULT_USER_PASSWORD)
 
     parser.add_option('-r', '--purge-repository',
                       action='store_true',
                       dest='purge_repository',
                       default=False,
-                      help="Purge the repository to remove orphan documents")
+                      help="Purge the repository to remove orphan documents.")
 
     parser.add_option('-l', '--purge-localroles',
                       action='store_true',
                       dest='purge_localroles',
                       default=False,
-                      help="Clean the localroles of deleted members")
+                      help="Purge the localroles of deleted members "
+                      "recorded as such.")
+
+    parser.add_option('-L', '--purge-localroles-force',
+                      action='store_true',
+                      dest='purge_localroles_force',
+                      default=False,
+                      help="Purge the localroles of deleted members.")
 
     parser.add_option('-P', '--pack-zodb',
                       action='store_true',
                       dest='pack_zodb',
                       default=False,
-                      help="Pack the ZODB")
+                      help="Pack the ZODB.")
 
     parser.add_option('-d', '--days',
                       action='store',
@@ -146,7 +154,7 @@ def execArgs():
                       metavar='NUMBER',
                       default=DEFAULT_HISTORY_DAYS,
                       help="Use NUMBER for the days to keep in history. "
-                      "Defaults to %s" % DEFAULT_HISTORY_DAYS)
+                      "Defaults to %s." % DEFAULT_HISTORY_DAYS)
 
     parser.add_option('-z', '--zodbfile',
                       action='store',
@@ -155,14 +163,14 @@ def execArgs():
                       metavar='FILE',
                       default=DEFAULT_ZODB_PATH,
                       help="The FILE path to the ZODB. "
-                      "The default is %s" % DEFAULT_ZODB_PATH)
+                      "The default is %s." % DEFAULT_ZODB_PATH)
 
     parser.add_option('-b', '--backup',
                       action='store_true',
                       dest='backup',
                       default=False,
                       help="Backup the ZODB that has just been packed "
-                           """using the "cp" command.""")
+                      """using the "cp" command.""")
 
     parser.add_option('-k', '--backupdir',
                       action='store',
@@ -172,7 +180,7 @@ def execArgs():
                       default=DEFAULT_ZODB_BACKUP_DIR_PATH,
                       help="The FILE path of the directory used for storing "
                       "ZODB backups. "
-                      "The default is %s" % DEFAULT_ZODB_BACKUP_DIR_PATH)
+                      "The default is %s." % DEFAULT_ZODB_BACKUP_DIR_PATH)
 
     parser.add_option('-B', '--keep-backups-count',
                       action='store',
@@ -181,7 +189,7 @@ def execArgs():
                       metavar='NUMBER',
                       default=DEFAULT_ZODB_BACKUPS_KEEP_COUNT,
                       help="The NUMBER of ZODB backups to keep. "
-                      "The default is %s" % DEFAULT_ZODB_BACKUPS_KEEP_COUNT)
+                      "The default is %s." % DEFAULT_ZODB_BACKUPS_KEEP_COUNT)
 
     parser.add_option('-s', '--send-notifications',
                       action='store',
@@ -191,7 +199,7 @@ def execArgs():
                       choices=['daily','weekly', 'monthly'],
                       default=DEFAULT_NOTIFICATION_FREQ,
                       help="Send email notifications of frequence FREQ of "
-                      "[daily|weekly|monthly]. Defaults to %s " %
+                      "[daily|weekly|monthly]. Defaults to %s." %
                       str(DEFAULT_NOTIFICATION_FREQ))
 
     (options, args) = parser.parse_args()
@@ -214,6 +222,16 @@ def execArgs():
                                               options.instance_id)
         callUrl(url, options.user_name, options.user_password)
         log("Successfully purged localroles of host %s" % options.host_name)
+
+    if options.purge_localroles_force:
+        log("Purging the local roles (forced) of host %s ..."
+            % options.host_name)
+        url = PURGE_LOCALROLES_FORCED_URL_PATTERN % (options.host_name,
+                                                     options.host_port,
+                                                     options.instance_id)
+        callUrl(url, options.user_name, options.user_password)
+        log("Successfully purged localroles (forced) of host %s"
+            % options.host_name)
 
     if options.notifications:
         log("Sending notifications of host %s ..." % options.host_name)

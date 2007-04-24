@@ -3,7 +3,10 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- Added the "-L" "--purge-localroles-force" option to purge local roles of
+  deleted members without relying on recorded deleted members. This is
+  particularly useful since CPSUserFolder doesn't record pending_users at this
+  time.
 Bug fixes
 ~~~~~~~~~
 -
