@@ -1,10 +1,10 @@
 #!/usr/bin/python
 #
-# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
 # Authors:
-# Julien Anguenot <ja@nuxeo.com>
 # M.-A. Darche <madarche@nuxeo.com>
 # Olivier Grisel <og@nuxeo.com>
+# Julien Anguenot <ja@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -162,7 +162,7 @@ def execArgs():
                       dest='backup',
                       default=False,
                       help="Backup the ZODB that has just been packed "
-                           "using the cp command.")
+                           """using the "cp" command.""")
 
     parser.add_option('-k', '--backupdir',
                       action='store',
@@ -199,49 +199,72 @@ def execArgs():
     verbose = options.verbose
 
     if options.purge_repository:
+        log("Purging the document repository of host %s ..." %
+            options.host_name)
         url = PURGE_REPOSITORY_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
-        call_url(url, options.user_name, options.user_password)
-        log("Successfully purged repository on host %s" % options.host_name)
+        callUrl(url, options.user_name, options.user_password)
+        log("Successfully purged repository of host %s" % options.host_name)
 
     if options.purge_localroles:
+        log("Purging the local roles of host %s ..." % options.host_name)
         url = PURGE_LOCALROLES_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
-        call_url(url, options.user_name, options.user_password)
-        log("Successfully purged localroles on host %s" % options.host_name)
+        callUrl(url, options.user_name, options.user_password)
+        log("Successfully purged localroles of host %s" % options.host_name)
 
     if options.notifications:
+        log("Sending notifications of host %s ..." % options.host_name)
         url = SEND_NOTIFICATIONS_PATTERN % (options.host_name,
                                             options.host_port,
                                             options.instance_id,
                                             options.notifications)
-        call_url(url, options.user_name, options.user_password)
-        log("Successfully sent notifications on host %s" % options.host_name)
+        callUrl(url, options.user_name, options.user_password)
+        log("Successfully sent notifications of host %s" % options.host_name)
 
     if options.pack_zodb:
-        url = ZODB_PACKING_URL_PATTERN % (options.host_name,
-                                          options.host_port,
-                                          options.days)
-        call_url(url, options.user_name, options.user_password)
-        log("Successfully packed ZODB on host %s" % options.host_name)
+        packZodb(options.zodbfile_path, options.days,
+                 options.host_name, options.host_port,
+                 options.user_name, options.user_password)
 
     if options.backup:
         backupZodb(options.zodbfile_path, options.backupdir_path,
                    options.backups_keep_count)
-        log("Successful backup of the ZODB")
 
+
+def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
+    """TODO : packZodb should WARN and not perform this action if there isn't
+    enough space left on the device where the ZODB is.
+    The method should check if there is 2x the size of the ZODB left.
+    """
+    log("Packing ZODB %s of host %s ..." % (zodb_path, host_name))
+    if verbose:
+        zodb_size = os.path.getsize(zodb_path)
+        log("ZODB size is %s" % getHumanReadableSize(zodb_size),
+	    increment=1)
+    url = ZODB_PACKING_URL_PATTERN % (host_name, host_port, days)
+    callUrl(url, user_name, user_password)
+    if verbose:
+        zodb_size = os.path.getsize(zodb_path)
+        log("ZODB size now is %s" % getHumanReadableSize(zodb_size),
+	    increment=1)
+    log("Successfully packed ZODB of host %s" % host_name)
 
 def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
+    """TODO : backupZodb should WARN and not perform this action if there isn't
+    enough space left on target device.
+    """
+    log("Checking for backups ...")
     time_string = strftime(TIME_FORMAT, gmtime())
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
     zodb_backup_path = os.path.join(backupdir_path, file_name)
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
-    log("command = %s" % command)
+    log("command = %s" % command, increment=1)
     os.system(command)
     if backups_keep_count > 0:
-        log("Removing old backups...")
+        log("There are some backups to remove ...", increment=1)
         file_names = os.listdir(backupdir_path)
         file_names = [x for x in file_names
                       if ZODB_BACKUP_FILENAME_REGEXP.match(x)]
@@ -249,12 +272,14 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
         file_names_to_delete = file_names[:-backups_keep_count]
         for file_name in file_names_to_delete:
             file_path = os.path.join(backupdir_path, file_name)
-            log("Removing = %s..." % file_name)
+            log("Removing = %s ..." % file_path, increment=1)
             os.remove(file_path)
+    log("Successful backup of the ZODB")
 
 
-def call_url(url, username, password):
-    """Call urllib2.urlopen with forced HTTP Basic Auth header"""
+def callUrl(url, username, password):
+    """Call urllib2.urlopen with forced HTTP Basic Auth header.
+    """
     request = urllib2.Request(url)
     base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
     request.add_header("Authorization", "Basic %s" % base64string)
@@ -275,9 +300,44 @@ def call_url(url, username, password):
         sys.exit(1)
 
 
-def log(message, force=False):
+def getHumanReadableSize(octet_size):
+    """Returns a string that is a human readable file size.
+    """
+    mega = 1024*1024
+    kilo = 1024
+
+    if octet_size is None or octet_size <= 0:
+        return "0"
+    elif octet_size >= mega:
+        if octet_size == mega:
+            return "1M"
+        else:
+            msize = float(octet_size/float(mega))
+            msize = float('%.02f' % msize)
+            return "%sM" % msize
+    elif octet_size >= kilo:
+
+        if octet_size == kilo:
+            return "1K"
+        else:
+            ksize = float(octet_size/float(kilo))
+            ksize = float('%.02f' % ksize)
+            return "%sK" % ksize
+    else:
+        return str(octet_size)
+
+
+def getSpaceLeftOnDevice():
+    """TODO
+    $ df -h | grep '^/dev/' | awk '{print $4}'
+    """
+    pass
+
+
+def log(message, force=False, increment=0):
     """Log the given message to stderr.
     """
+    message =  '    ' * increment + message
     if force or verbose:
         print >> sys.stderr, message
 

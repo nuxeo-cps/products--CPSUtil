@@ -54,7 +54,10 @@ def generatePassword(min_chars=10, max_chars=20):
     return password
 
 
-# A regexp that does word splitting using alpha-numerical words
+# A regexp that does word splitting using alpha-numerical words.
+# Note that we include the "_" character here so that no word splitting is done
+# through this character. This is a compatibility issue with previous versions
+# of CPS that were using "_" as a word separator.
 WORD_SPLITTING_REGEXP = re.compile('[^_a-zA-Z0-9]*')
 
 # Allowing this method to be imported in restricted code
@@ -98,7 +101,7 @@ def generateId(s, max_chars=24, lower=True, word_separator='-',
     if lower:
         id = id.lower()
 
-    # Word splitting the id based on the following separators: '-' '_' '.'.
+    # Performing word splitting on the id.
     # This is done because this method prevents words' cut.
     words = WORD_SPLITTING_REGEXP.split(id)
     words = [w for w in words if w]

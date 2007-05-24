@@ -1,5 +1,7 @@
-# (C) Copyright 2006 Nuxeo SAS <http://nuxeo.com>
-# Author: Olivier Grisel <og@nuxeo.com>
+# (C) Copyright 2006-2007 Nuxeo SAS <http://nuxeo.com>
+# Authors:
+# Olivier Grisel <og@nuxeo.com>
+# M.-A. Darche <madarche@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -16,12 +18,18 @@
 # 02111-1307, USA.
 #
 # $Id$
+
 from zope.interface import Interface
 from Products.GenericSetup.interfaces import IBody, ISetupEnviron
 
 class IRAMCacheManager(Interface):
-    """Standard Zope RAM Cache Manager
+    """Standard Zope RAM Cache Manager.
     """
+
+class IAcceleratedHTTPCacheManager(Interface):
+    """Standard Zope Accelerated HTTP Cache Manager.
+    """
+
 class IForceBodySetupEnviron(ISetupEnviron):
     """To force body export.
 

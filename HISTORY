@@ -39,6 +39,88 @@ New internal features
 - 
 
 ===========================================================
+Package: CPSUtil 0.19.0
+===========================================================
+First release built by: div at: 2007-03-14T12:27:33
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.19.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@51329
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- Added support for Zope Accelerated HTTP Cache Manager in cachemanagersetup.
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
+Package: CPSUtil 0.18.1
+===========================================================
+First release built by: div at: 2007-02-19T18:36:00
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.18.1
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@51117
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- cpshousekeeping : better output.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
+Package: CPSUtil 0.18.0
+===========================================================
+First release built by: gracinet at: 2007-02-08T19:08:12
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.18.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@51054
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- cpshousekeeping: added more verbose log messages especially concerning the
+  size of the ZODB.
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
+Package: CPSUtil 0.17.3
+===========================================================
+First release built by: ben at: 2007-01-08T10:49:33
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.17.3
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@50767
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Improved the sample logrotate.conf so that cron jobs don't output anything if
+  everything is doing fine.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.17.2
 ===========================================================
 First release built by: ben at: 2006-12-26T11:22:56
