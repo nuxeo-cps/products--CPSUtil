@@ -9,4 +9,5 @@ Bug fixes
 -
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
-- 
+- Allowing methods from the CPSUtil.text module to be imported
+  in restricted code.

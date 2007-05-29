@@ -1,5 +1,5 @@
 # -*- coding: ISO-8859-15 -*-
-# (C) Copyright 2005 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -23,10 +23,14 @@
 
 import string, codecs
 
+from AccessControl import ModuleSecurityInfo
+
 ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåçèéêëìíîïñòóôõöøùúûüýÿ""",
     r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toAscii')
 def toAscii(s):
     """Change accented and special characters by ASCII characters.
 
@@ -46,6 +50,8 @@ def toAscii(s):
     return s
 
 
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('truncateText')
 def truncateText(text, size=25):
     """Middle truncature."""
     if text is None or len(text) < size:
