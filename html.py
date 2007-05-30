@@ -1,4 +1,4 @@
-# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Tarek Ziade <tziade@nuxeo.com>
@@ -18,7 +18,7 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""Utility functions for manipulating HTML, XHTML.
+"""Utility functions for manipulating HTML and XHTML.
 """
 
 import re
@@ -26,8 +26,55 @@ from xml.sax.saxutils import quoteattr
 from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
 
-from AccessControl import ModuleSecurityInfo
 from Products.CMFDefault.utils import bodyfinder
+from Products.CMFCore.utils import getToolByName
+from AccessControl import ModuleSecurityInfo
+
+ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
+def renderHtmlTag(tagname, **kw):
+    """Render an HTML tag."""
+    # The "class" key cannot be used since it is a reserved word in python, so
+    # to set the "class" attribute one has to specify the "css_class" key.
+    if kw.get('css_class'):
+        kw['class'] = kw['css_class']
+        del kw['css_class']
+    if kw.has_key('contents'):
+        contents = kw['contents']
+        del kw['contents']
+    else:
+        contents = None
+    attrs = []
+    for key, value in kw.items():
+        if value is None:
+            continue
+        if key in ('value', 'alt') or value != '':
+            attrs.append('%s=%s' % (key, quoteattr(str(value))))
+    res = '<%s %s' % (tagname, ' '.join(attrs))
+    if contents is not None:
+        res += '>%s</%s>' % (contents, tagname)
+    elif tagname in ('input', 'img', 'br', 'hr'):
+        res += ' />'
+    else:
+        res += '>'
+    return res
+
+
+ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('htmlToText')
+def htmlToText(html, context):
+    """Transforms the given string to a string without any HTML formatting."""
+    if context is not None:
+        default_encoding = context.default_charset
+    else:
+        default_encoding = 'latin9'
+
+    transformer = getToolByName(context, 'portal_transforms', None)
+    result = transformer.convertTo(target_mimetype='text/plain', orig=html,
+                                   mimetype='text/html',
+                                   encoding=default_encoding,
+                                   )
+    text = result.getData()
+    return text.strip()
+
 
 # Regexp of the form xxx<body>xxx</body>xxx.
 # DOTALL: Make the "." special character match any character at all, including a
@@ -262,35 +309,6 @@ def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
         res = sanitizer.getResult()
     except (HTMLParseError, SGMLParseError, TypeError):
         pass
-    return res
-
-
-ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
-def renderHtmlTag(tagname, **kw):
-    """Render an HTML tag."""
-    # The "class" key cannot be used since it is a reserved word in python, so
-    # to set the "class" attribute one has to specify the "css_class" key.
-    if kw.get('css_class'):
-        kw['class'] = kw['css_class']
-        del kw['css_class']
-    if kw.has_key('contents'):
-        contents = kw['contents']
-        del kw['contents']
-    else:
-        contents = None
-    attrs = []
-    for key, value in kw.items():
-        if value is None:
-            continue
-        if key in ('value', 'alt') or value != '':
-            attrs.append('%s=%s' % (key, quoteattr(str(value))))
-    res = '<%s %s' % (tagname, ' '.join(attrs))
-    if contents is not None:
-        res += '>%s</%s>' % (contents, tagname)
-    elif tagname in ('input', 'img', 'br', 'hr'):
-        res += ' />'
-    else:
-        res += '>'
     return res
 
 

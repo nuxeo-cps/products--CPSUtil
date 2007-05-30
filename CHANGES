@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- Added an htmlToText method depending on PortalTransforms.
 Bug fixes
 ~~~~~~~~~
 -

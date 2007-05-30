@@ -56,7 +56,7 @@ def truncateText(text, size=25):
     """Middle truncature."""
     if text is None or len(text) < size:
         return text
-    mid_size = (size-3)/2
+    mid_size = (size - 3) / 2
     return text[:mid_size] + '...' + text[-mid_size:]
 
 
