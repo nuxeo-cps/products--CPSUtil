@@ -68,6 +68,8 @@ def htmlToText(html, context):
         default_encoding = 'latin9'
 
     transformer = getToolByName(context, 'portal_transforms', None)
+    if transformer is None:
+        return html
     result = transformer.convertTo(target_mimetype='text/plain', orig=html,
                                    mimetype='text/html',
                                    encoding=default_encoding,
