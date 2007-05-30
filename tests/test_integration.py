@@ -1,5 +1,5 @@
 # -*- coding: ISO-8859-15 -*-
-# (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -18,6 +18,7 @@
 # 02111-1307, USA.
 #
 # $Id$
+
 import unittest
 from Testing import ZopeTestCase
 from Products.CPSUtil.integration import isProductPresent
@@ -28,11 +29,7 @@ from Products.CPSUtil.integration import isUserAgentGecko
 class Test(unittest.TestCase):
 
     def test_isProductPresent(self):
-        self.assert_(not isProductPresent('Products.CPSCore'))
-
-        ZopeTestCase.installProduct('CPSCore', quiet=1)
-        self.assert_(isProductPresent('Products.CPSCore'))
-
+        self.assert_(isProductPresent('Products.CPSUtil'))
         self.assert_(not isProductPresent('Products.ProductWhichDoesntExist'))
 
 

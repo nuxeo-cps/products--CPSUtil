@@ -61,7 +61,11 @@ def renderHtmlTag(tagname, **kw):
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('htmlToText')
 def htmlToText(html, context):
-    """Transforms the given string to a string without any HTML formatting."""
+    """Transforms the given string to a string without any HTML formatting.
+
+    Example:
+    tal:define="htmlToText nocall:modules/Products.CPSUtil.html/htmlToText"
+    """
     if context is not None:
         default_encoding = context.default_charset
     else:
