@@ -159,6 +159,15 @@ def toLatin9(obj):
         obj = _stringToLatin9(obj)
     return obj
 
+def utf8ToUnicode(obj):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, str) and s is not None:
+                obj[k] = v.decode('utf-8')
+    elif isinstance(obj, str):
+        obj = obj.decode('utf-8')
+    return obj
+
 def _stringToLatin9(s):
     if s is None:
         return None

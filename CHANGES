@@ -9,4 +9,4 @@ Bug fixes
 -
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
-- 
+- Added method that converts object from utf-8 string to unicode
