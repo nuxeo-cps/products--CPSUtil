@@ -38,6 +38,7 @@ Starts the cpshousekeeping script every night at 03h59:
 
 import sys
 import os
+from gzip import GzipFile
 import base64
 import urllib2
 import re
@@ -61,6 +62,11 @@ PURGE_LOCALROLES_FORCED_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_
 PURGE_REPOSITORY_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
+# This regexp matches file names of the form
+# YYYY-MM-dd_hh:mm-xxxxxxxxxx
+# Examples:
+# 2007-09-17_11:24-Data.fs
+# 2007-09-17_11:24-Data.fs.gz
 ZODB_BACKUP_FILENAME_REGEXP = re.compile(r'\d+-\d{2}-\d{2}_\d{2}:\d{2}-.+')
 SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s"
 
@@ -68,7 +74,11 @@ SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notific
 def execArgs():
     """Analyze command line arguments.
     """
-    usage = "usage: %prog [options]"
+    usage = """Usage: %prog [options]
+
+Example:
+%prog -vrlPb -u admin -w 'xxx' --host localhost -p 8080 -i cps -z /usr/local/zope/instance/cps/var/Data.fs -k /var/backups/zodb/www.mysite.net
+    """
     parser = OptionParser(usage=usage)
 
     parser.add_option('-v', '--verbose',
@@ -182,6 +192,12 @@ def execArgs():
                       "ZODB backups. "
                       "The default is %s." % DEFAULT_ZODB_BACKUP_DIR_PATH)
 
+    parser.add_option('--nocompress',
+                      action='store_true',
+                      dest='nocompress',
+                      default=False,
+                      help="Don't compress the ZODB backups.")
+
     parser.add_option('-B', '--keep-backups-count',
                       action='store',
                       dest='backups_keep_count',
@@ -249,7 +265,7 @@ def execArgs():
 
     if options.backup:
         backupZodb(options.zodbfile_path, options.backupdir_path,
-                   options.backups_keep_count)
+                   not options.nocompress, options.backups_keep_count)
 
 
 def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
@@ -270,9 +286,11 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
 	    increment=1)
     log("Successfully packed ZODB of host %s" % host_name)
 
-def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
+def backupZodb(zodb_path, backupdir_path, compress=True, backups_keep_count=0):
     """TODO : backupZodb should WARN and not perform this action if there isn't
-    enough space left on target device.
+    enough space left on target device. But unfortunately this requires parsing
+    of platform specific information and there isn't any native python-way to
+    do this yet.
     """
     log("Checking for backups ...")
     time_string = strftime(TIME_FORMAT, gmtime())
@@ -281,8 +299,12 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
     log("command = %s" % command, increment=1)
     os.system(command)
+    if compress:
+        compressFile(zodb_backup_path)
+
     if backups_keep_count > 0:
-        log("There are some backups to remove ...", increment=1)
+        log("Checking for potential backups to remove, "
+            "keeping only the %s ones ..." % backups_keep_count, increment=1)
         file_names = os.listdir(backupdir_path)
         file_names = [x for x in file_names
                       if ZODB_BACKUP_FILENAME_REGEXP.match(x)]
@@ -295,12 +317,31 @@ def backupZodb(zodb_path, backupdir_path, backups_keep_count=0):
     log("Successful backup of the ZODB")
 
 
+def compressFile(file_path):
+    """Compress a file using GZIP.
+    """
+    log("Compressing %s ..." % file_path)
+    f = file(file_path, 'rb')
+    content = f.read()
+    f.close()
+    gzip_file_path = file_path + '.gz'
+    f = GzipFile(gzip_file_path, 'wb')
+    f.write(content)
+    f.close()
+    os.remove(file_path)
+    log("Compressing done : %s" % gzip_file_path)
+
+
 def callUrl(url, username, password):
     """Call urllib2.urlopen with forced HTTP Basic Auth header.
     """
     request = urllib2.Request(url)
     base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
-    request.add_header("Authorization", "Basic %s" % base64string)
+    request.add_header('Authorization', 'Basic %s' % base64string)
+    # Adding this to make the request be a POST request,
+    # because those methods need to be POST because they modify
+    # the state of the application.
+    request.add_data("This is a POST method")
     try:
         urllib2.urlopen(request)
     except urllib2.HTTPError, e:
