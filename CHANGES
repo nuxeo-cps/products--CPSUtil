@@ -3,11 +3,10 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- #1855: Added GZIP compression for ZODB backups in cpshousekeeping.
+-
 Bug fixes
 ~~~~~~~~~
-- #1854: cpshousekeeping doesn't work with recent 2.9 Zopes
-  having the postonly fix.
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

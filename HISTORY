@@ -1,4 +1,25 @@
 ===========================================================
+Package: CPSUtil 1.2.0
+===========================================================
+First release built by: madarche at: 2007-10-19T12:22:37
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/1.2.0
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@52013
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #1855: Added GZIP compression for ZODB backups in cpshousekeeping.
+Bug fixes
+~~~~~~~~~
+- #1854: cpshousekeeping doesn't work with recent 2.9 Zopes
+  having the postonly fix.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.1.0
 ===========================================================
 First release built by: madarche at: 2007-05-30T15:36:40
