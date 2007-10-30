@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- Fix a IE bug (zIndex) for autocompletion field
 Bug fixes
 ~~~~~~~~~
 -

@@ -104,6 +104,10 @@ Autocompleter.Base.prototype = {
   
   fixIEOverlapping: function() {
     Position.clone(this.update, this.iefix, {setTop:(!this.update.style.height)});
+<<<<<<< .mine
+    this.iefix.style.zIndex = 1;alert();
+    this.update.style.zIndex = 22;
+=======
     this.iefix.style.zIndex = 1;
     this.update.style.zIndex = 9;
     elm = this.update;
@@ -113,6 +117,7 @@ Autocompleter.Base.prototype = {
   //elm = this.update.parentNode.parentNode.parentNode;
   //  if (elm.className=="row")
     elm.style.zIndex=99;
+>>>>>>> .r52166
     Element.show(this.iefix);
   },
 
