@@ -121,6 +121,13 @@ Autocompleter.Base.prototype = {
     this.stopIndicator();
     if(Element.getStyle(this.update, 'display')!='none') this.options.onHide(this.element, this.update);
     if(this.iefix) Element.hide(this.iefix);
+    elm = this.update;
+    while (elm.className!="row"){
+        elm = elm.parentNode;
+    }
+    //elm = this.update.parentNode.parentNode.parentNode;
+    //  if (elm.className=="row")
+    elm.style.zIndex=0;
   },
 
   startIndicator: function() {
@@ -194,6 +201,12 @@ Autocompleter.Base.prototype = {
   
   onBlur: function(event) {
     // needed to make click events working
+    if(event&&Element.getStyle(this.update, 'height') != ''){
+         if( Position.within( this.update , Event.pointerX(event) , Event.pointerY(event) ) ){
+             Event.observe(this.update, "blur", this.onBlur.bindAsEventListener(this),true); // make sure blur is still around on
+             return;
+         }
+    }
     setTimeout(this.hide.bind(this), 250);
     this.hasFocus = false;
     this.active = false;     
