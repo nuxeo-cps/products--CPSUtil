@@ -109,10 +109,10 @@ Autocompleter.Base.prototype = {
     this.update.style.zIndex = 9;
     elm = this.update;
   //  while (elm.className!="row"){
-  //      elm = elm.parentNode;
+  //     elm = elm.parentNode;
   //  }
   elm = this.update.parentNode.parentNode.parentNode;
-    if (elm.className=="row")
+  if (elm.className=="row")
     elm.style.zIndex=99;
   Element.show(this.iefix);
   },
@@ -122,12 +122,12 @@ Autocompleter.Base.prototype = {
     if(Element.getStyle(this.update, 'display')!='none') this.options.onHide(this.element, this.update);
     if(this.iefix) Element.hide(this.iefix);
     elm = this.update;
-  //  while (elm.className!="row"){
-  //      elm = elm.parentNode;
-  //  }
+    //while (elm.className!="row"){
+    //    elm = elm.parentNode;
+    //}
     elm = this.update.parentNode.parentNode.parentNode;
-    if (elm.className=="row")
-    elm.style.zIndex=0;
+    if (elm.className=="row" && this.iefix)
+      elm.style.zIndex=1;
   },
 
   startIndicator: function() {
