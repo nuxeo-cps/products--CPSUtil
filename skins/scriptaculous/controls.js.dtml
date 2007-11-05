@@ -96,7 +96,7 @@ Autocompleter.Base.prototype = {
       new Insertion.After(this.update, 
        '<iframe id="' + this.update.id + '_iefix" '+
        'style="display:none;position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);" ' +
-       'src="javascript:false;" frameborder="0" scrolling="no"></iframe>');
+       'src="javascript:false;" frameborder="0" scrolling="yes"></iframe>');
       this.iefix = $(this.update.id+'_iefix');
     }
     if(this.iefix) setTimeout(this.fixIEOverlapping.bind(this), 50);
@@ -108,11 +108,11 @@ Autocompleter.Base.prototype = {
     this.iefix.style.zIndex = 1;
     this.update.style.zIndex = 9;
     elm = this.update;
-    while (elm.className!="row"){
-        elm = elm.parentNode;
-    }
-  //elm = this.update.parentNode.parentNode.parentNode;
-  //  if (elm.className=="row")
+  //  while (elm.className!="row"){
+  //      elm = elm.parentNode;
+  //  }
+  elm = this.update.parentNode.parentNode.parentNode;
+    if (elm.className=="row")
     elm.style.zIndex=99;
   Element.show(this.iefix);
   },
@@ -122,11 +122,11 @@ Autocompleter.Base.prototype = {
     if(Element.getStyle(this.update, 'display')!='none') this.options.onHide(this.element, this.update);
     if(this.iefix) Element.hide(this.iefix);
     elm = this.update;
-    while (elm.className!="row"){
-        elm = elm.parentNode;
-    }
-    //elm = this.update.parentNode.parentNode.parentNode;
-    //  if (elm.className=="row")
+  //  while (elm.className!="row"){
+  //      elm = elm.parentNode;
+  //  }
+    elm = this.update.parentNode.parentNode.parentNode;
+    if (elm.className=="row")
     elm.style.zIndex=0;
   },
 
