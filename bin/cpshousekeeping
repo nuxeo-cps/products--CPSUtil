@@ -40,6 +40,7 @@ import sys
 import os
 from gzip import GzipFile
 import base64
+from urllib import urlencode
 import urllib2
 import re
 from time import strftime, gmtime
@@ -50,6 +51,7 @@ DEFAULT_HOST_PORT = 8080
 DEFAULT_INSTANCE_ID = 'cps'
 DEFAULT_USER_NAME = 'admin'
 DEFAULT_USER_PASSWORD = 'admin'
+DEFAULT_ARCHIVED_REVISION_COUNT = 0
 DEFAULT_HISTORY_DAYS = 0
 DEFAULT_ZODB_PATH = '/usr/local/zope/instance/cps/var/Data.fs'
 DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
@@ -59,7 +61,8 @@ DEFAULT_NOTIFICATION_FREQ = None
 ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack?days:float=%d'
 PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
 PURGE_LOCALROLES_FORCED_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles?lazy:boolean=False"
-PURGE_REPOSITORY_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
+PURGE_DELETED_REVISIONS_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
+PURGE_ARCHIVED_REVISIONS_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeArchivedRevisions"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
 # This regexp matches file names of the form
@@ -151,6 +154,22 @@ Example:
                       default=False,
                       help="Purge the localroles of deleted members.")
 
+    parser.add_option('--purge-archived-revisions',
+                      action='store_true',
+                      dest='purge_archived_revisions',
+                      default=False,
+                      help="Purge the archived revisions of documents.")
+
+    parser.add_option('--archived-revisions',
+                      action='store',
+                      dest='archived_revisions',
+                      type='int',
+                      metavar='NUMBER',
+                      default=DEFAULT_ARCHIVED_REVISION_COUNT,
+                      help="Use NUMBER for the number of archives "
+                      "to keep for each document. "
+                      "Defaults to %s." % DEFAULT_HISTORY_DAYS)
+
     parser.add_option('-P', '--pack-zodb',
                       action='store_true',
                       dest='pack_zodb',
@@ -225,10 +244,10 @@ Example:
     if options.purge_repository:
         log("Purging the document repository of host %s ..." %
             options.host_name)
-        url = PURGE_REPOSITORY_URL_PATTERN % (options.host_name,
-                                              options.host_port,
-                                              options.instance_id)
-        callUrl(url, options.user_name, options.user_password)
+        url = PURGE_DELETED_REVISIONS_URL_PATTERN % (options.host_name,
+                                                     options.host_port,
+                                                     options.instance_id)
+        postUrl(url, options.user_name, options.user_password)
         log("Successfully purged repository of host %s" % options.host_name)
 
     if options.purge_localroles:
@@ -236,7 +255,7 @@ Example:
         url = PURGE_LOCALROLES_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
-        callUrl(url, options.user_name, options.user_password)
+        postUrl(url, options.user_name, options.user_password)
         log("Successfully purged localroles of host %s" % options.host_name)
 
     if options.purge_localroles_force:
@@ -245,8 +264,20 @@ Example:
         url = PURGE_LOCALROLES_FORCED_URL_PATTERN % (options.host_name,
                                                      options.host_port,
                                                      options.instance_id)
-        callUrl(url, options.user_name, options.user_password)
+        postUrl(url, options.user_name, options.user_password)
         log("Successfully purged localroles (forced) of host %s"
+            % options.host_name)
+
+    if options.purge_archived_revisions:
+        log("Purging archived revisions of documents of host %s "
+            "(keeping no more than %s archives per doc) ..."
+            % (options.host_name, options.archived_revisions))
+        url = PURGE_ARCHIVED_REVISIONS_URL_PATTERN % (options.host_name,
+                                                      options.host_port,
+                                                      options.instance_id)
+        postUrl(url, options.user_name, options.user_password,
+                params={'keep_max': options.archived_revisions})
+        log("Successfully purged archived revisions of documents of host %s"
             % options.host_name)
 
     if options.notifications:
@@ -255,7 +286,7 @@ Example:
                                             options.host_port,
                                             options.instance_id,
                                             options.notifications)
-        callUrl(url, options.user_name, options.user_password)
+        postUrl(url, options.user_name, options.user_password)
         log("Successfully sent notifications of host %s" % options.host_name)
 
     if options.pack_zodb:
@@ -279,7 +310,7 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
         log("ZODB size is %s" % getHumanReadableSize(zodb_size),
 	    increment=1)
     url = ZODB_PACKING_URL_PATTERN % (host_name, host_port, days)
-    callUrl(url, user_name, user_password)
+    postUrl(url, user_name, user_password)
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
         log("ZODB size now is %s" % getHumanReadableSize(zodb_size),
@@ -332,16 +363,20 @@ def compressFile(file_path):
     log("Compressing done : %s" % gzip_file_path)
 
 
-def callUrl(url, username, password):
+def postUrl(url, username, password, params={}):
     """Call urllib2.urlopen with forced HTTP Basic Auth header.
     """
     request = urllib2.Request(url)
     base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
     request.add_header('Authorization', 'Basic %s' % base64string)
-    # Adding this to make the request be a POST request,
-    # because those methods need to be POST because they modify
-    # the state of the application.
-    request.add_data("This is a POST method")
+    if params:
+        params_encoded = urlencode(params)
+        request.add_data(params_encoded)
+    else:
+        # Adding this to make sure the request is a POST request,
+        # because this method need to be POST because it modifies
+        # the state of the application.
+        request.add_data("This is a POST method")
     try:
         urllib2.urlopen(request)
     except urllib2.HTTPError, e:

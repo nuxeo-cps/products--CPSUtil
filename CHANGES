@@ -3,10 +3,11 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- #1860: "Add an option to cpshousekeeping to purge archived revisions of
+  documents".
 Bug fixes
 ~~~~~~~~~
--
+- 
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
