@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 0.22.0-rel1271525924
+===========================================================
+First release built by: laurent at: 2007-11-27T16:19:22
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.22.0-rel1271525924
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/branches/rel1271525924@52215
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- Change file
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.21.0-rel1271525924
 ===========================================================
 First release built by: laurent at: 2007-10-30T16:00:50
