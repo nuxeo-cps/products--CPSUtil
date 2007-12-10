@@ -21,19 +21,30 @@
 # 02111-1307, USA.
 #
 # $Id$
-"""A script to perform various housekeeping tasks on CPS by calling Zope through
-HTTPS and optionally.
+"""A script to perform various housekeeping tasks on CPS by calling Zope.
 
-This script should be used directly on the server running Zope.
+This script should be run directly against the server running Zope through HTTP
+and locally, ie not called through Apache httpd and run on localhost.
 
-Place this script in /etc/cron.daily/, /etc/cron.weekly/, /etc/cron.monthly/
-depending on your needs.
+A good practice is to call cpshousekeeping from another script, for example
+a zopecpshousekeeping shell script, so that the user name and password for
+connecting to Zope are never displayed in the email notifications sent by the
+cron daemon.
 
-Or you can make it called through an entry in /etc/crontab or through the
-"crontab -e" command.
+Depending on your needs, call this script in /etc/cron.daily/,
+/etc/cron.weekly/, /etc/cron.monthly/ or as an item in a user crontab through
+the "crontab -e" command.
 
-Starts the cpshousekeeping script every night at 03h59:
-59 3 * * * /usr/local/bin/cpshousekeeping -vrlPb -u admin -w 'xxx' --host localhost -p 8080 -i cps -z /usr/local/zope/instance/cps/var/Data.fs -k /var/backups/zodb/www.mysite.net > /dev/null 2>&1
+For example start the zopecpshousekeeping script every night at 03h59:
+
+59 3 * * * zopecpshousekeeping
+
+With the zopecpshousekeeping shell script containing the full command:
+
+#!/bin/sh
+
+/usr/local/sbin/cpshousekeeping --verbose --user admin --password 'xxx' --host localhost --port 8080 --instance-id cps --purge-repository --purge-localroles-force --pack-zodb --zodbfile /home/zope/cps/var/Data.fs --backupdir /var/backups/zodb/www.mysite.net
+
 """
 
 import sys
@@ -80,7 +91,7 @@ def execArgs():
     usage = """Usage: %prog [options]
 
 Example:
-%prog -vrlPb -u admin -w 'xxx' --host localhost -p 8080 -i cps -z /usr/local/zope/instance/cps/var/Data.fs -k /var/backups/zodb/www.mysite.net
+%prog --verbose --user admin --password 'xxx' --host localhost --port 8080 --instance-id cps --purge-repository --purge-localroles-force --pack-zodb --zodbfile /home/zope/cps/var/Data.fs --backupdir /var/backups/zodb/www.mysite.net
     """
     parser = OptionParser(usage=usage)
 

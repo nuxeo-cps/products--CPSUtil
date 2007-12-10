@@ -7,7 +7,9 @@ New features
   documents".
 Bug fixes
 ~~~~~~~~~
-- 
+- Updated the cpshousekeeping doc to state that it's better to call this script
+  from another script so that user name and password for connecting to Zope are
+  never displayed and thus cannot be spied.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
