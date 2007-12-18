@@ -253,7 +253,7 @@ Example:
     verbose = options.verbose
 
     if options.purge_repository:
-        log("Purging the document repository of host %s ..." %
+        log("\nPurging the document repository of host %s ..." %
             options.host_name)
         url = PURGE_DELETED_REVISIONS_URL_PATTERN % (options.host_name,
                                                      options.host_port,
@@ -262,7 +262,7 @@ Example:
         log("Successfully purged repository of host %s" % options.host_name)
 
     if options.purge_localroles:
-        log("Purging the local roles of host %s ..." % options.host_name)
+        log("\nPurging the local roles of host %s ..." % options.host_name)
         url = PURGE_LOCALROLES_URL_PATTERN % (options.host_name,
                                               options.host_port,
                                               options.instance_id)
@@ -270,7 +270,7 @@ Example:
         log("Successfully purged localroles of host %s" % options.host_name)
 
     if options.purge_localroles_force:
-        log("Purging the local roles (forced) of host %s ..."
+        log("\nPurging the local roles (forced) of host %s ..."
             % options.host_name)
         url = PURGE_LOCALROLES_FORCED_URL_PATTERN % (options.host_name,
                                                      options.host_port,
@@ -280,7 +280,7 @@ Example:
             % options.host_name)
 
     if options.purge_archived_revisions:
-        log("Purging archived revisions of documents of host %s "
+        log("\nPurging archived revisions of documents of host %s "
             "(keeping no more than %s archives per doc) ..."
             % (options.host_name, options.archived_revisions))
         url = PURGE_ARCHIVED_REVISIONS_URL_PATTERN % (options.host_name,
@@ -292,7 +292,7 @@ Example:
             % options.host_name)
 
     if options.notifications:
-        log("Sending notifications of host %s ..." % options.host_name)
+        log("\nSending notifications of host %s ..." % options.host_name)
         url = SEND_NOTIFICATIONS_PATTERN % (options.host_name,
                                             options.host_port,
                                             options.instance_id,
@@ -315,7 +315,7 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
     enough space left on the device where the ZODB is.
     The method should check if there is 2x the size of the ZODB left.
     """
-    log("Packing ZODB %s of host %s ..." % (zodb_path, host_name))
+    log("\nPacking ZODB %s of host %s ..." % (zodb_path, host_name))
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
         log("ZODB size is %s" % getHumanReadableSize(zodb_size),
@@ -334,7 +334,7 @@ def backupZodb(zodb_path, backupdir_path, compress=True, backups_keep_count=0):
     of platform specific information and there isn't any native python-way to
     do this yet.
     """
-    log("Checking for backups ...")
+    log("\nChecking for backups ...")
     time_string = strftime(TIME_FORMAT, gmtime())
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
     zodb_backup_path = os.path.join(backupdir_path, file_name)
