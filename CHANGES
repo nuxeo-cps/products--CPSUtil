@@ -5,6 +5,7 @@ New features
 ~~~~~~~~~~~~
 - #1860: "Add an option to cpshousekeeping to purge archived revisions of
   documents".
+- Added a cookie.js module to deal with cookies through JavaScript.
 Bug fixes
 ~~~~~~~~~
 - Updated the cpshousekeeping doc to state that it's better to call this script
