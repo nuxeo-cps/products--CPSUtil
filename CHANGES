@@ -3,14 +3,10 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- #1860: "Add an option to cpshousekeeping to purge archived revisions of
-  documents".
-- Added a cookie.js module to deal with cookies through JavaScript.
+-
 Bug fixes
 ~~~~~~~~~
-- Updated the cpshousekeeping doc to state that it's better to call this script
-  from another script so that user name and password for connecting to Zope are
-  never displayed and thus cannot be spied.
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
