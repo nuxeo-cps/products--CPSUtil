@@ -106,7 +106,7 @@ Autocompleter.Base = Class.create({
       new Insertion.After(this.update, 
        '<iframe id="' + this.update.id + '_iefix" '+
        'style="display:none;position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);" ' +
-       'src="javascript:false;" frameborder="0" scrolling="no"></iframe>');
+       'src="javascript:false;" frameborder="0" scrolling="yes"></iframe>');
       this.iefix = $(this.update.id+'_iefix');
     }
     if(this.iefix) setTimeout(this.fixIEOverlapping.bind(this), 50);
@@ -115,7 +115,14 @@ Autocompleter.Base = Class.create({
   fixIEOverlapping: function() {
     Position.clone(this.update, this.iefix, {setTop:(!this.update.style.height)});
     this.iefix.style.zIndex = 1;
-    this.update.style.zIndex = 2;
+    this.update.style.zIndex = 9;
+    elm = this.update;
+    //  while (elm.className!="row"){
+    //     elm = elm.parentNode;
+    //  }
+    elm = this.update.parentNode.parentNode.parentNode;
+    if (elm.className=="row")
+      elm.style.zIndex=99;
     Element.show(this.iefix);
   },
 
@@ -123,6 +130,13 @@ Autocompleter.Base = Class.create({
     this.stopIndicator();
     if(Element.getStyle(this.update, 'display')!='none') this.options.onHide(this.element, this.update);
     if(this.iefix) Element.hide(this.iefix);
+    elm = this.update;
+    //while (elm.className!="row"){
+    //    elm = elm.parentNode;
+    //}
+    elm = this.update.parentNode.parentNode.parentNode;
+    if (elm.className=="row" && this.iefix)
+      elm.style.zIndex=1;
   },
 
   startIndicator: function() {
@@ -196,6 +210,12 @@ Autocompleter.Base = Class.create({
   
   onBlur: function(event) {
     // needed to make click events working
+    if(event&&Element.getStyle(this.update, 'height') != ''){
+         if( Position.within( this.update , Event.pointerX(event) , Event.pointerY(event) ) ){
+             Event.observe(this.update, "blur", this.onBlur.bindAsEventListener(this),true); // make sure blur is still around on
+             return;
+         }
+    }
     setTimeout(this.hide.bind(this), 250);
     this.hasFocus = false;
     this.active = false;     
