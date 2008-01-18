@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 0.23.0-rel1271525924
+===========================================================
+First release built by: gracinet at: 2008-01-18T16:22:44
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/0.23.0-rel1271525924
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/branches/rel1271525924@52466
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- Updated to scrip.aculo.us and prototype
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 0.22.0-rel1271525924
 ===========================================================
 First release built by: laurent at: 2007-11-27T16:19:22
