@@ -6,7 +6,8 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- Added a path parameter to set cookies so that it's possible to set a cookie
+  site-wide.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

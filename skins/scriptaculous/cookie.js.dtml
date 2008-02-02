@@ -9,14 +9,15 @@
 // See scriptaculous.js for full license.
 
 var Cookie = {
-  set: function(name, value, daysToExpire) {
+  set: function(name, value, daysToExpire, path) {
     var expire = '';
     if (daysToExpire != undefined) {
       var d = new Date();
       d.setTime(d.getTime() + (86400000 * parseFloat(daysToExpire)));
       expire = '; expires=' + d.toGMTString();
+      var pathString = '; path=' + path;
     }
-    return (document.cookie = escape(name) + '=' + escape(value || '') + expire);
+    return (document.cookie = escape(name) + '=' + escape(value || '') + expire + pathString);
   },
   get: function(name) {
     var cookie = document.cookie.match(new RegExp('(^|;)\\s*' + escape(name) + '=([^;\\s]*)'));
