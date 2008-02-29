@@ -1,5 +1,5 @@
 # -*- coding: ISO-8859-15 -*-
-# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 #
@@ -49,6 +49,28 @@ def toAscii(s):
     s = s.replace('ß', 'ss')
     return s
 
+# Allowing this method to be imported in restricted code
+ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toLatin9')
+def toLatin9(obj):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, unicode):
+                v = _unicodeToLatin9(v)
+                obj[k] = v
+    elif isinstance(obj, unicode):
+        obj = _unicodeToLatin9(obj)
+    return obj
+
+def _unicodeToLatin9(s):
+    if s is None:
+        return None
+    else:
+        # Replace RIGHT SINGLE QUOTATION MARK (unicode only)
+        # by the APOSTROPHE (ascii and latin1).
+        # cf. http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html
+        s = s.replace(u'\u2019', u'\u0027')
+        #&#8217;
+        return s.encode('iso-8859-15', 'ignore')
 
 # Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('truncateText')
