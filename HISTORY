@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 1.3.2
+===========================================================
+First release built by: madarche at: 2008-03-07T18:45:07
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/1.3.2
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@52640
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Factorized the toLatin9 method in CPSUtil.text.
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.3.1
 ===========================================================
 First release built by: madarche at: 2008-02-22T15:55:13
