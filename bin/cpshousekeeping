@@ -49,6 +49,7 @@ With the zopecpshousekeeping shell script containing the full command:
 
 import sys
 import os
+from shutil import copyfileobj
 from gzip import GzipFile
 import base64
 from urllib import urlencode
@@ -363,13 +364,11 @@ def compressFile(file_path):
     """Compress a file using GZIP.
     """
     log("Compressing %s ..." % file_path)
-    f = file(file_path, 'rb')
-    content = f.read()
-    f.close()
+    f_in = file(file_path, 'rb')
     gzip_file_path = file_path + '.gz'
-    f = GzipFile(gzip_file_path, 'wb')
-    f.write(content)
-    f.close()
+    f_out = GzipFile(gzip_file_path, 'wb')
+    copyfileobj(f_in, f_out)
+    f_out.close()
     os.remove(file_path)
     log("Compressing done : %s" % gzip_file_path)
 
