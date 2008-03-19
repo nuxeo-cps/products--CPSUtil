@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
-- #1896: MemoryError on cpshousekeeping non-efficient Data.fs compression.
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
