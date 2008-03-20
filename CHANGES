@@ -6,7 +6,8 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #1897: Excessive cleaning in XhtmlSanitizer and HTMLSanitizer concerning
+  entities.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

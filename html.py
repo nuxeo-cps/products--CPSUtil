@@ -1,7 +1,8 @@
-# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Tarek Ziade <tziade@nuxeo.com>
+# Thierry Martins <tmartins@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -23,6 +24,7 @@
 
 import re
 from xml.sax.saxutils import quoteattr
+from htmlentitydefs import entitydefs
 from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
 
@@ -162,8 +164,8 @@ class XhtmlSanitizer(HTMLParser):
     def handle_charref(self, name):
         self.result.append('&#%s' % name)
 
-    def handle_entyref(self, name):
-        x = ';' * self.entitydefs.has_key(name)
+    def handle_entityref(self, name):
+        x = ';' * entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 
     def handle_starttag(self, tag, attrs):
@@ -254,8 +256,8 @@ class HTMLSanitizer(SGMLParser):
     def handle_charref(self, name):
         self.result.append('&#%s' % name)
 
-    def handle_entyref(self, name):
-        x = ';' * self.entitydefs.has_key(name)
+    def handle_entityref(self, name):
+        x = ';' * entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 
     def unknown_starttag(self, tag, attrs):
