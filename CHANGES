@@ -10,6 +10,7 @@ Bug fixes
   script.aculo.us 1.8.1 and prototype 1.6.0.1.
 - #1897: Excessive cleaning in XhtmlSanitizer and HTMLSanitizer concerning
   entities.
+- Removed contextmenu.js.dtml which wasn't used anywhere.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
