@@ -189,7 +189,7 @@ class XhtmlSanitizer(HTMLParser):
                 self.endTagList.insert(0, end_tag)
 
     def handle_endtag(self, tag):
-        # First eplacing the tag by another one if needed
+        # First replacing the tag by another one if needed
         tag = self.tag_replacements.get(tag, tag)
         if tag in self.tags_to_keep and tag not in self.tags_empty:
             end_tag = '</%s>' % tag
