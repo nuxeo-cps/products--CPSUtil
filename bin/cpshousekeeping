@@ -320,7 +320,7 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
         zodb_size = os.path.getsize(zodb_path)
         log("ZODB size is %s" % getHumanReadableSize(zodb_size),
 	    increment=1)
-    url = ZODB_PACKING_URL_PATTERN % (host_name, host_port, days)
+    url = ZODB_PACKING_URL_PATTERN % (host_name, host_port)
     postUrl(url, user_name, user_password, params={'days:float': days})
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
