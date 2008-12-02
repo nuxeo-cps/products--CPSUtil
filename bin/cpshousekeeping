@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Olivier Grisel <og@nuxeo.com>
@@ -69,9 +69,9 @@ DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
 DEFAULT_ZODB_BACKUPS_KEEP_COUNT = 7
 DEFAULT_NOTIFICATION_FREQ = None
 
-ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack?days:float=%d'
+ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack'
 PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
-PURGE_LOCALROLES_FORCED_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles?lazy:boolean=False"
+PURGE_LOCALROLES_FORCED_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
 PURGE_DELETED_REVISIONS_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
 PURGE_ARCHIVED_REVISIONS_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeArchivedRevisions"
 CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
@@ -275,7 +275,8 @@ Example:
         url = PURGE_LOCALROLES_FORCED_URL_PATTERN % (options.host_name,
                                                      options.host_port,
                                                      options.instance_id)
-        postUrl(url, options.user_name, options.user_password)
+        postUrl(url, options.user_name, options.user_password,
+                params={'lazy:boolean': False})
         log("Successfully purged localroles (forced) of host %s"
             % options.host_name)
 
@@ -321,7 +322,7 @@ def packZodb(zodb_path, days, host_name, host_port, user_name, user_password):
         log("ZODB size is %s" % getHumanReadableSize(zodb_size),
 	    increment=1)
     url = ZODB_PACKING_URL_PATTERN % (host_name, host_port, days)
-    postUrl(url, user_name, user_password)
+    postUrl(url, user_name, user_password, params={'days:float': days})
     if verbose:
         zodb_size = os.path.getsize(zodb_path)
         log("ZODB size now is %s" % getHumanReadableSize(zodb_size),
