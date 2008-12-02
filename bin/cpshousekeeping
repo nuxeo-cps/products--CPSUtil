@@ -70,11 +70,10 @@ DEFAULT_ZODB_BACKUPS_KEEP_COUNT = 7
 DEFAULT_NOTIFICATION_FREQ = None
 
 ZODB_PACKING_URL_PATTERN = 'http://%s:%s/Control_Panel/Database/manage_pack'
-PURGE_LOCALROLES_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
-PURGE_LOCALROLES_FORCED_URL_PATTERN = "http://%s:%s/%s/portal_membership/manage_purgeLocalRoles"
-PURGE_DELETED_REVISIONS_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions"
-PURGE_ARCHIVED_REVISIONS_URL_PATTERN = "http://%s:%s/%s/portal_repository/manage_purgeArchivedRevisions"
-CPS_LOGIN_URL_PATTERN = "http://%s:%s/%s/logged_in"
+PURGE_LOCALROLES_URL_PATTERN = 'http://%s:%s/%s/portal_membership/manage_purgeLocalRoles'
+PURGE_LOCALROLES_FORCED_URL_PATTERN = 'http://%s:%s/%s/portal_membership/manage_purgeLocalRoles'
+PURGE_DELETED_REVISIONS_URL_PATTERN = 'http://%s:%s/%s/portal_repository/manage_purgeDeletedRevisions'
+PURGE_ARCHIVED_REVISIONS_URL_PATTERN = 'http://%s:%s/%s/portal_repository/manage_purgeArchivedRevisions'
 TIME_FORMAT = '%Y-%m-%d_%H:%M'
 # This regexp matches file names of the form
 # YYYY-MM-dd_hh:mm-xxxxxxxxxx
@@ -82,7 +81,7 @@ TIME_FORMAT = '%Y-%m-%d_%H:%M'
 # 2007-09-17_11:24-Data.fs
 # 2007-09-17_11:24-Data.fs.gz
 ZODB_BACKUP_FILENAME_REGEXP = re.compile(r'\d+-\d{2}-\d{2}_\d{2}:\d{2}-.+')
-SEND_NOTIFICATIONS_PATTERN = "http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s"
+SEND_NOTIFICATIONS_PATTERN = 'http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s'
 
 
 def execArgs():
