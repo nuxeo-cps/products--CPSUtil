@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# print the doc if no args
+if [ -z $1 ]; then
+ cat <<EOF
+
+ Usage: runalltests <path>
+
+ This run all CPS tests from <path> (a Zope instance), 
+ exits with code 1 in case of errors (except import problems)
+
+ The standard output will be the path on filesystem of the error log,
+ for further processing.
+
+EOF
+  exit 0
+fi
+
+
+cd $1
+timestamp=`date +%F-%T`
+errorlog="/tmp/test_cps-errors-$timestamp.log"
+touch $errorlog # for people wanting to tail it right away
+echo $errorlog
+report="/tmp/test_cps-report"
+EXIT_CODE=0
+for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
+   logfile="/tmp/test_cps-$x-$timestamp.log"
+   bin/zopectl test --dir Products/$x > $logfile 2>&1
+   grep "^Total" $logfile > $report
+   analysed=`grep -v "0 failures, 0 errors" ${report}` 
+   if [ ! -z "$analysed" ]; then
+       EXIT_CODE=1
+       echo "BROKEN TESTS FOR $x" >> $errorlog
+       cat $logfile >> $errorlog
+   fi
+   rm $report
+done
+
+exit $EXIT_CODE
