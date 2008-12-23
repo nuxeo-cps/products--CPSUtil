@@ -75,13 +75,19 @@ _html_converter = retransform("html_to_text",
 def html_to_text(html_data):
     return _html_converter.convert(html_data)
 
-def send_mail(context, mto, mfrom, subject, body, mcc=(), attachments=(),
-              encoding='iso-8859-15', plain_text=True):
+def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
+              attachments=(),
+              encoding='iso-8859-15', plain_text=True, additional_headers=()):
     """Send a mail
 
-    body is plain text or html according to plain_text kwarg
+    mto is the user-level Mail To. It can be a string, or list/tuple of strings.
+        It can also be None, or empty, provided there are Ccs or Bccs.
+    mcc (Mail Cc) and mbcc (Mail Bcc) can be strings or list/tuples of strings.
 
-    Optional attachments are (filename, content-type, data) tuples.
+    body is plain text or html according to the plain_text kwarg
+
+    Optional attachments are triples (filename, content-type, data) tuples.
+    additional_headers are pairs (name, value)
 
     This function does not do any error handling besides re-casting and logging
     if the Mailhost fails to send it properly. 
@@ -89,12 +95,6 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), attachments=(),
     """
     mailhost = getToolByName(context, 'MailHost')
     attachments = list(attachments)
-
-    # building the formatted email message
-    if not mto:
-        raise ValueError('Empty To field forbidden')
-    if not isinstance(mto, str):
-        mto = ', '.join(mto)
 
     # prepare main content
     content_type = plain_text and 'text/plain' or 'text/html'
@@ -114,11 +114,29 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), attachments=(),
 
     COMMASPACE = ', '
 
+    # Headers
     msg['Subject'] = subject
     msg['From'] = mfrom
-    msg['To'] = isinstance(mto, basestring) and mto or COMMASPACE.join(mto)
+
+    if not mto: 
+        mto = []
+    if isinstance(mto, basestring):
+        mto = [mto]
+    msg['To'] = COMMASPACE.join(mto)
+
     if mcc:
         msg['Cc'] = isinstance(mcc, basestring) and mcc or COMMASPACE.join(mcc)
+        if not mto:
+            # use first Cc as (non header) mail-to
+            mto = [isinstance(mcc, basestring) and mcc or mcc[0]]
+    if mbcc:
+        # Don't put Bcc in headers otherwise they'd get transferred
+        if isinstance(mbcc, basestring):
+            mto.append(mbcc)
+        else:
+            mto.extend(mbcc)
+    for key, value in additional_headers:
+        msg[key] = value
     msg.preamble = subject
     # Guarantees the message ends in a newline
     msg.epilogue = ''
@@ -153,6 +171,8 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), attachments=(),
     logger.debug("sending email %s" % log_str)
 
     # sending and error casting
+    if not mto:
+        raise ValueError("Empty final list of recipients address")
     try:
         return mailhost._send(mfrom, mto, msg.as_string())
     # if anything went wrong: log the error for the admin and raise an exception
