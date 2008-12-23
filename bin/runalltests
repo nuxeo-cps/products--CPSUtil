@@ -7,7 +7,7 @@ if [ -z $1 ]; then
  Usage: runalltests <path>
 
  This run all CPS tests from <path> (a Zope instance), 
- exits with code 1 in case of errors (except import problems)
+ exits with code 1 in case of errors
 
  The standard output will be the path on filesystem of the error log,
  for further processing.
@@ -33,6 +33,14 @@ for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
        EXIT_CODE=1
        echo "BROKEN TESTS FOR $x" >> $errorlog
        cat $logfile >> $errorlog
+   fi
+
+   import_pbms=`grep -A10 "^Test-modules with import problems" $logfile`
+   if [ ! -z "$import_pbms" ];
+   then
+       EXIT_CODE=1
+       echo "IMPORT PROBLEMS FOR $x" >> $errorlog
+       echo $import_pbms >> $errorlog
    fi
    rm $report
 done
