@@ -42,7 +42,7 @@ for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
        echo "IMPORT PROBLEMS FOR $x" >> $errorlog
        echo $import_pbms >> $errorlog
    fi
-   rm $report
+   rm $report $logfile
 done
 
 exit $EXIT_CODE
