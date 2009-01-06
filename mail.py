@@ -90,7 +90,7 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     additional_headers are pairs (name, value)
 
     This function does not do any error handling besides re-casting and logging
-    if the Mailhost fails to send it properly. 
+    if the Mailhost fails to send it properly.
     This will be handled by the callers along with the redirect if needed.
     """
     mailhost = getToolByName(context, 'MailHost')
@@ -118,7 +118,7 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     msg['Subject'] = subject
     msg['From'] = mfrom
 
-    if not mto: 
+    if not mto:
         mto = []
     if isinstance(mto, basestring):
         mto = [mto]
