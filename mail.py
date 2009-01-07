@@ -1,5 +1,7 @@
-# (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
-# Author: Olivier Grisel <og@nuxeo.com>  (originally in CPSCourrier)
+# (C) Copyright 2005-2009 Nuxeo SAS <http://nuxeo.com>
+# Authors:
+# Olivier Grisel <og@nuxeo.com>
+# M.-A. Darche <madarche@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -16,7 +18,7 @@
 # 02111-1307, USA.
 #
 # $Id: html.py 53128 2008-11-23 22:27:28Z madarche $
-"""Utility functions for email handling
+"""Utility functions for email handling (i18n, etc.).
 """
 
 import logging
@@ -30,6 +32,7 @@ from email.MIMEBase import MIMEBase
 from email.MIMEImage import MIMEImage
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
+from email.Header import Header
 
 from Products.CMFCore.utils import getToolByName
 
@@ -115,7 +118,7 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     COMMASPACE = ', '
 
     # Headers
-    msg['Subject'] = subject
+    msg['Subject'] = Header(subject, encoding)
     msg['From'] = mfrom
 
     if not mto:

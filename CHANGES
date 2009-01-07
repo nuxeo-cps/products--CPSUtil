@@ -9,6 +9,8 @@ Bug fixes
 - #1762: Provide a high level utility for sending email
 - #1941: cpshousekeeping purge local roles force not effective (wrong parameter
   passing).
+- #1956: Non-ASCII email subjects are not compliant, not well encoded and not
+  well displayed.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
