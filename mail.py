@@ -36,6 +36,8 @@ from email.Header import Header
 
 from Products.CMFCore.utils import getToolByName
 
+from text import toAscii
+
 logger = logging.getLogger('Products.CPSUtil.mail')
 
 class retransform:
@@ -117,8 +119,11 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
 
     COMMASPACE = ', '
 
+    # Encoding according to RFC 2047 for non-ASCII subjects
+    if toAscii(subject) != subject:
+        subject = Header(subject, encoding)
     # Headers
-    msg['Subject'] = Header(subject, encoding)
+    msg['Subject'] = subject
     msg['From'] = mfrom
 
     if not mto:
