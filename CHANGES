@@ -11,6 +11,7 @@ Bug fixes
   passing).
 - #1956: Non-ASCII email subjects are not compliant, not well encoded and not
   well displayed.
+- Made /etc/init.d/zopes script be LSB-compliant.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

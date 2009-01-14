@@ -1,10 +1,18 @@
 #!/usr/bin/python
+### BEGIN INIT INFO
+# Provides:          zopes
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop Zope instances
+### END INIT INFO
 #
 # Don't remove the following two lines used for the RedHat chkconfig framework.
 #chkconfig: 2345 80 01
 #description: Zope servers
 #
-# (C) Copyright 2006 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2006-2009 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # Stefane Fermigier <sf@nuxeo.com>
 # M.-A. Darche <madarche@nuxeo.com>
