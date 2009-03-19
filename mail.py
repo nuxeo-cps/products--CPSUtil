@@ -202,9 +202,9 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     attachment_log = list((title, ctype) for title, ctype, _ in attachments)
     related_log = list((rel['filename'], rel['content-type'])
                        for rel in related_parts.values())
-    logger.debug('sending email to: %r, from: %r, subject: %r, body: %r, '
-                 'rel: %r, att: %r',
-                 mto, mfrom, subject, body, related_log, attachment_log)
+    log_str = 'to: %r, from: %r, subject: %r, body: %r, rel: %r, att: %r' % (
+        mto, mfrom, subject, body, related_log, attachment_log)
+    logger.debug('sending email %s', log_str)
 
     # sending and error casting
     if not mto:
