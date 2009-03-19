@@ -81,7 +81,7 @@ def html_to_text(html_data):
     return _html_converter.convert(html_data)
 
 def _make_html_part(body, encoding, related_parts=None):
-    html_part = MIMEText(body, _subtype='html', _charset=encoding) 
+    html_part = MIMEText(body, _subtype='html', _charset=encoding)
     if not related_parts:
         return html_part
 
@@ -92,7 +92,7 @@ def _make_html_part(body, encoding, related_parts=None):
         sub_part.add_header('Content-Disposition', 'inline',
                             filename=part['filename'])
         sub_part.add_header('Content-Id', cid)
-    res.attach(sub_part)
+        res.attach(sub_part)
     return res
 
 def _make_file_part(content_type, data):
