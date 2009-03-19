@@ -33,6 +33,7 @@ from email.MIMEImage import MIMEImage
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.Header import Header
+from email.Utils import make_msgid
 
 from Products.CMFCore.utils import getToolByName
 
@@ -80,6 +81,12 @@ _html_converter = retransform("html_to_text",
 def html_to_text(html_data):
     return _html_converter.convert(html_data)
 
+def make_cid(base):
+    """Return an RFC 2392 compliant Content-ID, stripped of the <> brackets."""
+    # RFC treats message ids and content ids exactly in the same way and
+    # refers to RFC 822 for syntax.
+    return make_msgid(base)[1:-1]
+
 def _make_html_part(body, encoding, related_parts=None):
     html_part = MIMEText(body, _subtype='html', _charset=encoding)
     if not related_parts:
@@ -91,7 +98,7 @@ def _make_html_part(body, encoding, related_parts=None):
         sub_part = _make_file_part(part['content-type'], part['data'])
         sub_part.add_header('Content-Disposition', 'inline',
                             filename=part['filename'])
-        sub_part.add_header('Content-Id', cid)
+        sub_part.add_header('Content-Id', '<%s>' % cid)
         res.attach(sub_part)
     return res
 
