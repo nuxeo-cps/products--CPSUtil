@@ -80,8 +80,42 @@ _html_converter = retransform("html_to_text",
 def html_to_text(html_data):
     return _html_converter.convert(html_data)
 
+def _make_html_part(body, encoding, related_parts=None):
+    html_part = MIMEText(body, _subtype='html', _charset=encoding) 
+    if not related_parts:
+        return html_part
+
+    res = MIMEMultipart(_subtype='related')
+    res.attach(html_part)
+    for cid, part in related_parts.items():
+        sub_part = _make_file_part(part['content-type'], part['data'])
+        sub_part.add_header('Content-Disposition', 'inline',
+                            filename=part['filename'])
+        sub_part.add_header('Content-Id', cid)
+    res.attach(sub_part)
+    return res
+
+def _make_file_part(content_type, data):
+    if content_type is None:
+        # No guess could be made, or the file is encoded (compressed), so
+        # use a generic bag-of-bits type.
+        content_type = 'application/octet-stream'
+    maintype, subtype = content_type.split('/', 1)
+    if maintype == 'text':
+        sub_msg = MIMEText(data, _subtype=subtype)
+    elif maintype == 'image':
+        sub_msg = MIMEImage(data, _subtype=subtype)
+    elif maintype == 'audio':
+        sub_msg = MIMEAudio(data, _subtype=subtype)
+    else:
+        sub_msg = MIMEBase(maintype, subtype)
+        sub_msg.set_payload(data)
+        # Encode the payload using Base64
+        Encoders.encode_base64(sub_msg)
+    return sub_msg
+
 def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
-              attachments=(),
+              attachments=(), related_parts=None,
               encoding='iso-8859-15', plain_text=True, additional_headers=()):
     """Send a mail
 
@@ -92,12 +126,19 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     body is plain text or html according to the plain_text kwarg
 
     Optional attachments are triples (filename, content-type, data) tuples.
-    additional_headers are pairs (name, value)
+    additional_headers are pairs (name, value), where data is either a string
+    or an object implementing the file API.
+
+    If optional related_parts dict is present and body is html, it's used in
+    a multipart/related MIME construct. The keys are content ids, values are
+    triples like attachments.
 
     This function does not do any error handling besides re-casting and logging
     if the Mailhost fails to send it properly.
     This will be handled by the callers along with the redirect if needed.
     """
+    if related_parts is None:
+        related_parts = {}
     mailhost = getToolByName(context, 'MailHost')
     attachments = list(attachments)
 
@@ -106,7 +147,7 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     if plain_text:
         main_msg = MIMEText(body, _subtype='plain', _charset=encoding)
     else:
-        alt_html = MIMEText(body, _subtype='html', _charset=encoding)
+        alt_html = _make_html_part(body, encoding, related_parts=related_parts)
         alt_plain = MIMEText(html_to_text(body), _charset=encoding)
         main_msg = MIMEMultipart(_subtype='alternative',
                                  _subparts=[alt_plain, alt_html])
@@ -151,22 +192,7 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
 
     # attachment management (if any)
     for title, ctype, data in attachments:
-        if ctype is None:
-            # No guess could be made, or the file is encoded (compressed), so
-            # use a generic bag-of-bits type.
-            ctype = 'application/octet-stream'
-        maintype, subtype = ctype.split('/', 1)
-        if maintype == 'text':
-            sub_msg = MIMEText(data, _subtype=subtype)
-        elif maintype == 'image':
-            sub_msg = MIMEImage(data, _subtype=subtype)
-        elif maintype == 'audio':
-            sub_msg = MIMEAudio(data, _subtype=subtype)
-        else:
-            sub_msg = MIMEBase(maintype, subtype)
-            sub_msg.set_payload(data)
-            # Encode the payload using Base64
-            Encoders.encode_base64(sub_msg)
+        sub_msg = _make_file_part(title, ctype, data)
         # Set the filename parameter
         sub_msg.add_header('Content-Disposition', 'attachment',
                            filename=title)
@@ -174,9 +200,11 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
 
     # loggin string
     attachment_log = list((title, ctype) for title, ctype, _ in attachments)
-    mail_data = (mto, mfrom, subject, body, attachment_log)
-    log_str = 'to: %r, from: %r, subject: %r, body: %r, att: %r' % mail_data
-    logger.debug("sending email %s" % log_str)
+    related_log = list((rel['filename'], rel['content-type'])
+                       for rel in related_parts.values())
+    logger.debug('sending email to: %r, from: %r, subject: %r, body: %r, '
+                 'rel: %r, att: %r',
+                 mto, mfrom, subject, body, related_log, attachment_log)
 
     # sending and error casting
     if not mto:

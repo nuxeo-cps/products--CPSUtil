@@ -3,7 +3,8 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- #1961: improve HTML rendering of document notifications (support for
+  multipart/related)
 Bug fixes
 ~~~~~~~~~
 - #1762: Provide a high level utility for sending email
@@ -14,4 +15,4 @@ Bug fixes
 - Made /etc/init.d/zopes script be LSB-compliant.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
-- 
+-
