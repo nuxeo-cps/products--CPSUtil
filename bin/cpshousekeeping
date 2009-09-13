@@ -26,6 +26,10 @@
 This script should be run directly against the server running Zope through HTTP
 and locally, ie not called through Apache httpd and run on localhost.
 
+This script can be used for monolithic Zope instances as well as ZEO
+configurations. In this latter case, one has just to run this script against one
+of the ZEO clients.
+
 A good practice is to call cpshousekeeping from another script, for example
 a zopecpshousekeeping shell script, so that the user name and password for
 connecting to Zope are never displayed in the email notifications sent by the

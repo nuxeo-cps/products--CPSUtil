@@ -15,4 +15,5 @@ Bug fixes
 - Made /etc/init.d/zopes script be LSB-compliant.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
--
+- Added a note on cpshousekeeping doc that this script can be used for ZEO
+  configurations too.
