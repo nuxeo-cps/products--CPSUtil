@@ -5,6 +5,7 @@ New features
 ~~~~~~~~~~~~
 - #1961: improve HTML rendering of document notifications (support for
   multipart/related)
+- #2080: CPS job system
 Bug fixes
 ~~~~~~~~~
 - #1762: Provide a high level utility for sending email

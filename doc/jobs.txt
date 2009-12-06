@@ -1,0 +1,140 @@
+========
+CPS JOBS
+========
+
+:Revision: $Id: fields.txt 51533 2007-04-16 09:32:03Z gracinet $
+
+.. sectnum::    :depth: 4
+.. contents::   :depth: 4
+
+CPS jobs is a harness to launch python scripts against a CPS
+instance. These scripts can invoke any API from the Zope/CMF/CPS stack
+and run as unrestricted users. It works either in monolithic or ZEO
+setups (see below).
+
+This is working on unix-like systems (UNIX, Linux, Mac OS). Making an MS
+Windows version would probably be just a matter of testing it.
+
+INSTALL
+=======
+
+Before running any job, you have to prepare the bootstrap launcher
+from the ``zopectl`` control script. If the value of ``INSTANCE_HOME``
+is the path to the Zope instance you want to equip, do the following::
+
+   $ cd ${INSTANCE_HOME}/bin
+   $ cp zopectl cpsjob
+   $ patch -p0 cpsjob < Products/CPSUtil/cpsjob.patch
+
+The ``cpsjob`` shell script has the same fundamental properties as
+``zopectl``. Notably, it is *tied to the instance*. If you need it
+in another Zope instance, even from the same ZEO cluster, you'll have
+this small procedure again. Same if you want to relocate the instance.
+The common reason for ``zopectl`` and ``cpsjob`` is that both include
+the path to the instance.
+
+INSTANCE TYPES
+==============
+
+The best flexibility is achieved with a ZEO cluster setup. In that
+context, there's no need to stop the application, and a job can be ran
+in any client, currently serving requests or not. There's no need to
+make a dedicated client.
+
+In monolithic setups, you have to stop the instance before running a
+CPS job. This is because the running instance has a lock on the ZODB.
+
+INVOCATION
+==========
+
+Assuming the ``cpsjob`` of that instance is on the ``PATH``, do::
+
+$ cpsjob [option] <portal id> <python module> [job args]
+
+where <portal id> is the id of the CPS portal at the root of the ZODB
+hierarchy, and <python module> is the dotted name of a python module
+such as ``myjob`` (from ``myjob.py`` on the current python path) or
+``Products.CPSDefault.jobs.examplejob`` (standard Zope import
+context).
+
+Available options
+-----------------
+
+Do ``cpsjob --help`` for an up-to-date list of options. Currently
+this is::
+
+  -h, --help            show this help message and exit
+  -u USER_ID, --username=USER_ID specifies the id of the transient
+  unrestricted user to run as (will appear, e.g, in status history of 
+  modified documents). Defaults to 'cpsjob'.
+
+Additional arguments
+--------------------
+
+They will be passed to the job (see below).
+
+Testing the launcher
+--------------------
+
+You can for instance use the sample script provided below.
+
+JOB PYTHON SCRIPTS
+==================
+
+The job script must declare a ``run`` function, accepting two
+positional arguments::
+
+- portal -- CPS portal object
+- arguments -- further arguments for the job. 
+
+Otherwise, it follows the same rules as any piece of unrestricted
+code. You can do anything that does not require a request object, and
+import any module from Zope or the application code.
+
+The configuration is mostly read from the standard ``zope.conf`` file.
+
+Job arguments
+-------------
+The standard ``sys.argv`` will be empty once the job code is
+reached. This is required by the Zope starter. 
+
+In particular, if you want to use the ``optparse``
+standard module, your ``run`` function has to pass ``arguments``
+explicitely to the ``OptionParser`` instance, like this::
+
+  >>> parser.parse_args(args=arguments)
+
+Logging
+-------
+
+The logging module is not configured by default. The job has to do it.
+
+Example
+-------
+
+This job prints the creation date of a document specified by
+its relative path from the portal::
+
+  from zope.interface import implements
+  from Products.CPSCore.interfaces import ICPSProxy, ICPSSite
+
+  def run(portal, args):
+      rpath = args and args[0] or ''
+      ob = portal.unrestrictedTraverse(rpath)
+
+      if ICPSSite.providedBy(ob):
+	  print "Found the portal object"
+      elif not ICPSProxy.providedBy(ob):
+          raise RuntimeError("Object at '%s' is not a CPS Proxy." %
+	  rpath)
+      else:
+          print "\nFound CPS proxy at '%s'" % rpath
+
+      print "Creation date: %s" % ob.created() # Dublin core API
+
+.. Emacs
+.. Local Variables:
+.. mode: rst
+.. End:
+.. Vim
+.. vim: set filetype=rst:
