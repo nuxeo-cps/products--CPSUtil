@@ -85,7 +85,7 @@ The job script must declare a ``run`` function, accepting two
 positional arguments::
 
 - portal -- CPS portal object
-- arguments -- further arguments for the job. 
+- arguments -- further arguments for the job.
 
 Otherwise, it follows the same rules as any piece of unrestricted
 code. You can do anything that does not require a request object, and
@@ -93,10 +93,22 @@ import any module from Zope or the application code.
 
 The configuration is mostly read from the standard ``zope.conf`` file.
 
+Persisting changes
+------------------
+
+Unlike External Methods, or code running in the context of an HTTP
+request, a CPS job has to invoke itself the transaction commit,
+otherwise nothing will be persisted::
+
+  >>> import transaction
+  >>> transaction.commit()
+
+This is really the same as within a ``zopectl debug`` session.
+
 Job arguments
 -------------
 The standard ``sys.argv`` will be empty once the job code is
-reached. This is required by the Zope starter. 
+reached. This is required by the Zope starter.
 
 In particular, if you want to use the ``optparse``
 standard module, your ``run`` function has to pass ``arguments``
