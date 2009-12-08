@@ -4,7 +4,9 @@ For now the options system is at its simplest
 """
 
 import sys
+import os
 import optparse
+import logging
 
 import Zope2
 
@@ -51,11 +53,25 @@ def login(portal, user_id, roles=('Manager', 'Member')):
     user = CPSUnrestrictedUser(user_id, '', roles, '').__of__(portal.acl_users)
     newSecurityManager(None, user)
 
+def configure_logging():
+    """Needs INSTANCE_HOME to be set"""
+
+    logger = logging.getLogger('')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler(
+        os.path.join(INSTANCE_HOME, 'log', 'cpsjob.log'))
+
+    formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s %(message)s',
+                                  )#datefmt='%a, %d %b %Y %H:%M:%S',)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
 def main(options, arguments):
     if not options.zope_conf:
 	raise ValueError("Configuration file must be provided")
 
     Zope2.configure(options.zope_conf)
+    configure_logging()
 
     # now Zope 2 importer is ready
     run = get_run_function(arguments[1])
