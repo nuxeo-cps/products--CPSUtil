@@ -20,6 +20,7 @@ optparser.add_option('-u', '--username', dest='user_id', default='cpsjob',
                      )
 optparser.add_option('-C', '--conf', dest='zope_conf',
                      help=optparse.SUPPRESS_HELP)
+optparser.disable_interspersed_args()
 
 def get_run_function(dotted_name):
     module = __import__(dotted_name)
@@ -70,7 +71,10 @@ if __name__ == '__main__':
     if len(arguments) < 2:
 	optparser.error("Incorrect number of arguments. Use -h for long help")
 
-    del sys.argv[:] # Zope needs it
+    del sys.argv[1:] # Zope needs argv to be cleaned up
+    # If the launched module uses optparse, will see its dotted name
+    # as the prog name (for usage message etc)
+    sys.argv[0] = arguments[1]
     main(options, arguments)
 
 
