@@ -88,8 +88,9 @@ positional arguments::
 - arguments -- further arguments for the job.
 
 Otherwise, it follows the same rules as any piece of unrestricted
-code. You can do anything that does not require a request object (see
-below), and import any module from Zope or the application code.
+code. You can do anything that does not expect the REQUEST object to
+be a real one (see below), and import any module from Zope or the
+ application code.
 
 The configuration is mostly read from the standard ``zope.conf`` file.
 
@@ -124,25 +125,15 @@ The logging module is not configured by default. The job has to do it.
 Zope code needing a request
 ---------------------------
 
-Currently, the CPS job system does not wrap the application and portal
-objects in a request. Therefore, only code that doesn't need a request
-can run.
+Currently, the CPS job system wraps the application and portal
+objects in the same kind of request than what ZopeTestCase does.
 
 This is good enough for now, since the kind of tasks that make sense
 for a CPS job are precisely those for which proper HTTP requests don't
 really make much sense.
 
-Technically, there are a few potential problems, though, here's a list:
-
-CMF skins don't work
-  again, the kind of code you might
-  want to launch through cps jobs should not rely on acquiring python scripts
-  from the CMF skins (or any other kind of objects), but
-  there might be a few left for historical reasons. Example: ``computeId``
-  (from ``cps_default`` skin) was still used by CPSSubscriptions
-  recipient rules instantiation at the time of this writing (corrected
-  since). See http://svn.nuxeo.org/trac/pub/ticket/2081
-
+Don't expect anything from this request to really make sense,
+though. It's provided so that stuff like skins acquisition can work.
 
 Sample job
 ----------

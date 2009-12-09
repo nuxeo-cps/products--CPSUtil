@@ -9,6 +9,7 @@ import optparse
 import logging
 
 import Zope2
+#from Testing.ZopeTestCase.utils import makerequest
 
 # command line parsing
 
@@ -24,6 +25,30 @@ optparser.add_option('-C', '--conf', dest='zope_conf',
                      help=optparse.SUPPRESS_HELP)
 optparser.disable_interspersed_args()
 
+# Taken from ZopeTestCase.
+# Not imported because import as side-effect of switching to testing ZODB
+def makerequest(app, stdout=sys.stdout, host=None, port=None):
+    '''Wraps the app into a fresh REQUEST.'''
+    from ZPublisher.BaseRequest import RequestContainer
+    from ZPublisher.Request import Request
+    from ZPublisher.Response import Response
+    response = Response(stdout=stdout)
+    environ = {}
+    environ['SERVER_NAME'] = host or 'nohost'
+    environ['SERVER_PORT'] = '%d' % (port or 80)
+    environ['REQUEST_METHOD'] = 'GET'
+    request = Request(sys.stdin, environ, response)
+    request._steps = ['noobject'] # Fake a published object
+    request['ACTUAL_URL'] = request.get('URL') # Zope 2.7.4
+
+    # set Zope3-style default skin so that the request is usable for
+    # Zope3-style view look-ups
+    from zope.app.publication.browser import setDefaultSkin
+    setDefaultSkin(request)
+
+    return app.__of__(RequestContainer(REQUEST=request))
+
+
 def get_run_function(dotted_name):
     module = __import__(dotted_name)
     for segment in dotted_name.split('.')[1:]:
@@ -35,6 +60,7 @@ def get_run_function(dotted_name):
 	raise ValueError("Script to be launched must provide a 'run' function")
 
 def get_portal(app, portal_id):
+    app = makerequest(app)
     from Products.CPSCore.portal import CPSSite
     try:
         return getattr(app, portal_id)
@@ -56,15 +82,17 @@ def login(portal, user_id, roles=('Manager', 'Member')):
 def configure_logging():
     """Needs INSTANCE_HOME to be set"""
 
-    logger = logging.getLogger('')
-    logger.setLevel(logging.DEBUG)
     handler = logging.FileHandler(
         os.path.join(INSTANCE_HOME, 'log', 'cpsjob.log'))
 
     formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)-8s %(message)s',
                                   )#datefmt='%a, %d %b %Y %H:%M:%S',)
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
+
+    for path in ('', 'Products'):
+        logger = logging.getLogger(path)
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(handler)
 
 def main(options, arguments):
     if not options.zope_conf:
