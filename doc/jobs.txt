@@ -12,11 +12,11 @@ instance. These scripts can invoke any API from the Zope/CMF/CPS stack
 and run as unrestricted users. It works either in monolithic or ZEO
 setups (see below).
 
-This is working on unix-like systems (UNIX, Linux, Mac OS). Making an MS
-Windows version would probably be just a matter of testing it.
-
 INSTALL
 =======
+
+Scripts can be lauched either through ``zopectl run`` or using a
+custom alternative to zopectl, usually called ``cpsjob``.
 
 Before running any job, you have to prepare the bootstrap launcher
 from the ``zopectl`` control script. If the value of ``INSTANCE_HOME``
@@ -47,15 +47,25 @@ CPS job. This is because the running instance has a lock on the ZODB.
 INVOCATION
 ==========
 
+With the custom launcher
+------------------------
 Assuming the ``cpsjob`` of that instance is on the ``PATH``, do::
 
-$ cpsjob [option] <portal id> <python module> [job args]
+ $ cpsjob [options] <portal id> <python module> [job args]
 
 where <portal id> is the id of the CPS portal at the root of the ZODB
 hierarchy, and <python module> is the dotted name of a python module
 such as ``myjob`` (from ``myjob.py`` on the current python path) or
 ``Products.CPSDefault.jobs.examplejob`` (standard Zope import
 context).
+
+Through ``zopectl run``
+-----------------------
+From the instance home::
+
+ $ bin/zopectl run /path/to/the/script.py [options] <portal id> [job args]
+
+where <portal id> is as above
 
 Available options
 -----------------
@@ -65,7 +75,7 @@ this is::
 
   -h, --help            show this help message and exit
   -u USER_ID, --username=USER_ID specifies the id of the transient
-  unrestricted user to run as (will appear, e.g, in status history of 
+  unrestricted user to run as (will appear, e.g, in status history of
   modified documents). Defaults to 'cpsjob'.
 
 Additional arguments
@@ -73,21 +83,26 @@ Additional arguments
 
 They will be passed to the job (see below).
 
-Testing the launcher
---------------------
+Testing the custom launcher
+---------------------------
 
 You can for instance use the sample script provided below.
 
 JOB PYTHON SCRIPTS
 ==================
 
-The job script must declare a ``run`` function, accepting two
-positional arguments::
+A job script for the custom launcher must declare a ``run`` function,
+accepting two positional arguments::
 
 - portal -- CPS portal object
 - arguments -- further arguments for the job.
 
-Otherwise, it follows the same rules as any piece of unrestricted
+A job for ``zopectl run`` must instead do the following::
+
+ >>> from Products.CPSUtil.cpsjob import bootstrap
+ >>> portal, options, arguments = bootstrap()
+
+Otherwise, they follow the same rules as any piece of unrestricted
 code. You can do anything that does not expect the REQUEST object to
 be a real one (see below), and import any module from Zope or the
  application code.
@@ -108,32 +123,27 @@ This is really the same as within a ``zopectl debug`` session.
 
 Job arguments
 -------------
-The standard ``sys.argv`` will be empty once the job code is
-reached. This is required by the Zope starter.
+In the custom launcher context, the standard ``sys.argv`` will be
+empty once the job code is reached. This is required by the Zope
+starter.
 
-In particular, if you want to use the ``optparse``
-standard module, your ``run`` function has to pass ``arguments``
+In the ``zopectl run`` context, this is true after the call to ``bootstrap``.
+
+In particular, in order to use the ``optparse``
+standard module, the job has to pass ``arguments``
 explicitely to the ``OptionParser`` instance, like this::
 
   >>> parser.parse_args(args=arguments)
 
-Logging
--------
+Another possibility, in the ``zopectl run`` context is to add options
+to ``cpsjob.optparser`` before the call to ``bootstrap``.
+The user would have to be entered before the portal id. The call to
+``bootstrap`` does the parsing::
 
-The logging module is not configured by default. The job has to do it.
+ >>> portal, options, arguments = bootstrap()
 
-Zope code needing a request
----------------------------
-
-Currently, the CPS job system wraps the application and portal
-objects in the same kind of request than what ZopeTestCase does.
-
-This is good enough for now, since the kind of tasks that make sense
-for a CPS job are precisely those for which proper HTTP requests don't
-really make much sense.
-
-Don't expect anything from this request to really make sense,
-though. It's provided so that stuff like skins acquisition can work.
+arguments stores the arguments after the portal id (same as in custom
+launcher context)
 
 Sample job
 ----------
@@ -157,6 +167,16 @@ its relative path from the portal::
           print "\nFound CPS proxy at '%s'" % rpath
 
       print "Creation date: %s" % ob.created() # Dublin core API
+
+It can be enabled for ``zopectl run`` by further adding this::
+
+  if __name__ == '__main__':
+      from Products.CPSUtil.cpsjob import bootstrap
+      portal, options, arguments = bootstrap(app)
+      run(portal, arguments)
+
+Of course, if the goal is to support just one of the invocations
+methods, there's no need for such an indirection.
 
 .. Emacs
 .. Local Variables:

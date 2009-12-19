@@ -1,6 +1,28 @@
-"""This is a general script launcher.
+"""This is a general script launcher/helper for CPS.
 
-For now the options system is at its simplest
+Can be invocated directly instead of Zope2/Startup/zopectl.py,
+or used as a toolkit by zopectl run scripts.
+In particular, there is an OptionParser instance and a bootstrap function, to
+be used along these lines:
+
+>>> from Products.CPSUtil import cpsjob
+>>> cpsjob.optparse.add_option('-e', '--example', dest='exmp'. default='val')
+>>> portal, options, arguments = cpsjob.bootstrap(app)
+
+The bootstrap function uses the first positional arg of the script as the name
+of the CPS portal. Scripts for which this behaviour would be found useless
+or obstrusive can of course import directly some of the lower level helper
+functions.
+
+An external method can be applied simply like this:
+
+>>> from Products.CPSUtil import cpsjob
+>>> portal, options, arguments = cpsjob.bootstrap(app)
+>>> portal.my_external_method()
+>>> import transaction; transaction.commit()
+
+Don't forget the commit in this case, since it's usually automatic in the
+context external methods are launched in.
 """
 
 import sys
@@ -9,7 +31,6 @@ import optparse
 import logging
 
 import Zope2
-#from Testing.ZopeTestCase.utils import makerequest
 
 # command line parsing
 
@@ -21,8 +42,6 @@ optparser.add_option('-u', '--username', dest='user_id', default='cpsjob',
                      "status history of modified documents). "
                      "Defaults to '%default'."
                      )
-optparser.add_option('-C', '--conf', dest='zope_conf',
-                     help=optparse.SUPPRESS_HELP)
 optparser.disable_interspersed_args()
 
 # Taken from ZopeTestCase.
@@ -99,18 +118,28 @@ def main(options, arguments):
 	raise ValueError("Configuration file must be provided")
 
     Zope2.configure(options.zope_conf)
-    configure_logging()
-
     # now Zope 2 importer is ready
     run = get_run_function(arguments[1])
-
-    app = Zope2.app()
-    portal = get_portal(app, arguments[0])
-    login(portal, options.user_id)
-
+    portal, options, arguments = bootstrap(Zope2.app())
     run(portal, arguments[2:])
 
+def bootstrap(app):
+    """To be launched via zopectl run.
+
+    Return portal, options, positional arguments
+    """
+    configure_logging()
+    options, arguments = optparser.parse_args()
+    portal = get_portal(app, arguments[0])
+    if len(arguments) < 1:
+	optparser.error("Incorrect number of arguments. Use -h for long help")
+
+    login(portal, options.user_id)
+    return portal, options, arguments[1:]
+
 if __name__ == '__main__':
+    optparser.add_option('-C', '--conf', dest='zope_conf',
+                         help=optparse.SUPPRESS_HELP)
     options, arguments = optparser.parse_args()
     if len(arguments) < 2:
 	optparser.error("Incorrect number of arguments. Use -h for long help")
