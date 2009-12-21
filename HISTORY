@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 1.4.1
+===========================================================
+First release built by: gracinet at: 2009-12-21T11:55:12
+SVN Tag: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/tags/1.4.1
+Build from: https://svn.nuxeo.org/pub/CPS3/products/CPSUtil/trunk@54171
+
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2080 (CPS jobs): provided ```zopectl run``` capability
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.4.0
 ===========================================================
 First release built by: gracinet at: 2009-12-15T12:28:52
