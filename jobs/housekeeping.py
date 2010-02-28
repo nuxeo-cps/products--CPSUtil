@@ -25,16 +25,34 @@
 
 """A cps job to perform the same tasks as bin/cpshousekeeping."""
 
+import os
+import re
+import gzip
+from time import strftime, gmtime
 import logging
+logger = logging.getLogger("housekeeping")
+
 import transaction
+from ZODB.FileStorage.FileStorage import FileStorage
+from ZEO.ClientStorage import ClientStorage
+
 from Products.CPSUtil import cpsjob
 
 DEFAULT_ARCHIVED_REVISION_COUNT = 0
 DEFAULT_HISTORY_DAYS = 0
-DEFAULT_ZODB_PATH = '/usr/local/zope/instance/cps/var/Data.fs'
 DEFAULT_ZODB_BACKUP_DIR_PATH = '/var/backups/zodb'
 DEFAULT_ZODB_BACKUPS_KEEP_COUNT = 7
 DEFAULT_NOTIFICATION_FREQ = None
+
+TIME_FORMAT = '%Y-%m-%d_%H:%M'
+# This regexp matches file names of the form
+# YYYY-MM-dd_hh:mm-xxxxxxxxxx
+# Examples:
+# 2007-09-17_11:24-Data.fs
+# 2007-09-17_11:24-Data.fs.gz
+ZODB_BACKUP_FILENAME_REGEXP = re.compile(r'\d+-\d{2}-\d{2}_\d{2}:\d{2}-.+')
+SEND_NOTIFICATIONS_PATTERN = 'http://%s:%s/%s/cps_subscriptions_schedule_notifications?subscription_mode=%s'
+
 
 def setup_optparser(parser=cpsjob.optparser):
     usage = """Usage: %prog [options] <portal id>
@@ -100,21 +118,13 @@ Example:
                       help="Use NUMBER for the days to keep in history. "
                       "Defaults to %s." % DEFAULT_HISTORY_DAYS)
 
-    parser.add_option('-z', '--zodbfile',
-                      action='store',
-                      dest='zodbfile_path',
-                      type='string',
-                      metavar='FILE',
-                      default=DEFAULT_ZODB_PATH,
-                      help="The FILE path to the ZODB. "
-                      "The default is %s." % DEFAULT_ZODB_PATH)
-
     parser.add_option('-b', '--backup',
                       action='store_true',
                       dest='backup',
                       default=False,
                       help="Backup the ZODB that has just been packed "
-                      """using the "cp" command.""")
+                      """using the "cp" command (FileStorage or ZEO only).
+                      Autodetects the file to backup.""")
 
     parser.add_option('-k', '--backupdir',
                       action='store',
@@ -152,42 +162,57 @@ Example:
                       "[daily|weekly|monthly]. Defaults to %s." %
                       str(DEFAULT_NOTIFICATION_FREQ))
 
-def log(message, force=False, increment=0):
-    """Log the given message to stderr.
-    """
-    message =  '    ' * increment + message
-    if force or verbose:
-        print >> sys.stderr, message
+def getZodb(portal):
+    return portal._p_jar._db
 
 def pack(portal, days=0):
-    db_id = portal._p_jar._db.database_name
-    logger = logging.getLogger('')
+    db_id = getZodb(portal).database_name
     db = app.Control_Panel.Database[db_id]
     logger.info("Starting pack for %s, database name is '%s'", portal, db_id)
     db.manage_pack(days=days)
     logger.info("Pack of database '%s' done", db_id)
 
-def backupZodb(zodb_path, backupdir_path, compress=True, backups_keep_count=0):
+def backupZodb(portal, backupdir_path, compress=True, backups_keep_count=0):
     """TODO : backupZodb should WARN and not perform this action if there isn't
     enough space left on target device. But unfortunately this requires parsing
     of platform specific information and there isn't any native python-way to
     do this yet.
-    GR: taken from old cpshousekeeping.
-    Obviously, this applies to FSStorage only.
+    GR: taken from old cpshousekeeping and refactored a bit to take advantage
+    from internal knowledge of ZODB
     """
-    log("\nChecking for backups ...")
+    db = getZodb(portal)
+    db_id = db.database_name
+    storage = db._storage
+    if isinstance(storage, FileStorage):
+        zodb_path = storage._file_name
+        logger.info("Database %s uses FileStorage at %s", db_id, zodb_path)
+    elif isinstance(storage, ClientStorage):
+        zodb_path = storage._server.get_info()['name']
+        if not os.path.isfile(zodb_path) or not os.access(zodb_path, os.R_OK):
+            logger.error("The ZEO mounted database '%s' (for %s) does not "
+                         "seem to be a FileStorage available from this "
+                         "script. Name found is '%s'. If this does not look "
+                         "like a path on the ZEO Server host, you are not on "
+                         "FileStorage. Otherwise, check permissions and "
+                         "overall availability from this host.",
+                         db_id, portal, zodb_path)
+            return
+        logger.info("Database %s is a ZEO mount for a FileStorage at %s",
+                    db_id, zodb_path)
+    else:
+        logger.error("Database '%s' (for %s) is neither FileStorage nor ZEO "
+                     " based. Use other means to perform the backup",
+                     db_id, portal)
+        return
+
     time_string = strftime(TIME_FORMAT, gmtime())
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
     zodb_backup_path = os.path.join(backupdir_path, file_name)
     command = "cp -p %s %s" % (zodb_path, zodb_backup_path)
-    log("command = %s" % command, increment=1)
-    os.system(command)
-    if compress:
-        compressFile(zodb_backup_path)
 
     if backups_keep_count > 0:
-        log("Checking for potential backups to remove, "
-            "keeping only the %s ones ..." % backups_keep_count, increment=1)
+        logger.warn("Checking for potential backups to remove, "
+                    "keeping only the %d latest ones ...", backups_keep_count)
         file_names = os.listdir(backupdir_path)
         file_names = [x for x in file_names
                       if ZODB_BACKUP_FILENAME_REGEXP.match(x)]
@@ -195,50 +220,64 @@ def backupZodb(zodb_path, backupdir_path, compress=True, backups_keep_count=0):
         file_names_to_delete = file_names[:-backups_keep_count]
         for file_name in file_names_to_delete:
             file_path = os.path.join(backupdir_path, file_name)
-            log("Removing = %s ..." % file_path, increment=1)
+            logger.info("Removing %s ..." % file_path)
             os.remove(file_path)
-    log("Successful backup of the ZODB")
 
+    logger.info("backup command = %s" % command)
+    os.system(command)
+    if compress:
+        compressFile(zodb_backup_path)
+
+    logger.warn("Successful backup of the ZODB")
+
+def compressFile(file_path):
+    """Compress a file using GZIP.
+    """
+    logger.info("Compressing %s ...", file_path)
+    f_in = open(file_path, 'rb')
+    gzip_file_path = file_path + '.gz'
+    f_out = gzip.open(gzip_file_path, 'wb')
+    f_out.writelines(f_in)
+    f_out.close()
+    os.remove(file_path)
+    logger.info("Compressing done : %s", gzip_file_path)
 
 def exec_args():
     setup_optparser()
     portal, options, _ = cpsjob.bootstrap(app)
     portal_str = str(portal)
 
-    global verbose
-    verbose = options.verbose
-
     repotool = portal.portal_repository
     membtool = portal.portal_membership
 
     if options.purge_repository:
-        log("\nPurging the document repository of %s ..." % portal_str)
+        logging.warn("Purging the document repository of %s ...", portal_str)
         repotool.purgeDeletedRevisions()
         transaction.commit()
-        log("Successfully purged repository of %s" % portal_str)
+        logging.warn("Successfully purged repository of %s", portal_str)
 
     if options.purge_localroles or options.purge_localroles_force:
-        log("\nPurging the local roles of portal %s ..." % portal_str)
+        logger.warn("Purging the local roles of portal %s ...", portal_str)
         mids = membtool.purgeDeletedMembersLocalRoles(
             lazy=not options.purge_localroles_force)
         transaction.commit()
-        log(("Successfully purged localroles of %s " +
-            "(found %d deleted members)") % (portal_str, len(mids)))
-        if verbose and mids:
-            log("Deleted members were:\n%s" % '\n'.join(mids))
+        logger.warn(
+            "Successfully purged localroles of %s (found %d deleted members)",
+            portal_str, mids)
+        logging.info("Deleted members were:\n%s", '\n'.join(mids))
 
     if options.purge_archived_revisions:
         keep_max = options.archived_revisions
-        log("\nPurging archived revisions of documents of %s "
-            "(keeping no more than %s archives per doc) ..."
-            % (portal_str, keep_max))
+        logger.warn("Purging archived revisions of documents of %s "
+            "(keeping no more than %s archives per doc) ...",
+                     portal_str, keep_max)
         repotool.purgeArchivedRevisions(keep_max=keep_max)
         transaction.commit()
-        log("Successfully purged archived revisions of " + portal_str)
+        logger.warn("Successfully purged archived revisions of %s", portal_str)
 
     if options.notifications:
         freq = options.notifications
-        log("\nSending %s notifications of %s ..." % (freq, portal_str))
+        logger.warn("Sending %s notifications of %s ...", freq, portal_str)
         url = SEND_NOTIFICATIONS_PATTERN % (options.host_name,
                                             options.host_port,
                                             options.instance_id,
@@ -246,18 +285,18 @@ def exec_args():
         try:
             meth = portal.cps_subscriptions_schedule_notifications
         except AttributeError:
-            log("\nCPSSubscriptions does not seem to be active in %s",
+            logger.error("CPSSubscriptions does not seem to be active in %s",
                 portal_str)
         else:
             meth(options.notifications)
             transaction.commit()
-            log("Successfully sent notifications for %s" % portal_str)
+            logger.warn("Successfully sent notifications for %s", portal_str)
 
     if options.pack_zodb:
         pack(portal, days=options.days)
 
     if options.backup:
-        backupZodb(options.zodbfile_path, options.backupdir_path,
+        backupZodb(portal, options.backupdir_path,
                    not options.nocompress, options.backups_keep_count)
 
 
