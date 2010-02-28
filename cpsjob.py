@@ -38,6 +38,10 @@ optparser.add_option('-u', '--username', dest='user_id', default='cpsjob',
                      "status history of modified documents). "
                      "Defaults to '%default'."
                      )
+optparser.add_option('--loglevel', dest='log_level', default='INFO',
+                     help="Log level (standard logging module levels)"
+                     "Defaults to '%default'."
+                     )
 
 # Taken from ZopeTestCase.
 # Not imported because import as side-effect of switching to testing ZODB
@@ -83,7 +87,7 @@ def login(portal, user_id, roles=('Manager', 'Member')):
     user = CPSUnrestrictedUser(user_id, '', roles, '').__of__(portal.acl_users)
     newSecurityManager(None, user)
 
-def configure_logging():
+def configure_logging(level):
     """Needs INSTANCE_HOME to be set"""
 
     handler = logging.FileHandler(
@@ -95,21 +99,22 @@ def configure_logging():
 
     for path in ('', 'Products'):
         logger = logging.getLogger(path)
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(getattr(logging, level.upper()))
         logger.addHandler(handler)
 
 def parse_args():
     options, arguments = optparser.parse_args()
     if len(arguments) < 1:
 	optparser.error("Incorrect number of arguments. Use -h for long help")
+    return options, arguments
 
 def bootstrap(app):
     """To be launched via zopectl run.
 
     Return portal, options, positional arguments
     """
-    configure_logging()
     options, arguments = parse_args()
+    configure_logging(options.log_level)
 
     portal = get_portal(app, arguments[0])
     login(portal, options.user_id)
