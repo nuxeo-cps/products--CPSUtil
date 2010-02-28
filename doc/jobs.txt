@@ -7,31 +7,12 @@ CPS JOBS
 .. sectnum::    :depth: 4
 .. contents::   :depth: 4
 
-CPS jobs is a harness to launch python scripts against a CPS
-instance. These scripts can invoke any API from the Zope/CMF/CPS stack
+CPS jobs is a harness to launch python scripts ("jobs") against a CPS
+portal. The jobs can invoke any API from the Zope/CMF/CPS stack
 and run as unrestricted users. It works either in monolithic or ZEO
-setups (see below).
+setups.
 
-INSTALL
-=======
-
-Scripts can be lauched either through ``zopectl run`` or using a
-custom alternative to zopectl, usually called ``cpsjob``.
-
-Before running any job, you have to prepare the bootstrap launcher
-from the ``zopectl`` control script. If the value of ``INSTANCE_HOME``
-is the path to the Zope instance you want to equip, do the following::
-
-   $ cd ${INSTANCE_HOME}/bin
-   $ cp zopectl cpsjob
-   $ patch -p0 cpsjob < Products/CPSUtil/cpsjob.patch
-
-The ``cpsjob`` shell script has the same fundamental properties as
-``zopectl``. Notably, it is *tied to the instance*. If you need it
-in another Zope instance, even from the same ZEO cluster, you'll have
-this small procedure again. Same if you want to relocate the instance.
-The common reason for ``zopectl`` and ``cpsjob`` is that both include
-the path to the instance.
+For long-running scripts, it is highly preferable to external methods.
 
 INSTANCE TYPES
 ==============
@@ -47,67 +28,67 @@ CPS job. This is because the running instance has a lock on the ZODB.
 INVOCATION
 ==========
 
-With the custom launcher
-------------------------
-Assuming the ``cpsjob`` of that instance is on the ``PATH``, do::
-
- $ cpsjob [options] <portal id> <python module> [job args]
-
-where <portal id> is the id of the CPS portal at the root of the ZODB
-hierarchy, and <python module> is the dotted name of a python module
-such as ``myjob`` (from ``myjob.py`` on the current python path) or
-``Products.CPSDefault.jobs.examplejob`` (standard Zope import
-context).
-
-Through ``zopectl run``
------------------------
 From the instance home::
 
  $ bin/zopectl run /path/to/the/script.py [options] <portal id> [job args]
 
-where <portal id> is as above
+where <portal id> is the id of the cps portal object (expected to be
+found at the root of the application).
 
 Available options
 -----------------
 
-Do ``cpsjob --help`` for an up-to-date list of options. Currently
-this is::
+To get the list of common options for all jobs, simply do::
+
+  python Products/CPSUtil/cpsjob.py
+
+Currently, this is::
 
   -h, --help            show this help message and exit
   -u USER_ID, --username=USER_ID specifies the id of the transient
   unrestricted user to run as (will appear, e.g, in status history of
   modified documents). Defaults to 'cpsjob'.
 
-Additional arguments
---------------------
+For a given job, do (a bit longer to execute)::
 
-They will be passed to the job (see below).
+  bin/zopectl run /path/to/the/script.py --help
 
-Testing the custom launcher
----------------------------
+The user option
+---------------
 
-You can for instance use the sample script provided below.
+It is highly suggested to provide it with the id of a valid Zope user with
+management rights (ZMI access at the root).
 
-JOB PYTHON SCRIPTS
-==================
+Indeed, some jobs can create scripts, skins layers etc. They would then
+be owned by the provided user, and might become a major
+problem with Zope's security refusing them later on, leading to a
+portal severely broken (yet easily fixable) portal.
 
-A job script for the custom launcher must declare a ``run`` function,
-accepting two positional arguments::
+STANDARD JOBS
+=============
 
-- portal -- CPS portal object
-- arguments -- further arguments for the job.
+A few jobs ship right away with CPS. Look for ``jobs`` directories
+in the various products, and in particular in CPSUtil and CPSDefault.
+For instance, to reindex the catalog of a CPS portal, and rebuil its
+tree caches, you can do::
 
-A job for ``zopectl run`` must instead do the following::
+ bin/zopectl run Products/CPSDefault/jobs/resync -u <user> -c -t <portal id>
+
+WRITING JOBS
+============
+
+A job for ``zopectl run`` typically includes the following lines::
 
  >>> from Products.CPSUtil.cpsjob import bootstrap
- >>> portal, options, arguments = bootstrap()
+ >>> portal, options, arguments = bootstrap(app)
 
-Otherwise, they follow the same rules as any piece of unrestricted
+``portal`` is the portal object. ``options`` and ``arguments`` as are
+provided by the ``optparse`` module, the latter being stripped from
+the portal id.
+
+Apart from that, they follow the same rules as any piece of unrestricted
 code. You can do anything that does not expect the REQUEST object to
-be a real one (see below), and import any module from Zope or the
- application code.
-
-The configuration is mostly read from the standard ``zope.conf`` file.
+be a real one (see below), and import any module from Zope or application code.
 
 Persisting changes
 ------------------
@@ -121,29 +102,18 @@ otherwise nothing will be persisted::
 
 This is really the same as within a ``zopectl debug`` session.
 
-Job arguments
--------------
-In the custom launcher context, the standard ``sys.argv`` will be
-empty once the job code is reached. This is required by the Zope
-starter.
+Job arguments and options
+-------------------------
+To accept more command line options, add them to ``cpsjob.optparser``
+before the call to ``bootstrap``. The later does the parsing::
 
-In the ``zopectl run`` context, this is true after the call to ``bootstrap``.
+ >>> from Products.CPSUtil import cpsjob
+ >>> cpsjob.optparser.add_option('-e', '--example', dest='exmp', default='val')
+ >>> portal, options, arguments = cpsjob.bootstrap(app)
 
-In particular, in order to use the ``optparse``
-standard module, the job has to pass ``arguments``
-explicitely to the ``OptionParser`` instance, like this::
-
-  >>> parser.parse_args(args=arguments)
-
-Another possibility, in the ``zopectl run`` context is to add options
-to ``cpsjob.optparser`` before the call to ``bootstrap``.
-The user would have to be entered before the portal id. The call to
-``bootstrap`` does the parsing::
-
- >>> portal, options, arguments = bootstrap()
-
-arguments stores the arguments after the portal id (same as in custom
-launcher context)
+``optparse`` is a normal ``OptParse`` instance. You can for instance
+also change ``usage``, invoke ``optparse.error()``, and ``--help``
+will display your updated list of options.
 
 Sample job
 ----------
@@ -151,32 +121,49 @@ Sample job
 This job prints the creation date of the portal, or of a document specified by
 its relative path from the portal::
 
+  from Products.CPSUtil.cpsjob import bootstrap
   from zope.interface import implements
   from Products.CPSCore.interfaces import ICPSProxy, ICPSSite
 
-  def run(portal, args):
-      rpath = args and args[0] or ''
-      ob = portal.unrestrictedTraverse(rpath)
+  portal, options, ars = bootstrap(app)
+  rpath = args and args[0] or ''
+  ob = portal.unrestrictedTraverse(rpath)
 
-      if ICPSSite.providedBy(ob):
-	  print "Found the portal object"
-      elif not ICPSProxy.providedBy(ob):
-          raise RuntimeError("Object at '%s' is not a CPS Proxy." %
-	  rpath)
-      else:
-          print "\nFound CPS proxy at '%s'" % rpath
+  if ICPSSite.providedBy(ob):
+      print "Found the portal object"
+  elif not ICPSProxy.providedBy(ob):
+      raise RuntimeError("Object at '%s' is not a CPS Proxy." % rpath)
+  else:
+      print "\nFound CPS proxy at '%s'" % rpath
+  print "Creation date: %s" % ob.created() # Dublin core API
 
-      print "Creation date: %s" % ob.created() # Dublin core API
+Wrapping an external method as a job
+------------------------------------
 
-It can be enabled for ``zopectl run`` by further adding this::
+People have been using external methods for a long time for cps portal
+administrative tasks, the most pervasive example being the tasks
+provided by ``cpshousekeeping``, a script that actually mostly calls
+external methods through the HTTP library.
 
-  if __name__ == '__main__':
-      from Products.CPSUtil.cpsjob import bootstrap
-      portal, options, arguments = bootstrap(app)
-      run(portal, arguments)
+It's easy to wrap an external method in a cps job, therefore making it
+much more suited for automated tasks.
+Here's an example that's equivalent to a call of ``ext_meth`` on the
+portal::
 
-Of course, if the goal is to support just one of the invocations
-methods, there's no need for such an indirection.
+  >>> from Products.CPSUtil.cpsjob import bootstrap
+  >>> portal = bootstrap[0]
+  >>> portal.ext_meth()
+  >>> import transaction; transaction.commit()
+
+Don't forget the explicit commit: most external methods won't do it,
+since they are written with the implicit transaction handling in mind.
+
+Jobs and conflicts
+------------------
+
+As of now, there is no helper to handle database conflicts. If a
+``ConflictError`` is being raised, the current job transaction will
+rollback, and the job will exit.
 
 .. Emacs
 .. Local Variables:

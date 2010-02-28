@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2080 (cpsjob): made zopectl run the only supported running method
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

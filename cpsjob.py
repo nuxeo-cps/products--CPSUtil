@@ -1,4 +1,4 @@
-"""This is a general script launcher/helper for CPS.
+"""This is meant to be used in conjunction with zopectl run
 
 Can be invocated directly instead of Zope2/Startup/zopectl.py,
 or used as a toolkit by zopectl run scripts.
@@ -6,7 +6,7 @@ In particular, there is an OptionParser instance and a bootstrap function, to
 be used along these lines:
 
 >>> from Products.CPSUtil import cpsjob
->>> cpsjob.optparse.add_option('-e', '--example', dest='exmp'. default='val')
+>>> cpsjob.optparser.add_option('-e', '--example', dest='exmp', default='val')
 >>> portal, options, arguments = cpsjob.bootstrap(app)
 
 The bootstrap function uses the first positional arg of the script as the name
@@ -22,27 +22,22 @@ An external method can be applied simply like this:
 >>> import transaction; transaction.commit()
 
 Don't forget the commit in this case, since it's usually automatic in the
-context external methods are launched in.
+context external methods are normally launched in.
 """
 
 import sys
 import os
-import optparse
 import logging
 
-import Zope2
-
-# command line parsing
-
+import optparse
 optparser = optparse.OptionParser(
-    usage="usage: %prog [options] <portal id> <job module> [job args]")
+    usage="usage: %prog [options] <portal id> [job args]")
 optparser.add_option('-u', '--username', dest='user_id', default='cpsjob',
                      help="the identifier of the transient unrestricted "
                      "user to run as (will appear, e.g, in "
                      "status history of modified documents). "
                      "Defaults to '%default'."
                      )
-optparser.disable_interspersed_args()
 
 # Taken from ZopeTestCase.
 # Not imported because import as side-effect of switching to testing ZODB
@@ -67,16 +62,6 @@ def makerequest(app, stdout=sys.stdout, host=None, port=None):
 
     return app.__of__(RequestContainer(REQUEST=request))
 
-
-def get_run_function(dotted_name):
-    module = __import__(dotted_name)
-    for segment in dotted_name.split('.')[1:]:
-	module = getattr(module, segment)
-
-    try:
-       return module.run
-    except AttributeError:
-	raise ValueError("Script to be launched must provide a 'run' function")
 
 def get_portal(app, portal_id):
     app = makerequest(app)
@@ -113,15 +98,10 @@ def configure_logging():
         logger.setLevel(logging.DEBUG)
         logger.addHandler(handler)
 
-def main(options, arguments):
-    if not options.zope_conf:
-	raise ValueError("Configuration file must be provided")
-
-    Zope2.configure(options.zope_conf)
-    # now Zope 2 importer is ready
-    run = get_run_function(arguments[1])
-    portal, options, arguments = bootstrap(Zope2.app())
-    run(portal, arguments[2:])
+def parse_args():
+    options, arguments = optparser.parse_args()
+    if len(arguments) < 1:
+	optparser.error("Incorrect number of arguments. Use -h for long help")
 
 def bootstrap(app):
     """To be launched via zopectl run.
@@ -129,26 +109,11 @@ def bootstrap(app):
     Return portal, options, positional arguments
     """
     configure_logging()
-    options, arguments = optparser.parse_args()
-    portal = get_portal(app, arguments[0])
-    if len(arguments) < 1:
-	optparser.error("Incorrect number of arguments. Use -h for long help")
+    options, arguments = parse_args()
 
+    portal = get_portal(app, arguments[0])
     login(portal, options.user_id)
     return portal, options, arguments[1:]
 
 if __name__ == '__main__':
-    optparser.add_option('-C', '--conf', dest='zope_conf',
-                         help=optparse.SUPPRESS_HELP)
-    options, arguments = optparser.parse_args()
-    if len(arguments) < 2:
-	optparser.error("Incorrect number of arguments. Use -h for long help")
-
-    del sys.argv[1:] # Zope needs argv to be cleaned up
-    # If the launched module uses optparse, will see its dotted name
-    # as the prog name (for usage message etc)
-    sys.argv[0] = arguments[1]
-    main(options, arguments)
-
-
-
+    parse_args() # what else could we do without the app object ?
