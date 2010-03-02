@@ -87,7 +87,7 @@ def unMarshallObject(stamp, data):
     data = decodestring(data)
     return loads(data)
 
-def marshallElement(element, encoding='ISO-8859-15'):
+def marshallElement(element, encoding='utf-8'):
     """ maps element to serialize objects
 
     >>> from DateTime import DateTime
@@ -149,3 +149,32 @@ def unMarshallElement(element):
             element[key] = unMarshallElement(element[key])
     return element
 
+def toLatin9(obj):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, unicode):
+                v = _stringToLatin9(v)
+                obj[k] = v
+    elif isinstance(obj, unicode):
+        obj = _stringToLatin9(obj)
+    return obj
+
+def utf8ToUnicode(obj):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, str):
+                obj[k] = v.decode('utf-8')
+    elif isinstance(obj, str):
+        obj = obj.decode('utf-8')
+    return obj
+
+def _stringToLatin9(s):
+    if s is None:
+        return None
+    else:
+        # Replace RIGHT SINGLE QUOTATION MARK (unicode only)
+        # by the APOSTROPHE (ascii and latin1).
+        # cf. http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html
+        s = s.replace(u'\u2019', u'\u0027')
+        #&#8217;
+        return s.encode('iso-8859-15', 'ignore')
