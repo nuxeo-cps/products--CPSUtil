@@ -29,9 +29,12 @@ for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
    bin/zopectl test --dir Products/$x > $logfile 2>&1
    grep "^Total" $logfile > $report
 
-   if [ ! -s $report ]; then
+   if [ -s $report ]; then
+      analysed=`grep -v "0 failures, 0 errors" ${report}`
+   else
       # No summary, happens in case there's no layer tests (e.g, CPSCore)
       grep "Ran [0-9]* tests with" $logfile > $report
+      analysed=`grep -v "0 failures and 0 errors" ${report}`
    fi
 
    if [ ! -s $report ]; then
@@ -47,7 +50,6 @@ for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
 	   cat $logfile >> $errorlog
        fi
    else
-       analysed=`grep -v "0 failures, 0 errors" ${report}`
        if [ ! -z "$analysed" ]; then
 	   EXIT_CODE=1
 	   echo "BROKEN TESTS FOR $x" >> $errorlog
