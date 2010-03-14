@@ -6,8 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
-- #2125: cpshousekeeping as a CPS job
-- #2080 (cpsjob): made zopectl run the only supported running method
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
