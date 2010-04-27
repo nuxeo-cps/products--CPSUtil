@@ -23,6 +23,8 @@
 
 import string, codecs
 
+from ZPublisher import Converters
+
 from AccessControl import ModuleSecurityInfo
 
 ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
@@ -158,3 +160,35 @@ def winToLatin9_errors(exc):
 
 ## Register the fallback
 codecs.register_error('latin9_fallback', winToLatin9_errors)
+
+ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('get_final_encoding')
+def get_final_encoding(context):
+    """Return the encoding in which HTML pages are produced.
+
+    context is used for acquisition of the default_charset property.
+
+    The 'default_charset' portal property describes what charset is fed to the
+    TAL engine. In case the value is 'unicode', it means that ZPT callers are
+    supposed to transmit python unicode strings, and therefore that the final
+    encoding is made by the TAL engine, according to the Zope configuration
+    setting. This function introspects that, so that it can be used by code
+    that doesn't call ZPTs to use the correct encoding.
+
+    >>> class FakePortal:
+    ...     pass
+    >>> portal = FakePortal()
+    >>> portal.default_charset = 'iso-dont-exist'
+    >>> get_final_encoding(portal)
+    'iso-dont-exist'
+    >>> portal.default_charset = 'unicode'
+
+    All we can test here is that there's no error. Value depends on zope.conf
+    >>> from_conf = get_final_encoding(portal)
+    """
+
+    charset = context.default_charset
+    if charset != 'unicode':
+        return charset
+    # see Zope2.Startup.datatypes
+    return Converters.default_encoding
+
