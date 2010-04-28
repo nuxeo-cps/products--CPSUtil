@@ -22,6 +22,7 @@
 """
 
 import re
+import logging
 from zope.tal.taldefs import attrEscape
 from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
@@ -29,6 +30,8 @@ from HTMLParser import HTMLParser, HTMLParseError
 from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.utils import bodyfinder
+
+logger = logging.getLogger('Products.CPSUtil.html')
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('htmlToText')
 def htmlToText(html, context):
@@ -288,20 +291,19 @@ def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
 
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
-def renderHtmlTag(tagname, **kw):
-    """Render an HTML tag."""
-    # The "class" key cannot be used since it is a reserved word in python, so
-    # to set the "class" attribute one has to specify the "css_class" key.
-    if kw.get('css_class'):
-        kw['class'] = kw['css_class']
-        del kw['css_class']
-    if kw.has_key('contents'):
-        contents = kw['contents']
-        del kw['contents']
-    else:
-        contents = None
-    attrs = []
-    for key, value in kw.items():
+def renderHtmlTag(tagname, contents=None, css_class=None, **attrs):
+    """Render an HTML tag.
+
+    all values must be either ascii strings or unicode.
+
+    the attrs dict will end up as attributes
+    there is a special case for css_class since class is a python reserved word.
+    """
+    if css_class is not None:
+        attrs['class'] = css_class
+
+    rattrs = []
+    for key, value in attrs.items():
         if value is None:
             continue
         if key in ('value', 'alt') or value != '':
@@ -310,14 +312,15 @@ def renderHtmlTag(tagname, **kw):
             if key == 'name' and not ':' in value:
                 # unicode string needed
                 value = value + ':utf8:ustring'
-            attrs.append('%s="%s"' % (key, attrEscape(value)))
-    res = '<%s %s' % (tagname, ' '.join(attrs))
+            rattrs.append('%s="%s"' % (key, attrEscape(value)))
+    res = '<%s %s' % (tagname, ' '.join(rattrs))
     if contents is not None:
         res += '>%s</%s>' % (contents, tagname)
     elif tagname in ('input', 'img', 'br', 'hr'):
         res += ' />'
     else:
         res += '>'
+
     return res
 
 
