@@ -1,7 +1,8 @@
-# -*- coding: ISO-8859-15 -*-
+# -*- coding: iso-8859-1 -*-
 # (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
+# G. Racinet <georges@racinet.fr>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -26,6 +27,12 @@ import string, codecs
 from ZPublisher import Converters
 
 from AccessControl import ModuleSecurityInfo
+
+# encoding of pre-unicode days. Please import this constant rather than
+# use it in the migration code : this will reduce the size of greps for
+# harcoded iso-8859-15 occurences
+OLD_CPS_ENCODING = 'iso-8859-15'
+
 
 ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
