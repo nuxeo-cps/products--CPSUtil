@@ -37,8 +37,6 @@ from email.Utils import make_msgid
 
 from Products.CMFCore.utils import getToolByName
 
-from text import toAscii
-
 logger = logging.getLogger('Products.CPSUtil.mail')
 
 class retransform:
@@ -211,7 +209,11 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     for key, value in additional_headers:
         msg[key] = _encode_header(value, encoding)
 
-    msg.preamble = subject
+    if isinstance(subject, unicode):
+        msg.preamble = subject.encode(encoding)
+    else:
+        msg.preamble = subject
+
     # Guarantees the message ends in a newline
     msg.epilogue = ''
 

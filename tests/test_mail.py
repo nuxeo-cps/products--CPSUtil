@@ -38,6 +38,7 @@ class MailTest(unittest.TestCase):
 
     def setUp(self):
         self.MailHost = FakeMailHost()
+        self.default_charset = 'utf-8'
 
     def test_unicode_to(self):
         send_mail(self, u'gr <gr@example.com>', 'CPS Portal <cps@example.com>',
@@ -46,6 +47,12 @@ class MailTest(unittest.TestCase):
         send_mail(self, u'gr\xe9 <gr@example.com>',
                   'CPS Portal <cps@example.com>',
                   'The subject', 'The body')
+
+    def test_subject_unicode(self):
+        # was an error occuring with preamble, for multiparts only
+        send_mail(self, '<gr@example.com', 'cps@example.com',
+                  u'Cr\xe9ation de contenu', '<html><body>Body</body></html>',
+                  plain_text=False, encoding='utf-8')
 
 def test_suite():
     suite = unittest.TestSuite()
