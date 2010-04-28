@@ -36,6 +36,7 @@ from email.Header import Header
 from email.Utils import make_msgid
 
 from Products.CMFCore.utils import getToolByName
+from text import get_final_encoding
 
 logger = logging.getLogger('Products.CPSUtil.mail')
 
@@ -135,7 +136,7 @@ def _encode_header(header, encoding):
 
 def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
               attachments=(), related_parts=None,
-              encoding='utf-8', plain_text=True, additional_headers=()):
+              encoding=None, plain_text=True, additional_headers=()):
     """Send a mail
 
     mto is the user-level Mail To. It can be a string, or list/tuple of strings.
@@ -156,6 +157,8 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     if the Mailhost fails to send it properly.
     This will be handled by the callers along with the redirect if needed.
     """
+    if encoding is None:
+        encoding = get_final_encoding(context)
     if related_parts is None:
         related_parts = {}
     mailhost = getToolByName(context, 'MailHost')

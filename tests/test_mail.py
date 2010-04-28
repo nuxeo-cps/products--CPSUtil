@@ -52,7 +52,7 @@ class MailTest(unittest.TestCase):
         # was an error occuring with preamble, for multiparts only
         send_mail(self, '<gr@example.com', 'cps@example.com',
                   u'Cr\xe9ation de contenu', '<html><body>Body</body></html>',
-                  plain_text=False, encoding='utf-8')
+                  plain_text=False)
 
 def test_suite():
     suite = unittest.TestSuite()
