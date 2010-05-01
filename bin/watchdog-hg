@@ -51,7 +51,10 @@ else
    hg pull -u >> $updatelog # update the bundle itself
    echo Calling hgbundler  >> $updatelog
    hgbundler make-clones >> $updatelog 2>&1 # update products hg information
-   hgmap pull >> $updatelog # pull on all clones
+   cd .hgbundler
+   hgmap pull >> $updatelog # pull on partially used clones (also sub-bundles)
+   cd ..
+   hgmap pull >> $updatelog # pull on all direct clones
 
    # switch branches if needed and update all clones
    hgbundler update-clones >> $updatelog 2>&1
