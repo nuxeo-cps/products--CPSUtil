@@ -2,8 +2,8 @@
 
 if [ -z $1 ]; then
  cat <<EOF
- This script leverages the 'runalltests' script for cron jobs. 
- The latter script must be on the PATH, as well as hgbundler.py
+ This script leverages the 'runalltests' script for cron jobs.
+ The latter script must be on the PATH, as well as hgbundler
 
  Usage: watchdog <zope_path> [<cps_checkout>] [--fresh]
 
@@ -50,11 +50,11 @@ else
    echo pull/up on bundle $checkout >> $updatelog
    hg pull -u >> $updatelog # update the bundle itself
    echo Calling hgbundler  >> $updatelog
-   hgbundler.py make-clones >> $updatelog 2>&1 # update products hg information
+   hgbundler make-clones >> $updatelog 2>&1 # update products hg information
    hgmap pull >> $updatelog # pull on all clones
 
    # switch branches if needed and update all clones
-   hgbundler.py update-clones >> $updatelog 2>&1
+   hgbundler update-clones >> $updatelog 2>&1
    echo update finished >> $updatelog
 fi
 
