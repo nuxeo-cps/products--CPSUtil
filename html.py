@@ -291,7 +291,8 @@ def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
 
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
-def renderHtmlTag(tagname, contents=None, css_class=None, **attrs):
+def renderHtmlTag(tagname, contents=None, css_class=None, unicode_input=True,
+                  **attrs):
     """Render an HTML tag.
 
     all values must be either ascii strings or unicode.
@@ -309,7 +310,7 @@ def renderHtmlTag(tagname, contents=None, css_class=None, **attrs):
         if key in ('value', 'alt') or value != '':
             if not isinstance(value, basestring):
                 value = str(value)
-            if key == 'name' and not ':' in value:
+            if key == 'name' and unicode_input and not ':' in value: 
                 # unicode string needed
                 value = value + ':utf8:ustring'
             rattrs.append('%s="%s"' % (key, attrEscape(value)))
