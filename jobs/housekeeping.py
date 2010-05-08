@@ -263,7 +263,7 @@ def exec_args():
         transaction.commit()
         logger.warn(
             "Successfully purged localroles of %s (found %d deleted members)",
-            portal_str, mids)
+            portal_str, len(mids))
         logging.info("Deleted members were:\n%s", '\n'.join(mids))
 
     if options.purge_archived_revisions:
