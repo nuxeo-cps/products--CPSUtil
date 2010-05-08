@@ -251,10 +251,10 @@ def exec_args():
     membtool = portal.portal_membership
 
     if options.purge_repository:
-        logging.warn("Purging the document repository of %s ...", portal_str)
+        logger.warn("Purging the document repository of %s ...", portal_str)
         repotool.purgeDeletedRevisions()
         transaction.commit()
-        logging.warn("Successfully purged repository of %s", portal_str)
+        logger.warn("Successfully purged repository of %s", portal_str)
 
     if options.purge_localroles or options.purge_localroles_force:
         logger.warn("Purging the local roles of portal %s ...", portal_str)
@@ -263,8 +263,8 @@ def exec_args():
         transaction.commit()
         logger.warn(
             "Successfully purged localroles of %s (found %d deleted members)",
-            portal_str, mids)
-        logging.info("Deleted members were:\n%s", '\n'.join(mids))
+            portal_str, len(mids))
+        logger.info("Deleted members were:\n%s", '\n'.join(mids))
 
     if options.purge_archived_revisions:
         keep_max = options.archived_revisions

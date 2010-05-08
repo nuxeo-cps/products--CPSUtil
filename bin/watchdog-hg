@@ -1,0 +1,76 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+ cat <<EOF
+ This script leverages the 'runalltests' script for cron jobs.
+ The latter script must be on the PATH, as well as hgbundler
+
+ Usage: watchdog <zope_path> [<cps_checkout>] [--fresh]
+
+ it is assumed that <zope_path> is a Zope instance.
+ in case <cps_checkout> is missing, <zope_path>/Products must be a CPS bundle
+ checkout. Otherwise <zope_path>/Products is assumed to be a symbolic link to
+ such a checkout. 
+
+ The standard output of this script is empty in case of success, and made of
+ the error log (test output for products having failing tests). This is meant
+ to allow a command such as the following
+
+   watchdog /home/zope/cps3full | mail -e -s "CPS 3 full tests are broken" cpsmaintainer@example.com
+ 
+ The '--fresh' option will be interpreted ONLY IF <cps_checkout> is present.
+ It has the effect of making a new fresh checkout (rm -r, svn co). 
+ To avoid repeating <zope_path> in case the checkout is <zope_path>/Products,
+ you can simply make <cps_checkout> explicitly empty:
+    watchdog <zope_path> "" --fresh
+
+ Otherwise, the checkout will be simply updated (svn up)
+
+EOF
+  exit 0
+fi
+
+if [ -z $2 ]; then
+   checkout=$1/Products
+else
+   checkout=$2
+fi
+
+# checkout update process
+timestamp=`date +%F-%T`
+updatelog="/tmp/test_cps-hgupdate-$timestamp.log"
+touch $updatelog
+
+if [ x$3 = "x--fresh" ];
+then
+   echo "Making a fresh checkout is not implemented yet" >&2
+   exit 1
+else
+   cd $checkout
+   echo pull/up on bundle $checkout >> $updatelog
+   hg pull -u >> $updatelog # update the bundle itself
+   echo Calling hgbundler  >> $updatelog
+   hgbundler make-clones >> $updatelog 2>&1 # update products hg information
+   cd .hgbundler
+   hgmap pull >> $updatelog # pull on partially used clones (also sub-bundles)
+   cd ..
+   hgmap pull >> $updatelog # pull on all direct clones
+
+   # switch branches if needed and update all clones
+   hgbundler update-clones >> $updatelog 2>&1
+   echo update finished >> $updatelog
+fi
+
+# run the tests
+error_log=`runalltests $1`
+if [ $? -ne 0 ]; then
+  cat $error_log
+  echo UPDATE LOG:
+  cat $updatelog
+else
+  rm $error_log $updatelog
+fi
+
+
+
+

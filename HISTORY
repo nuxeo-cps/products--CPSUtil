@@ -1,4 +1,22 @@
 ===========================================================
+Package: CPSUtil 1.4.2
+===========================================================
+First release built by: gracinet at: 2010-03-14T16:39:50
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2125: cpshousekeeping as a CPS job
+- #2080 (cpsjob): made zopectl run the only supported running method
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.4.1
 ===========================================================
 First release built by: gracinet at: 2009-12-21T11:55:12
