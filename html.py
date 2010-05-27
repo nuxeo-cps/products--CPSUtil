@@ -24,6 +24,7 @@
 import re
 import logging
 from zope.tal.taldefs import attrEscape
+import htmlentitydefs
 from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
 
@@ -105,6 +106,8 @@ class XhtmlSanitizer(HTMLParser):
         }
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'accesskey', 'onclick')
+    entitydefs = htmlentitydefs.entitydefs
+
 
     def __init__(self, tags_to_keep=None,
                  attributes_to_keep=None, attributes_to_remove=None):
@@ -134,7 +137,7 @@ class XhtmlSanitizer(HTMLParser):
     def handle_charref(self, name):
         self.result.append('&#%s' % name)
 
-    def handle_entyref(self, name):
+    def handle_entityref(self, name):
         x = ';' * self.entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 
@@ -197,6 +200,7 @@ class HTMLSanitizer(SGMLParser):
         }
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'accesskey', 'onclick')
+    entitydefs = htmlentitydefs.entitydefs
 
     def __init__(self, tags_to_keep=None,
                  attributes_to_keep=None, attributes_to_remove=None):
@@ -226,7 +230,7 @@ class HTMLSanitizer(SGMLParser):
     def handle_charref(self, name):
         self.result.append('&#%s' % name)
 
-    def handle_entyref(self, name):
+    def handle_entityref(self, name):
         x = ';' * self.entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 

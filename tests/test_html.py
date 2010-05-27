@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-15 -*-
+# -*- coding: iso-8859-15 -*-
 # (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # Tarek Ziadé <tz@nuxeo.com>
@@ -104,6 +104,9 @@ class Test(unittest.TestCase):
         res = sanitize("<p>TITRE VI : DISPOSITIONS DIVERSES.<br /> Chapitre III : Informations sur les marchés. Section 1 : Observatoire économique de l'achat public.</p>",
                        tags_to_keep=[])
         self.assertEquals(res, "TITRE VI : DISPOSITIONS DIVERSES. Chapitre III : Informations sur les marchés. Section 1 : Observatoire économique de l'achat public.")
+        # Testing entities
+        inp = '&laquo;&agrave;&raquo'
+        self.assertEquals(sanitize(inp), inp)
 
         # Testing support of XHTML notations such as <br/> and <hr/>
         res = sanitize("<p>TITRE VI :<hr/> DISPOSITIONS DIVERSES.<br/> Chapitre III : Informations sur les marchés. Section 1 : Observatoire économique de l'achat public.</p>",
@@ -214,6 +217,10 @@ class Test(unittest.TestCase):
 
         res = sanitize('ftg<i>  yuh</i>jik', sgml=True)
         self.assertEquals(res, 'ftg<em>  yuh</em>jik')
+
+        # Testing entities
+        inp = '&laquo;&agrave;&raquo'
+        self.assertEquals(sanitize(inp, sgml=True), inp)
 
         # Testing removals of all HTML tags
         res = sanitize("<p>TITRE VI : DISPOSITIONS DIVERSES.<P> Chapitre III : Informations sur les marchés. Section 1 : Observatoire économique de l'achat public.</p>",
