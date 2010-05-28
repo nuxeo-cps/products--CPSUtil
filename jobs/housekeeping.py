@@ -58,7 +58,7 @@ def setup_optparser(parser=cpsjob.optparser):
     usage = """Usage: %prog [options] <portal id>
 
 Example:
-%prog --verbose --user admin --purge-repository --purge-localroles-force --pack-zodb --zodbfile /home/zope/cps/var/Data.fs --backupdir /var/backups/zodb/www.mysite.net cps
+%prog --verbose --user admin --purge-repository --purge-localroles-force --pack-zodb --backupdir /var/backups/zodb/www.mysite.net cps
     """
 
     parser.add_option('-v', '--verbose',
