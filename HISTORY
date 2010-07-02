@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.5.0
+===========================================================
+First release built by: gracinet at: 2010-06-30T02:36:36
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- Set editors' mode in JavaScript file. 
+
+===========================================================
 Package: CPSUtil 1.4.2
 ===========================================================
 First release built by: gracinet at: 2010-03-14T16:39:50

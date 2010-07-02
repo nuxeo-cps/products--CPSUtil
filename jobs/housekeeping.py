@@ -58,7 +58,7 @@ def setup_optparser(parser=cpsjob.optparser):
     usage = """Usage: %prog [options] <portal id>
 
 Example:
-%prog --verbose --user admin --purge-repository --purge-localroles-force --pack-zodb --zodbfile /home/zope/cps/var/Data.fs --backupdir /var/backups/zodb/www.mysite.net cps
+%prog --verbose --user admin --purge-repository --purge-localroles-force --pack-zodb --backupdir /var/backups/zodb/www.mysite.net cps
     """
 
     parser.add_option('-v', '--verbose',
@@ -162,15 +162,73 @@ Example:
                       "[daily|weekly|monthly]. Defaults to %s." %
                       str(DEFAULT_NOTIFICATION_FREQ))
 
+def getHumanReadableSize(octet_size):
+    """Returns a string that is a human readable file size.
+    """
+    mega = 1024*1024
+    kilo = 1024
+
+    if octet_size is None or octet_size <= 0:
+        return "0"
+    elif octet_size >= mega:
+        if octet_size == mega:
+            return "1M"
+        else:
+            msize = float(octet_size/float(mega))
+            msize = float('%.02f' % msize)
+            return "%sM" % msize
+    elif octet_size >= kilo:
+
+        if octet_size == kilo:
+            return "1K"
+        else:
+            ksize = float(octet_size/float(kilo))
+            ksize = float('%.02f' % ksize)
+            return "%sK" % ksize
+    else:
+        return str(octet_size)
+
+def getHumanReadableFileSize(path):
+    """Return a hr representation of the file size, or 'unknown'."""
+    if (path is None or not os.path.isfile(path)
+        or not os.access(path, os.R_OK)):
+        return 'unknown'
+    return getHumanReadableSize(os.path.getsize(path))
+
 def getZodb(portal):
     return portal._p_jar._db
 
+def getDbFilePath(portal=None, db=None):
+    """Return the path to DB file, if applicable, or None."""
+
+    if db is None:
+        if portal is None:
+            raise ValueError("portal and db both None")
+        db = getZodb(portal)
+
+    db_id = db.database_name
+    storage = db._storage
+    if isinstance(storage, FileStorage):
+        path = storage._file_name
+        logger.info("Database %s uses FileStorage at %s", db_id, path)
+        return path
+    elif isinstance(storage, ClientStorage):
+        path = storage._server.get_info()['name']
+        logger.info("Database %s is a ZEO mount for a FileStorage at %s",
+                    db_id, path)
+        return path
+
 def pack(portal, days=0):
-    db_id = getZodb(portal).database_name
-    db = app.Control_Panel.Database[db_id]
-    logger.info("Starting pack for %s, database name is '%s'", portal, db_id)
-    db.manage_pack(days=days)
-    logger.info("Pack of database '%s' done", db_id)
+    db = getZodb(portal)
+    db_id = db.database_name
+    db_ctl = app.Control_Panel.Database[db_id]
+    db_path = getDbFilePath(db=db)
+
+    logger.warn("Starting pack for %s, database name is '%s' (size %s)",
+                portal, db_id, getHumanReadableFileSize(db_path))
+    db_ctl.manage_pack(days=days)
+    logger.warn("Pack of database '%s' done. Current size %s", db_id,
+                getHumanReadableFileSize(db_path))
 
 def backupZodb(portal, backupdir_path, compress=True, backups_keep_count=0):
     """TODO : backupZodb should WARN and not perform this action if there isn't
@@ -182,28 +240,24 @@ def backupZodb(portal, backupdir_path, compress=True, backups_keep_count=0):
     """
     db = getZodb(portal)
     db_id = db.database_name
-    storage = db._storage
-    if isinstance(storage, FileStorage):
-        zodb_path = storage._file_name
-        logger.info("Database %s uses FileStorage at %s", db_id, zodb_path)
-    elif isinstance(storage, ClientStorage):
-        zodb_path = storage._server.get_info()['name']
-        if not os.path.isfile(zodb_path) or not os.access(zodb_path, os.R_OK):
-            logger.error("The ZEO mounted database '%s' (for %s) does not "
-                         "seem to be a FileStorage available from this "
-                         "script. Name found is '%s'. If this does not look "
-                         "like a path on the ZEO Server host, you are not on "
-                         "FileStorage. Otherwise, check permissions and "
-                         "overall availability from this host.",
-                         db_id, portal, zodb_path)
-            return
-        logger.info("Database %s is a ZEO mount for a FileStorage at %s",
-                    db_id, zodb_path)
-    else:
+    zodb_path = getDbFilePath(db=db)
+
+    if zodb_path is None:
         logger.error("Database '%s' (for %s) is neither FileStorage nor ZEO "
                      " based. Use other means to perform the backup",
                      db_id, portal)
         return
+
+    if not os.path.isfile(zodb_path) or not os.access(zodb_path, os.R_OK):
+        logger.error("The ZEO mounted database '%s' (for %s) does not "
+                     "seem to be a FileStorage available from this "
+                     "script. Name found is '%s'. If this does not look "
+                     "like a path on the ZEO Server host, you are not on "
+                     "FileStorage. Otherwise, check permissions and "
+                     "overall availability from this host.",
+                     db_id, portal, zodb_path)
+        return
+
 
     time_string = strftime(TIME_FORMAT, gmtime())
     file_name = '%s-%s' % (time_string, os.path.basename(zodb_path))
