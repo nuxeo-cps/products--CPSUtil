@@ -22,10 +22,9 @@
 """Utility functions for manipulating text.
 """
 
-import string, codecs
+import string, codecs, re
 
 from ZPublisher import Converters
-
 from AccessControl import ModuleSecurityInfo
 
 # encoding of pre-unicode days. Please import this constant rather than
@@ -33,12 +32,40 @@ from AccessControl import ModuleSecurityInfo
 # harcoded iso-8859-15 occurences
 OLD_CPS_ENCODING = 'iso-8859-15'
 
-
 ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""¿¡¬√ƒ≈«»… ÀÃÕŒœ—“”‘’÷ÿŸ⁄€‹›‡·‚„‰ÂÁËÈÍÎÏÌÓÔÒÚÛÙıˆ¯˘˙˚¸˝ˇ""",
     r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
-# Allowing this method to be imported in restricted code
+ENTITY_RE = re.compile(r'&#(\d+);')
+
+def entity_transcode(match_obj):
+    """Replace numeric XML entity by corresponding unicode string."""
+    return unichr(int(match_obj.group(1)))
+
+def upgrade_string_unicode(v):
+    """Upgrade a single string from older CPS encoding, including entities.
+
+    Indeed such entities are quite common as a result of copy-pasting of non
+    iso chars in a <textarea>.
+    >>> upgrade_string_unicode('See what I mean &#8230;')
+    u'See what I mean \u2026'
+    >>> upgrade_string_unicode('&#8230; Abusing of ellipsis &#8230;')
+    u'\u2026 Abusing of ellipsis \u2026'
+
+    Having problems with source charset and doctest for this one
+    >>> upgrade_string_unicode(
+    ...    'Av\xe9 l&#8217;assent !') == u'Av\xe9 l\u2019assent !'
+    True
+    """
+    if not isinstance(v, basestring):
+        # can have None (typically from a bad field conf)
+        return v # not the job of *this* upgrader
+
+    if isinstance(v, str):
+        v = v.decode(OLD_CPS_ENCODING)
+
+    return ENTITY_RE.sub(entity_transcode, v)
+
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toAscii')
 def toAscii(s):
     """Change accented and special characters by ASCII characters.
@@ -58,7 +85,6 @@ def toAscii(s):
     s = s.replace('ﬂ', 'ss')
     return s
 
-# Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toLatin9')
 def toLatin9(obj):
     if isinstance(obj, dict):
@@ -81,7 +107,6 @@ def _unicodeToLatin9(s):
         #&#8217;
         return s.encode('iso-8859-15', 'ignore')
 
-# Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('truncateText')
 def truncateText(text, size=25):
     """Middle truncature."""
@@ -163,9 +188,6 @@ def winToLatin9_errors(exc):
         return codecs.lookup_error('xmlcharrefreplace')(exc)
     return res, exc.end # we made at worst one to many mappings
 
-
-
-## Register the fallback
 codecs.register_error('latin9_fallback', winToLatin9_errors)
 
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('get_final_encoding')
