@@ -22,6 +22,7 @@
 """Utility functions for manipulating text.
 """
 
+import logging
 import string, codecs, re
 
 from ZPublisher import Converters
@@ -37,6 +38,8 @@ ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
 ENTITY_RE = re.compile(r'&#(\d+);')
+
+logger = logging.getLogger('Products.CPSUtil.text')
 
 def entity_transcode(match_obj):
     """Replace numeric XML entity by corresponding unicode string."""
@@ -65,6 +68,22 @@ def upgrade_string_unicode(v):
         v = v.decode(OLD_CPS_ENCODING)
 
     return ENTITY_RE.sub(entity_transcode, v)
+
+def uni_lower(s):
+    """Makes unicode lower, whether the input is str or unicode.
+
+    >>> uni_lower('AbC')
+    u'abc'
+    >>> uni_lower(u'Abb\xc9') == u'abb\xe9'
+    True
+    """
+    if isinstance(s, unicode):
+        return s.lower()
+    elif isinstance(s, str):
+        logger.debug("uni_lower: working on %r with no charset", s)
+        return unicode(s).lower()
+    elif not isinstance(s, basestring):
+        raise ValueError("Expected string input, got %r" % s)
 
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toAscii')
 def toAscii(s):
