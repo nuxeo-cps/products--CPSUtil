@@ -1,8 +1,7 @@
-# (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2005-2006 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Tarek Ziade <tziade@nuxeo.com>
-# Thierry Martins <tmartins@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -18,48 +17,22 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-# $Id$
-"""Utility functions for manipulating HTML and XHTML.
+# $Id: html.py 51271 2007-02-27 16:58:48Z div $
+"""Utility functions for manipulating HTML, XHTML.
 """
 
 import re
-from xml.sax.saxutils import quoteattr
-from htmlentitydefs import entitydefs
+import logging
+from zope.tal.taldefs import attrEscape
+import htmlentitydefs
 from sgmllib import SGMLParser, SGMLParseError
 from HTMLParser import HTMLParser, HTMLParseError
 
-from Products.CMFDefault.utils import bodyfinder
-from Products.CMFCore.utils import getToolByName
 from AccessControl import ModuleSecurityInfo
+from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.utils import bodyfinder
 
-ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
-def renderHtmlTag(tagname, **kw):
-    """Render an HTML tag."""
-    # The "class" key cannot be used since it is a reserved word in python, so
-    # to set the "class" attribute one has to specify the "css_class" key.
-    if kw.get('css_class'):
-        kw['class'] = kw['css_class']
-        del kw['css_class']
-    if kw.has_key('contents'):
-        contents = kw['contents']
-        del kw['contents']
-    else:
-        contents = None
-    attrs = []
-    for key, value in kw.items():
-        if value is None:
-            continue
-        if key in ('value', 'alt') or value != '':
-            attrs.append('%s=%s' % (key, quoteattr(str(value))))
-    res = '<%s %s' % (tagname, ' '.join(attrs))
-    if contents is not None:
-        res += '>%s</%s>' % (contents, tagname)
-    elif tagname in ('input', 'img', 'br', 'hr'):
-        res += ' />'
-    else:
-        res += '>'
-    return res
-
+logger = logging.getLogger('Products.CPSUtil.html')
 
 ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('htmlToText')
 def htmlToText(html, context):
@@ -68,21 +41,15 @@ def htmlToText(html, context):
     Example:
     tal:define="htmlToText nocall:modules/Products.CPSUtil.html/htmlToText"
     """
-    if context is not None:
-        default_encoding = context.default_charset
-    else:
-        default_encoding = 'latin9'
-
     transformer = getToolByName(context, 'portal_transforms', None)
     if transformer is None:
         return html
     result = transformer.convertTo(target_mimetype='text/plain', orig=html,
                                    mimetype='text/html',
-                                   encoding=default_encoding,
+                                   encoding='utf8',
                                    )
     text = result.getData()
     return text.strip()
-
 
 # Regexp of the form xxx<body>xxx</body>xxx.
 # DOTALL: Make the "." special character match any character at all, including a
@@ -106,7 +73,11 @@ def getHtmlBody(html_content):
     #html_body = HTML_BODY_REGEXP.sub(r'\1', html_content)
     html_body = bodyfinder(html_content)
     html_body = STRIP_ATTRIBUTES_REGEXP.sub('', html_body)
-
+    if isinstance(html_body, str):
+        try:
+            html_body = html_body.decode('iso-8859-15')
+        except UnicodeDecodeError:
+            raise
     return html_body
 
 
@@ -135,6 +106,8 @@ class XhtmlSanitizer(HTMLParser):
         }
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'accesskey', 'onclick')
+    entitydefs = htmlentitydefs.entitydefs
+
 
     def __init__(self, tags_to_keep=None,
                  attributes_to_keep=None, attributes_to_remove=None):
@@ -165,7 +138,7 @@ class XhtmlSanitizer(HTMLParser):
         self.result.append('&#%s' % name)
 
     def handle_entityref(self, name):
-        x = ';' * entitydefs.has_key(name)
+        x = ';' * self.entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 
     def handle_starttag(self, tag, attrs):
@@ -189,7 +162,7 @@ class XhtmlSanitizer(HTMLParser):
                 self.endTagList.insert(0, end_tag)
 
     def handle_endtag(self, tag):
-        # First replacing the tag by another one if needed
+        # First eplacing the tag by another one if needed
         tag = self.tag_replacements.get(tag, tag)
         if tag in self.tags_to_keep and tag not in self.tags_empty:
             end_tag = '</%s>' % tag
@@ -227,6 +200,7 @@ class HTMLSanitizer(SGMLParser):
         }
     attributes_to_keep = ()
     attributes_to_remove = ('style', 'accesskey', 'onclick')
+    entitydefs = htmlentitydefs.entitydefs
 
     def __init__(self, tags_to_keep=None,
                  attributes_to_keep=None, attributes_to_remove=None):
@@ -257,7 +231,7 @@ class HTMLSanitizer(SGMLParser):
         self.result.append('&#%s' % name)
 
     def handle_entityref(self, name):
-        x = ';' * entitydefs.has_key(name)
+        x = ';' * self.entitydefs.has_key(name)
         self.result.append('&%s%s' % (name, x))
 
     def unknown_starttag(self, tag, attrs):
@@ -317,6 +291,41 @@ def sanitize(html, tags_to_keep=None, attributes_to_keep=None,
         res = sanitizer.getResult()
     except (HTMLParseError, SGMLParseError, TypeError):
         pass
+    return res
+
+
+ModuleSecurityInfo('Products.CPSUtil.html').declarePublic('renderHtmlTag')
+def renderHtmlTag(tagname, contents=None, css_class=None, unicode_input=True,
+                  **attrs):
+    """Render an HTML tag.
+
+    all values must be either ascii strings or unicode.
+
+    the attrs dict will end up as attributes
+    there is a special case for css_class since class is a python reserved word.
+    """
+    if css_class is not None:
+        attrs['class'] = css_class
+
+    rattrs = []
+    for key, value in attrs.items():
+        if value is None:
+            continue
+        if key in ('value', 'alt') or value != '':
+            if not isinstance(value, basestring):
+                value = str(value)
+            if key == 'name' and unicode_input and not ':' in value: 
+                # unicode string needed
+                value = value + ':utf8:ustring'
+            rattrs.append('%s="%s"' % (key, attrEscape(value)))
+    res = '<%s %s' % (tagname, ' '.join(rattrs))
+    if contents is not None:
+        res += '>%s</%s>' % (contents, tagname)
+    elif tagname in ('input', 'img', 'br', 'hr'):
+        res += ' />'
+    else:
+        res += '>'
+
     return res
 
 

@@ -3,10 +3,10 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- UNICODE
 Bug fixes
 ~~~~~~~~~
--
+- #2155: Html sanitizers don't recognize entities
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

@@ -213,7 +213,7 @@ Example:
                       dest='backup',
                       default=False,
                       help="Backup the ZODB that has just been packed "
-                      """using the "cp" command.""")
+                           """using the "cp" command.""")
 
     parser.add_option('-k', '--backupdir',
                       action='store',
@@ -301,7 +301,7 @@ Example:
                                             options.host_port,
                                             options.instance_id,
                                             options.notifications)
-        postUrl(url, options.user_name, options.user_password)
+        callUrl(url, options.user_name, options.user_password)
         log("Successfully sent notifications of host %s" % options.host_name)
 
     if options.pack_zodb:

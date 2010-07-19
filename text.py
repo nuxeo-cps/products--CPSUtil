@@ -1,7 +1,8 @@
-# -*- coding: ISO-8859-15 -*-
+# -*- coding: iso-8859-1 -*-
 # (C) Copyright 2005-2008 Nuxeo SAS <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
+# G. Racinet <georges@racinet.fr>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
@@ -21,15 +22,69 @@
 """Utility functions for manipulating text.
 """
 
-import string, codecs
+import logging
+import string, codecs, re
 
+from ZPublisher import Converters
 from AccessControl import ModuleSecurityInfo
+
+# encoding of pre-unicode days. Please import this constant rather than
+# use it in the migration code : this will reduce the size of greps for
+# harcoded iso-8859-15 occurences
+OLD_CPS_ENCODING = 'iso-8859-15'
 
 ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
     r"""ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜİàáâãäåçèéêëìíîïñòóôõöøùúûüıÿ""",
     r"""AAAAAACEEEEIIIINOOOOOOUUUUYaaaaaaceeeeiiiinoooooouuuuyy""")
 
-# Allowing this method to be imported in restricted code
+ENTITY_RE = re.compile(r'&#(\d+);')
+
+logger = logging.getLogger('Products.CPSUtil.text')
+
+def entity_transcode(match_obj):
+    """Replace numeric XML entity by corresponding unicode string."""
+    return unichr(int(match_obj.group(1)))
+
+def upgrade_string_unicode(v):
+    """Upgrade a single string from older CPS encoding, including entities.
+
+    Indeed such entities are quite common as a result of copy-pasting of non
+    iso chars in a <textarea>.
+    >>> upgrade_string_unicode('See what I mean &#8230;')
+    u'See what I mean \u2026'
+    >>> upgrade_string_unicode('&#8230; Abusing of ellipsis &#8230;')
+    u'\u2026 Abusing of ellipsis \u2026'
+
+    Having problems with source charset and doctest for this one
+    >>> upgrade_string_unicode(
+    ...    'Av\xe9 l&#8217;assent !') == u'Av\xe9 l\u2019assent !'
+    True
+    """
+    if not isinstance(v, basestring):
+        # can have None (typically from a bad field conf)
+        return v # not the job of *this* upgrader
+
+    if isinstance(v, str):
+        v = v.decode(OLD_CPS_ENCODING)
+
+    return ENTITY_RE.sub(entity_transcode, v)
+
+def uni_lower(s):
+    """Makes unicode lower, whether the input is str or unicode.
+
+    >>> uni_lower('AbC')
+    u'abc'
+    >>> uni_lower(u'Abb\xc9') == u'abb\xe9'
+    True
+    """
+    if isinstance(s, unicode):
+        return s.lower()
+    elif isinstance(s, str):
+        logger.debug("uni_lower: working on %r with no charset", s)
+        return unicode(s).lower()
+    elif not isinstance(s, basestring):
+        raise ValueError("Expected string input, got %r" % s)
+
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toAscii')
 def toAscii(s):
     """Change accented and special characters by ASCII characters.
@@ -49,7 +104,6 @@ def toAscii(s):
     s = s.replace('ß', 'ss')
     return s
 
-# Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toLatin9')
 def toLatin9(obj):
     if isinstance(obj, dict):
@@ -72,7 +126,6 @@ def _unicodeToLatin9(s):
         #&#8217;
         return s.encode('iso-8859-15', 'ignore')
 
-# Allowing this method to be imported in restricted code
 ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('truncateText')
 def truncateText(text, size=25):
     """Middle truncature."""
@@ -154,7 +207,36 @@ def winToLatin9_errors(exc):
         return codecs.lookup_error('xmlcharrefreplace')(exc)
     return res, exc.end # we made at worst one to many mappings
 
-
-
-## Register the fallback
 codecs.register_error('latin9_fallback', winToLatin9_errors)
+
+ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('get_final_encoding')
+def get_final_encoding(context):
+    """Return the encoding in which HTML pages are produced.
+
+    context is used for acquisition of the default_charset property.
+
+    The 'default_charset' portal property describes what charset is fed to the
+    TAL engine. In case the value is 'unicode', it means that ZPT callers are
+    supposed to transmit python unicode strings, and therefore that the final
+    encoding is made by the TAL engine, according to the Zope configuration
+    setting. This function introspects that, so that it can be used by code
+    that doesn't call ZPTs to use the correct encoding.
+
+    >>> class FakePortal:
+    ...     pass
+    >>> portal = FakePortal()
+    >>> portal.default_charset = 'iso-dont-exist'
+    >>> get_final_encoding(portal)
+    'iso-dont-exist'
+    >>> portal.default_charset = 'unicode'
+
+    All we can test here is that there's no error. Value depends on zope.conf
+    >>> from_conf = get_final_encoding(portal)
+    """
+
+    charset = context.default_charset
+    if charset != 'unicode':
+        return charset
+    # see Zope2.Startup.datatypes
+    return Converters.default_encoding
+

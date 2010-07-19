@@ -116,7 +116,7 @@ def generateId(s, max_chars=24, lower=True, word_separator='-',
 
     if not words:
         hash_object = md5.new()
-        hash_object.update(s)
+        hash_object.update(id)
         id = generateId(hash_object.digest())
     # Doing the truncation if max_chars has been specified
     elif max_chars > 0:

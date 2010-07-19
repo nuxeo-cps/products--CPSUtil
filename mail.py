@@ -36,8 +36,7 @@ from email.Header import Header
 from email.Utils import make_msgid
 
 from Products.CMFCore.utils import getToolByName
-
-from text import toAscii
+from text import get_final_encoding
 
 logger = logging.getLogger('Products.CPSUtil.mail')
 
@@ -121,9 +120,23 @@ def _make_file_part(content_type, data):
         Encoders.encode_base64(sub_msg)
     return sub_msg
 
+def _encode_header(header, encoding):
+    """Encode header according to RFC 2047 for non-ASCII subjects.
+
+    >>> _encode_header(u'this is pure ascii', 'whatever')
+    'this is pure ascii'
+    >>> header = _encode_header(u'\xe9', 'latin-1')
+    >>> header.encode()
+    '=?iso-8859-1?q?=E9?='
+    """
+    try:
+        return str(header)
+    except UnicodeEncodeError:
+        return Header(header, encoding)
+
 def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
               attachments=(), related_parts=None,
-              encoding='iso-8859-15', plain_text=True, additional_headers=()):
+              encoding=None, plain_text=True, additional_headers=()):
     """Send a mail
 
     mto is the user-level Mail To. It can be a string, or list/tuple of strings.
@@ -144,6 +157,8 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     if the Mailhost fails to send it properly.
     This will be handled by the callers along with the redirect if needed.
     """
+    if encoding is None:
+        encoding = get_final_encoding(context)
     if related_parts is None:
         related_parts = {}
     mailhost = getToolByName(context, 'MailHost')
@@ -151,6 +166,10 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
 
     # prepare main content
     content_type = plain_text and 'text/plain' or 'text/html'
+
+    if isinstance(body, unicode):
+        body = body.encode(encoding)
+
     if plain_text:
         main_msg = MIMEText(body, _subtype='plain', _charset=encoding)
     else:
@@ -167,33 +186,37 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
 
     COMMASPACE = ', '
 
-    # Encoding according to RFC 2047 for non-ASCII subjects
-    if toAscii(subject) != subject:
-        subject = Header(subject, encoding)
     # Headers
-    msg['Subject'] = subject
-    msg['From'] = mfrom
+    msg['Subject'] = _encode_header(subject, encoding)
+    msg['From'] = _encode_header(mfrom, encoding)
 
     if not mto:
         mto = []
     if isinstance(mto, basestring):
         mto = [mto]
-    msg['To'] = COMMASPACE.join(mto)
+
+    msg['To'] = _encode_header(COMMASPACE.join(mto), encoding)
 
     if mcc:
-        msg['Cc'] = isinstance(mcc, basestring) and mcc or COMMASPACE.join(mcc)
+        cc_header = isinstance(mcc, basestring) and mcc or COMMASPACE.join(mcc)
+        msg['Cc'] = _encode_header(cc_header, encoding)
         if not mto:
             # use first Cc as (non header) mail-to
             mto = [isinstance(mcc, basestring) and mcc or mcc[0]]
     if mbcc:
         # Don't put Bcc in headers otherwise they'd get transferred
         if isinstance(mbcc, basestring):
-            mto.append(mbcc)
-        else:
-            mto.extend(mbcc)
+            mbcc = [mbcc]
+        mto.extend(mbcc)
+
     for key, value in additional_headers:
-        msg[key] = value
-    msg.preamble = subject
+        msg[key] = _encode_header(value, encoding)
+
+    if isinstance(subject, unicode):
+        msg.preamble = subject.encode(encoding)
+    else:
+        msg.preamble = subject
+
     # Guarantees the message ends in a newline
     msg.epilogue = ''
 

@@ -28,20 +28,35 @@ for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
    logfile="/tmp/test_cps-$x-$timestamp.log"
    bin/zopectl test --dir Products/$x > $logfile 2>&1
    grep "^Total" $logfile > $report
-   analysed=`grep -v "0 failures, 0 errors" ${report}` 
-   if [ ! -z "$analysed" ]; then
-       EXIT_CODE=1
-       echo "BROKEN TESTS FOR $x" >> $errorlog
-       cat $logfile >> $errorlog
+
+   if [ -s $report ]; then
+      analysed=`grep -v "0 failures, 0 errors" ${report}`
+   else
+      # No summary, happens in case there's no layer tests (e.g, CPSCore)
+      grep "Ran [0-9]* tests with" $logfile > $report
+      analysed=`grep -v "0 failures and 0 errors" ${report}`
    fi
 
-   import_pbms=`grep -A10 "^Test-modules with import problems" $logfile`
-   if [ ! -z "$import_pbms" ];
-   then
+   if [ ! -s $report ]; then
        EXIT_CODE=1
-       echo "IMPORT PROBLEMS FOR $x" >> $errorlog
-       echo $import_pbms >> $errorlog
+
+       import_pbms=`grep -A10 "^Test-modules with import problems" $logfile`
+       if [ ! -z "$import_pbms" ];
+       then
+	   echo "\nIMPORT PROBLEMS FOR $x" >> $errorlog
+	   echo $import_pbms >> $errorlog
+       else
+	   echo "\nDON'T UNDERSTAND tests results for $x" >> $errorlog
+	   cat $logfile >> $errorlog
+       fi
+   else
+       if [ ! -z "$analysed" ]; then
+	   EXIT_CODE=1
+	   echo "BROKEN TESTS FOR $x" >> $errorlog
+	   cat $logfile >> $errorlog
+       fi
    fi
+
    rm $report $logfile
 done
 
