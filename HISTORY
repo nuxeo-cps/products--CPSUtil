@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.6.0
+===========================================================
+First release built by: gracinet at: 2010-07-26T22:52:26
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- UNICODE
+Bug fixes
+~~~~~~~~~
+- #2155: Html sanitizers don't recognize entities
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.5.0
 ===========================================================
 First release built by: gracinet at: 2010-06-30T02:36:36
