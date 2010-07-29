@@ -9,7 +9,7 @@ CPS JOBS
 
 CPS jobs is a harness to launch python scripts ("jobs") against a CPS
 portal. The jobs can invoke any API from the Zope/CMF/CPS stack
-and run as unrestricted users. It works either in monolithic or ZEO
+and run as registered users. It works either in monolithic or ZEO
 setups.
 
 For long-running scripts, it is highly preferable to external methods.
@@ -45,9 +45,11 @@ To get the list of common options for all jobs, simply do::
 Currently, this is::
 
   -h, --help            show this help message and exit
-  -u USER_ID, --username=USER_ID specifies the id of the transient
-  unrestricted user to run as (will appear, e.g, in status history of
-  modified documents). Defaults to 'cpsjob'.
+  -u USER_ID, --username=USER_ID specifies the id of the user to run as.
+  this user must be either a global Zope one (from the root ``acl_users``)
+  or one from the targetted CPS portal. He must have the ``Manager`` role.
+  In case there is a user with that id both at the root of Zope and within
+  the CPS portal, the former takes precedence.
 
 For a given job, do (a bit longer to execute)::
 

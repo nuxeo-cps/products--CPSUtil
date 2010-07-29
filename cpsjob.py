@@ -81,10 +81,23 @@ def get_portal(app, portal_id):
         raise RuntimeError("Not the id of a CPS portal : '%s'", portal_id)
 
 def login(portal, user_id, roles=('Manager', 'Member')):
-    from AccessControl.SecurityManagement import newSecurityManager
-    from Products.CPSCore.CPSMembershipTool import CPSUnrestrictedUser
+    """Lookup and log user in.
+    This is done first from root user folder, then from CPS' to avoid
+    lenghty timeouts in case of broken LDAP setups and the like."""
 
-    user = CPSUnrestrictedUser(user_id, '', roles, '').__of__(portal.acl_users)
+    from AccessControl.SecurityManagement import newSecurityManager
+    app = portal.unrestrictedTraverse('/')
+    aclu = app.acl_users
+    user = aclu.getUser(user_id)
+    if user is None:
+        aclu = portal.acl_users
+        user = aclu.getUser(user_id)
+
+    if user is None:
+        raise ValueError('Could not find user %r' % user_id)
+    user = user.__of__(aclu)
+    if not user.has_role('Manager'):
+        raise ValueError('User %r not a Manager' % user_id)
     newSecurityManager(None, user)
 
 def configure_logging(level):
