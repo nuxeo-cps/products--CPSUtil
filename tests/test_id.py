@@ -1,5 +1,6 @@
 # -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
+# (C) Copyright 2010 AFUL <http://aful.org>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
 # Stefane Fermigier <sf@nuxeo.com>
@@ -17,8 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
-#
-# $Id$
+
 import unittest
 
 from OFS.Folder import Folder
@@ -42,6 +42,9 @@ class Test(unittest.TestCase):
         password_length = len(password)
         self.assert_(password_length >= 20 and password_length <= 30)
 
+    def testWithUtf8(self):
+        s1 = "C'est l'\xc3\xa9t\xc3\xa9 !"
+        self.assertEquals(generateId(s1), "c-est-l-ete")
 
     def testGenerateIdBasic(self):
         # stupid id should return random number
@@ -50,7 +53,7 @@ class Test(unittest.TestCase):
 
         # Testing that the generated strings are free of special characters and
         # lower case.
-        s1 = "C'est l'été !"
+        s1 = "C'est l'\xe9t\xe9 !"
         self.assertEquals(generateId(s1), "c-est-l-ete")
         self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
         self.assertEquals(generateId(s1, lower=False), "C-est-l-ete")
