@@ -1,4 +1,3 @@
-# -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
 # (C) Copyright 2010 AFUL <http://aful.org>
 # Authors:
@@ -42,10 +41,6 @@ class Test(unittest.TestCase):
         password_length = len(password)
         self.assert_(password_length >= 20 and password_length <= 30)
 
-    def testWithUtf8(self):
-        s1 = "C'est l'\xc3\xa9t\xc3\xa9 !"
-        self.assertEquals(generateId(s1), "c-est-l-ete")
-
     def testGenerateIdBasic(self):
         # stupid id should return random number
         for id in ('', '-', ' ', '.'):
@@ -53,12 +48,12 @@ class Test(unittest.TestCase):
 
         # Testing that the generated strings are free of special characters and
         # lower case.
-        s1 = "C'est l'\xe9t\xe9 !"
+        s1 = u"C'est l'\xe9t\xe9 !"
         self.assertEquals(generateId(s1), "c-est-l-ete")
         self.assertEquals(generateId(s1, lower=True), "c-est-l-ete")
         self.assertEquals(generateId(s1, lower=False), "C-est-l-ete")
 
-        s2 = "C'est !!! l'été !!!!"
+        s2 = u"C'est !!! l'\xe9t\xe9 !!!!"
         self.assertEquals(generateId(s2), "c-est-l-ete")
         self.assertEquals(generateId(s2, lower=True), "c-est-l-ete")
         self.assertEquals(generateId(s2, lower=False), "C-est-l-ete")
@@ -94,7 +89,7 @@ class Test(unittest.TestCase):
                                      meaningless_words=meaningless_words_en),
                           "message-from-president")
 
-        s2 = "Voilà l'été"
+        s2 = u"Voil\xe0 l'\xe9t\xe9"
         meaningless_words_fr = "et ou un une le la les l de des ces que qui est sont a ont je voici"
         self.assertEquals(generateId(s2, lower=True,
                                      meaningless_words=meaningless_words_fr),
@@ -118,7 +113,7 @@ class Test(unittest.TestCase):
         # unique and meaningful Ids in a given container.
 
         examples = ["We are belong to us",
-                    "C'est l'été !",
+                    u"C'est l'\xe9t\xe9 !",
                     # This kind of string can be found on wiki links
                     "?Mine",
                     "???",
@@ -186,10 +181,9 @@ class Test(unittest.TestCase):
     def testGenerateFileName(self):
        self.assertEquals(generateFileName("My Document.doc"), 'My_Document.doc')
        self.assertEquals(generateFileName("MyDocument.sxw"), 'MyDocument.sxw')
-       self.assertEquals(generateFileName("Procédures finales.sxw"),
+       self.assertEquals(generateFileName(u"Proc\xe9dures finales.sxw"),
                          'Procedures_finales.sxw')
-       self.assertEquals(generateFileName(u'å'), 'a')
-       self.assertEquals(generateFileName('å'), 'a')
+
 
        # check removing of special leading and trailing characters
        # currently special leading are: '_' and '.'
