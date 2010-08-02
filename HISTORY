@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.6.1
+===========================================================
+First release built by: gracinet at: 2010-08-02T20:00:06
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2173: cps jobs are now being ran with registered users only
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.6.0
 ===========================================================
 First release built by: gracinet at: 2010-07-26T22:52:26
