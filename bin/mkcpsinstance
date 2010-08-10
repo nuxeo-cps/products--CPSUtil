@@ -21,14 +21,28 @@
 This script relies on the knowledge of the Zope home,
 that's why it can't directly be distributed with CPS itself
 """
-ZOPE_HOME = '/opt/Zope-2.9'
-CPS_HOME = '/opt/cps-3.5'
-ZOPE_CPS_SKEL = '/etc/opt/cps-3.5/zope-skel'
-SITE_CREATE_JOB = 'Products/CPSDefault/jobs/makecpssite.py'
+SITE_CREATE_JOB = 'CPSDefault/jobs/makecpssite.py'
 
 import os
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] <target directory>")
+parser.add_option('-z', '--zope-bin',
+                  dest='zope_bin',
+                  default='/opt/Zope-2.9/bin',
+                  metavar='PATH',
+                  help="Zope bin subdirectory (default %default).")
+parser.add_option('-c', '--cps-products',
+                  dest='cps_products',
+                  default='/opt/cps-3.5/Products',
+                  metavar='PATH',
+                  help="CPS Products directory (default %default).")
+parser.add_option('-s', '--zope-skeleton',
+                  dest='zope_skel',
+                  default='/etc/opt/cps-3.5/zope-skel',
+                  metavar='PATH',
+                  help="Zope Skeleton to use (default %default)."
+                  "Note that the provided zope.conf must set the path to "
+                  "CPS Products.")
 parser.add_option('-t', '--root-themes-container',
                   dest='themes', default='cps-themes',
                   help="Path from the instance home to the root "
@@ -45,10 +59,11 @@ if len(args) != 1:
     parser.error("Wrong number or arguments")
 instance_home = args[0]
 
-os.system('%s/bin/mkzopeinstance.py -d %s -u %s -s %s' % (
-    ZOPE_HOME, instance_home, options.user_and_pwd, ZOPE_CPS_SKEL))
+os.system('%s/mkzopeinstance.py -d %s -u %s -s %s' % (
+    options.zope_bin, instance_home, options.user_and_pwd, options.zope_skel))
 if options.posix_owner:
     os.system('chown -R %s %s' % (options.posix_owner, instance_home))
 user_id, _ = options.user_and_pwd.split(':')
 os.system('%s/bin/zopectl run %s/%s -u %s -t %s cps' % (
-    instance_home, CPS_HOME, SITE_CREATE_JOB, user_id, options.themes))
+    instance_home, options.cps_products, SITE_CREATE_JOB, user_id,
+    options.themes))
