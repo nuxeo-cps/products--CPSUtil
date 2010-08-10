@@ -47,6 +47,14 @@ parser.add_option('-t', '--root-themes-container',
                   dest='themes', default='cps-themes',
                   help="Path from the instance home to the root "
                   "themes container.")
+parser.add_option('-l', '--link-themes-from',
+                  dest='link_themes', default='',
+                  metavar='PATH',
+                  help="Create the themes container as a symlink from PATH")
+parser.add_option('-d', '--duplicate-themes-from',
+                  dest='dup_themes', default='',
+                  metavar='PATH',
+                  help="Create the themes container by copying PATH")
 parser.add_option('-u', '--zope-user_and_pwd', dest="user_and_pwd",
                  default='admin:admin',
                  help="Zope toplevel initial user and password (<name>:<pwd>)")
@@ -64,8 +72,15 @@ if os.getuid() == 0 and not options.posix_owner:
 
 os.system('%s/mkzopeinstance.py -d %s -u %s -s %s' % (
     options.zope_bin, instance_home, options.user_and_pwd, options.zope_skel))
+if options.dup_themes:
+    os.system('cp -r %s %s/%s' % (options.dup_themes,
+                                  instance_home, options.themes))
 if options.posix_owner:
     os.system('chown -R %s %s' % (options.posix_owner, instance_home))
+if options.link_themes:
+    os.system('ln -s %s %s/%s' % (options.link_themes,
+                                  instance_home, options.themes))
+
 user_id, _ = options.user_and_pwd.split(':')
 os.system('%s/bin/zopectl run %s/%s -u %s -t %s cps' % (
     instance_home, options.cps_products, SITE_CREATE_JOB, user_id,
