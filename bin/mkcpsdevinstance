@@ -1,0 +1,131 @@
+#!/usr/bin/env python
+# Copyright (c) 2010 Georges Racinet <http://www.racinet.fr>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+#
+# $Id$
+"""Direct executable to make a cps developpment instance.
+
+This script relies on the knowledge of the Zope home,
+that's why it can't directly be distributed with CPS itself
+"""
+import os
+import cgi
+HGBUNDLER_PATH = os.environ['PATH'].split(':')
+HGBUNDLER_PATH.append('/opt/hgbundler/bin')
+SITE_CREATE_JOB = 'Products/CPSDefault/jobs/makecpssite.py'
+
+from optparse import OptionParser
+parser = OptionParser(usage="%prog [options] <target directory>")
+parser.add_option('-z', '--zope-bin',
+                  dest='zope_bin',
+                  default='/opt/Zope-2.9/bin',
+                  metavar='PATH',
+                  help="Zope bin subdirectory (default %default).")
+parser.add_option('-b', '--bundle-url', dest="bundle_url",
+                  default='https://hg.cps-cms.org/CPS/bundles'
+                  '?subpath=CPS-3-full',
+                  help="Remote bundle repo url. Use 'subpath' argument to "
+                  "specify that the bundle is a subdirectory and 'branch' to "
+                  "set it on a branch up. All arguments to be URL encoded. "
+                  "Default: %default")
+parser.add_option('-s', '--zope-skeleton',
+                  dest='zope_skel',
+                  default='/etc/opt/cps-3.5/zope-dev-skel',
+                  metavar='PATH',
+                  help="Zope Skeleton to use (default %default)."
+                  "Note that it musn't have a Products directory")
+parser.add_option('-t', '--root-themes-container',
+                  dest='themes', default='Products/CPSDefault/themes',
+                  help="Path from the instance home to the root "
+                  "themes container (default %default)")
+parser.add_option('-l', '--link-themes-from',
+                  dest='link_themes', default='',
+                  metavar='PATH',
+                  help="Create the themes container as a symlink from PATH")
+parser.add_option('-d', '--duplicate-themes-from',
+                  dest='dup_themes', default='',
+                  metavar='PATH',
+                  help="Create the themes container by copying PATH")
+parser.add_option('-u', '--zope-user_and_pwd', dest="user_and_pwd",
+                 default='admin:admin',
+                 help="Zope toplevel initial user and password "
+                 "(default %default)")
+parser.add_option('--posix-owner', dest="posix_owner", default='',
+                 help="Set ownership of the instance on filesystem "
+                      "(needed to run as root, typically set to zope:zope)")
+
+options, args = parser.parse_args()
+if len(args) != 1:
+    parser.error("Wrong number or arguments")
+instance_home = args[0]
+if os.getuid() == 0 and not options.posix_owner:
+    parser.error("--posix_owner is mandatory to run as root.")
+
+os.system('%s/mkzopeinstance.py -d %s -u %s -s %s' % (
+    options.zope_bin, instance_home, options.user_and_pwd, options.zope_skel))
+if options.dup_themes:
+    os.system('cp -r %s %s/%s' % (options.dup_themes,
+                                  instance_home, options.themes))
+if options.posix_owner:
+    os.system('chown -R %s %s' % (options.posix_owner, instance_home))
+if options.link_themes:
+    os.system('ln -s %s %s/%s' % (options.link_themes,
+                                  instance_home, options.themes))
+
+user_id, _ = options.user_and_pwd.split(':')
+
+url = options.bundle_url
+split = url.split('?', 1)
+if len(split) > 1:
+    url = split[0]
+    query = cgi.parse_qs(split[1])
+    subpath = query.get('subpath', [''])
+    if len(subpath) > 1:
+        raise ValueError("Got ore than one value for subpath")
+    subpath = subpath[0]
+
+    branch = query.get('branch', [''])
+    if len(branch) > 1:
+        raise ValueError("Got ore than one value for bundle branch")
+    branch = branch[0]
+
+products_dir = instance_home + '/Products'
+
+for p in HGBUNDLER_PATH:
+    hgbundler = os.path.join(p, 'hgbundler')
+    if os.access(hgbundler, os.X_OK and os.R_OK):
+        break
+else:
+    raise RuntimeError("Could not find hgbundler on the path nor in /opt")
+
+if subpath:
+    os.system('hg clone %s %s/bundle' % (url, instance_home))
+    os.system('ln -s bundle/%s %s' % (subpath, products_dir))
+else:
+    os.system('hg clone %s %s/Products' % (url, instance_home))
+
+if branch:
+    os.system('cd %s; hg up %s' % (products_dir, branch))
+
+os.system('%s --bundle-dir=%s make-clones' % (hgbundler, products_dir))
+
+cmd = '%s/bin/zopectl run %s/%s -u %s cps ' % (
+    instance_home, instance_home, SITE_CREATE_JOB, user_id)
+if options.themes:
+    cmd += '-t %s' % options.themes
+os.system(cmd)
+
+print "Instance at %s ready to be started" % instance_home
