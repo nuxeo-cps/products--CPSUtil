@@ -52,12 +52,15 @@ parser.add_option('-u', '--zope-user_and_pwd', dest="user_and_pwd",
                  help="Zope toplevel initial user and password (<name>:<pwd>)")
 parser.add_option('--posix-owner', dest="posix_owner", default='',
                  help="Set ownership of the instance on filesystem "
-                      "(needed to run as root, typically set to zope:zope)")
+                      "(mandatory to run as root, typically set to zope:zope)")
 
 options, args = parser.parse_args()
 if len(args) != 1:
     parser.error("Wrong number or arguments")
 instance_home = args[0]
+
+if os.getuid() == 0 and not options.posix_owner:
+    parser.error("--posix_owner is mandatory to run as root.")
 
 os.system('%s/mkzopeinstance.py -d %s -u %s -s %s' % (
     options.zope_bin, instance_home, options.user_and_pwd, options.zope_skel))
