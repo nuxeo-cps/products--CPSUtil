@@ -71,11 +71,16 @@ class PropertiesPostProcessor(object):
                                               manage_tabs_message=message)
 
     _properties_post_process_split = ()
+    _properties_post_process_split_lines = ()
     _properties_post_process_tales = ()
 
     def _postProcessProperties(self):
         """Post-processing after properties change."""
-        # Split on some separator.
+        # Split each line on some separator
+        for attr_lines, attr, sep in self._properties_post_process_split_lines:
+            setattr(self, attr, tuple( tuple(i.strip() for i in l.split(sep))
+                                       for l in getattr(self, attr_lines)))
+        # Split a string on some separator.
         for attr_str, attr, seps in self._properties_post_process_split:
             v = [getattr(self, attr_str)]
             for sep in seps:
@@ -85,6 +90,7 @@ class PropertiesPostProcessor(object):
                 v = vv
             v = [s.strip() for s in v]
             v = filter(None, v)
+            # XXX this is non idempotent but fixing is dangerous
             setattr(self, attr_str, '; '.join(v))
             setattr(self, attr, v)
         # TALES expression.

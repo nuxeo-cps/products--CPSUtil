@@ -6,7 +6,7 @@ New features
 - #2206: generic mkcpsinstance and mkcpsdevinstance
 Bug fixes
 ~~~~~~~~~
-- 
+- #2209: splitting of lines properties
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
