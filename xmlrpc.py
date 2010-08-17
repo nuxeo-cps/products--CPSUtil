@@ -87,14 +87,14 @@ def unMarshallObject(stamp, data):
     data = decodestring(data)
     return loads(data)
 
-def marshallElement(element, encoding='utf-8'):
+def marshallElement(element, encodinp='utf-8'):
     """ maps element to serialize objects
 
     >>> from DateTime import DateTime
-    >>> date = DateTime('01/01/1970')
+    >>> date = DateTime('01/01/1971')
     >>> date = marshallElement(date)
     >>> date.value
-    '19700101T00:00:00'
+    '19710101T00:00:00'
     """
     if hasattr(element, 'aq_base'):
         element = marshallElement(element.aq_base)
@@ -130,10 +130,10 @@ def unMarshallElement(element):
     """ unmarshall element
 
     >>> from DateTime import DateTime
-    >>> date = DateTime('01/01/1970')
+    >>> date = DateTime('01/01/1971')
     >>> date = unMarshallElement(marshallElement(date))
     >>> str(date)
-    '1970/01/01'
+    '1971/01/01'
     """
     if isMarshalledObject(element):
         return unMarshallObject(element[0], element[1])

@@ -7,6 +7,7 @@ New features
 Bug fixes
 ~~~~~~~~~
 - #2209: splitting of lines properties
+- doctest fix on Debian lenny 
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
