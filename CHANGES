@@ -6,7 +6,7 @@ New features
 - #2206: generic mkcpsinstance and mkcpsdevinstance
 Bug fixes
 ~~~~~~~~~
-- 
+- doctest fix on Debian lenny 
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
