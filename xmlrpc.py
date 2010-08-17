@@ -87,7 +87,7 @@ def unMarshallObject(stamp, data):
     data = decodestring(data)
     return loads(data)
 
-def marshallElement(element, encodinp='utf-8'):
+def marshallElement(element, encoding='utf-8'):
     """ maps element to serialize objects
 
     >>> from DateTime import DateTime
