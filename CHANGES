@@ -8,6 +8,7 @@ New features
 Bug fixes
 ~~~~~~~~~
 - #2209: splitting of lines properties
+- #837: new resource registry (move to feature when finished)
 - doctest fix on Debian lenny 
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
