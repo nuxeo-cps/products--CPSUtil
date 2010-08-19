@@ -4,6 +4,7 @@ Requires
 New features
 ~~~~~~~~~~~~
 - #2206: generic mkcpsinstance and mkcpsdevinstance
+- #2205: new utility to get an open file from OFS.File
 Bug fixes
 ~~~~~~~~~
 - #2209: splitting of lines properties
