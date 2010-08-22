@@ -89,7 +89,10 @@ user_id, _ = options.user_and_pwd.split(':')
 
 url = options.bundle_url
 split = url.split('?', 1)
-if len(split) > 1:
+if len(split) == 1:
+    subpath = ''
+    branch = ''
+else:
     url = split[0]
     query = cgi.parse_qs(split[1])
     subpath = query.get('subpath', [''])
