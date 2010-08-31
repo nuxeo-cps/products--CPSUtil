@@ -31,7 +31,7 @@ from HTMLParser import HTMLParser, HTMLParseError
 from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.utils import bodyfinder
-from text import isUtf8
+from text import isUtf8, OLD_CPS_ENCODING
 
 logger = logging.getLogger('Products.CPSUtil.html')
 
@@ -77,7 +77,7 @@ def getHtmlBody(html_content):
 
     # Support for previews of old pre-unicode CPS documents
     if isinstance(html_body, str) and not isUtf8(html_body):
-        html_body = html_body.decode('iso-8859-15')
+        html_body = html_body.decode(OLD_CPS_ENCODING)
     return html_body
 
 
