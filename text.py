@@ -136,7 +136,7 @@ def truncateText(text, size=25):
 
 def isUtf8(text):
     try:
-        text = unicode(text, 'UTF-8', 'strict')
+        text = unicode(text, 'utf-8', 'strict')
         return True
     except UnicodeDecodeError:
         return False
