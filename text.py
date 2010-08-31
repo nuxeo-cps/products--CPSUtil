@@ -134,6 +134,12 @@ def truncateText(text, size=25):
     mid_size = (size - 3) / 2
     return text[:mid_size] + '...' + text[-mid_size:]
 
+def isUtf8(text):
+    try:
+        text = unicode(text, 'UTF-8', 'strict')
+        return True
+    except UnicodeDecodeError:
+        return False
 
 # This table gives rough latin9 equivalents for Unicode characters coming from
 # the MS Windows western charset (cp1522) that won't get directly translated
