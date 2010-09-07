@@ -7,9 +7,7 @@ New features
 Bug fixes
 ~~~~~~~~~
 - doctest fix on Debian lenny 
-- Fixed HTML previews of UTF-8 documents (such as all current XML documents, ie
-  OpenDocument, etc.) and added support for HTML previews of old pre-Unicode CPS
-  documents.
+- Fixed #2231: HTML previews of documents are wrongly encoded
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
