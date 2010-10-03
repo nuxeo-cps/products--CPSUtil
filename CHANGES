@@ -3,11 +3,10 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- #2206: generic mkcpsinstance and mkcpsdevinstance
+-
 Bug fixes
 ~~~~~~~~~
-- doctest fix on Debian lenny 
-- Fixed #2231: HTML previews of documents are wrongly encoded
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
