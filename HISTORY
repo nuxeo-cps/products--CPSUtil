@@ -1,4 +1,22 @@
 ===========================================================
+Package: CPSUtil 1.7.0
+===========================================================
+First release built by: gracinet at: 2010-10-03T11:46:47
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2206: generic mkcpsinstance and mkcpsdevinstance
+Bug fixes
+~~~~~~~~~
+- doctest fix on Debian lenny 
+- Fixed #2231: HTML previews of documents are wrongly encoded
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.6.1
 ===========================================================
 First release built by: gracinet at: 2010-08-02T20:00:06
