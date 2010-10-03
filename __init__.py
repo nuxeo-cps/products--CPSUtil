@@ -27,6 +27,7 @@ import integration
 import text
 import html
 import session
+import resourceregistry
 
 registerDirectory('skins', globals())
 

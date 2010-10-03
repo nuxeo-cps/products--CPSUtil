@@ -21,6 +21,7 @@
 
 import rfc822
 from StringIO import StringIO # cStringIO is not deepcopy-able
+from Acquisition import aq_base
 from ZPublisher.HTTPRequest import FileUpload
 from OFS.Image import File
 
@@ -145,6 +146,20 @@ def readPdata(pdata, pos, n=-1):
     res.insert(0, pdata.data[pos:pos+n])
     return res
 
+def ofsFileHandler(ofsfile):
+    """Return most RAM effective readonly open file object for an OFS File.
+
+    Aware of special subclasses like DiskFile or TramlineFile (no dependency).
+    In current implementation, only these special classes are RAM effective.
+    """
+
+    # special cases
+    getFileHandler = getattr(aq_base(ofsfile), 'getFileHandler', None)
+    if getFileHandler is not None:
+        return ofsfile.getFileHandler()
+
+    # default case
+    return OFSFileIO(ofsfile)
 
 def makeFileUploadFromOFSFile(ofsfile, filename=None):
     """Make a file upload from an OFS.File object.
