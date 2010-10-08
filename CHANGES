@@ -4,6 +4,7 @@ Requires
 New features
 ~~~~~~~~~~~~
 - #2205: new utility to get an open file from OFS.File
+- #2091: crashshield now a CPSUtil feature
 Bug fixes
 ~~~~~~~~~
 - #2209: splitting of lines properties
