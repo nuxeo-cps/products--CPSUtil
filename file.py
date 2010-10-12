@@ -123,6 +123,9 @@ class OFSFileIO(object):
             pos += self.len
         self.pos = max(0, pos)
 
+    def close(self):
+        pass
+
 
 def readPdata(pdata, pos, n=-1):
     """Read at most n bytes from a Pdata starting at offset pos.
