@@ -1,6 +1,6 @@
-# (C) Copyright 2005-2007 Nuxeo SAS <http://nuxeo.com>
+# (C) Copyright 2010 Georges Racinet
 # Authors:
-# M.-A. Darche <madarche@nuxeo.com>
+# Georges Racinet <georges@racinet.fr>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as published
