@@ -52,34 +52,27 @@ def zdt2dt(zdt, naive=False):
     interoperability with libraries that don't expect timezone-aware datetime
     instances, since both kinds can't be compared, but should be avoided if
     possible, because of the great confusion it can imply.
-    The examples below demonstrate some non-obvious behaviour
+    The examples below demonstrate some non-obvious behaviour.
 
-    Preparation: let's make the DateTime class believe that the local timezone
-    is GMT+1, with GMT+2 daylight saving time (in summer), and see what happens
-    >>> save_localzone0 = DateTime._localzone0
-    >>> save_localzone1 = DateTime._localzone1
-    >>> save_mutipleZones = DateTime._multipleZones
-    >>> DateTime._localzone0 = 'GMT+1'
-    >>> DateTime._localzone1 = 'GMT+2'
-    >>> DateTime._multipleZones = True
+    We can't really test the resulting value, because they are translated in
+    local time (may depend on the machine running the doctest), and that's
+    C-level localtime(). The results are indicated for this author's dev
+    setup machine (CET, CEST), but aren't tested.
+    They demonstrate the local time being applied with daylight savings
+    *for the target date/time*.
 
-    Now a summer date (from another time zone) is delivered in GMT+2
-    >>> zdt2dt(DateTime('2010/06/25 12:37 GMT+3'), naive=True)
+    >>> dt = zdt2dt(DateTime('2010/06/25 12:37 GMT+3'), naive=True)
+
     datetime.datetime(2010, 6, 25, 11, 37)
 
     While a winter date is delivered in GMT+1
-    >>> zdt2dt(DateTime('2010/02/25 12:37 GMT+3'), naive=True)
-    datetime.datetime(2010, 2, 25, 10, 37)
+    >>> dt = zdt2dt(DateTime('2010/02/25 12:37 GMT+3'), naive=True)
 
-    Restoring true values
-    >>> DateTime._localzone0 = save_localzone0
-    >>> DateTime._localzone1 = save_localzone1
-    >>> DateTime._multipleZones = save_mutipleZones
+    datetime.datetime(2010, 2, 25, 10, 37)
     """
     if zdt is None:
         return None
     # Daylights can't be known from DateTime
-    import pdb; pdb.set_trace()
     if naive:
         return datetime.fromtimestamp(zdt.timeTime())
 
