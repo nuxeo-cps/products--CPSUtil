@@ -1,0 +1,239 @@
+<?xml version="1.0"?>
+<directories>
+<!--
+#
+# Directory list for build_cps_doc.py.
+#
+# Instruct build_cps_doc.py to process a directories list file such
+#   as this one with the -x/- -xml-directories flag.
+#
+# Add documentation directories to be processed to this file, one
+#   <directory> element for each product.
+#
+#
+-->
+
+  <text/>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSBlog/doc</path>
+    <title>CPSBlog</title>
+    <text>A simple Blog product for CPS.
+    </text>
+  </directory>
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSCalendar/doc</path>
+    <title>CPSCalendar</title>
+    <text>
+**Note:** CPSCalendar is obsolete and no longer maintained.  It is
+replaced by CPSSharedCalendar.
+    </text>
+  </directory>
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSCore/doc</path>
+    <title>CPSCore</title>
+    <text>
+    </text>
+  </directory>
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSDefault/doc</path>
+    <title>CPSDefault</title>
+    <text>
+    </text>
+  </directory>
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSDesignerThemes/doc</path>
+    <title>CPSDesignerThemes</title>
+    <text>
+    </text>
+  </directory>
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSDirectory/doc</path>
+    <title>CPSDirectory</title>
+    <text>A CPSDirectory is a container for holding other things
+such as users.  In addition, a CPSDirectory provides the following:
+
+- Authentication services for entries.
+- A proxy for other directories.
+- A consolidated view of other directories.
+- A container for "links" to entries in other directories, so that changes
+  made to the entries do not have to be reported on several
+  directories.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSDocument/doc</path>
+    <title>CPSDocument</title>
+    <text>CPSDocument provides the following:
+
+- Support for flexible documents, specifically documents
+  containing a variety of widget type, which can be added and edited
+  by the user.
+- Support text transformation from a variety of source types, e.g.
+  StructuredText, reStructuredText, MSWord-like conversions.
+- Document rendering (generation) and display.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSForum/doc</path>
+    <title>CPSForum</title>
+    <text>CPSForum enables the site designer to add discussion
+forum capabilities to a CPS site.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSI18n/doc</path>
+    <title>CPSI18n</title>
+    <text>
+CPSI18n provides translation services for CPS products.
+    </text>
+  </directory>
+
+  <directory>
+    <path>./CPSNavigation/doc</path>
+    <title>CPSNavigation</title>
+    <text>CPSNavigation makes it very easy to create a kind of Explorer for
+each of the following:
+
+- Documents
+
+  - using portal_tree for folders and documents
+
+- All Vocabularies
+
+  - Hierarchy vocabulary
+
+- Directories
+
+  - acl_users
+
+  - ldap
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSPortlets/doc</path>
+    <title>CPSPortlets</title>
+    <text>
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSRelation/doc</path>
+    <title>CPSRelation</title>
+    <text>
+The Relation Tool can manage several and different kinds of graphs
+representing labeled relations between objects.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSRemoteController/doc</path>
+    <title>CPSRemoteController</title>
+    <text>
+CPSRemoteController provides the ability to to run Python scripts,
+outside of the CPS environment that manipulate a CPS portal,
+including the users, groups, documents, and other objects at that
+site.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSSchemas/doc</path>
+    <title>CPSSchemas</title>
+    <text>
+CPSSchemas supports the definition of CPS document types.  It is
+used, for example, by CPSTypeMaker.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSSharedCalendar/doc</path>
+    <title>CPSSharedCalendar</title>
+    <text>
+CPSSharedCalendar, iCalendar, CalCore, and CalZope
+provide a shared calendaring system for CPS.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSSkins/doc</path>
+    <title>CPSSkins</title>
+    <text>
+CPSSkins enables the manager of a CPS portal to customize the look
+and feel of a CPS portal using a WYSIWYG editor that is accessed
+through the CPS portal.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSSubscriptions/doc</path>
+    <title>CPSSubscriptions</title>
+    <text>CPSSubscriptions is a CPS3
+product that handles event subscriptions and notifications.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSUserFolder/doc</path>
+    <title>CPSUserFolder</title>
+    <text>CPSUserFolder is a user folder designed to work in conjunction
+with CPSDirectory (and therefore CPSSchemas). Directories are used
+to describe what are the attributes of a user (using a schema) and
+where they are stored (depending on the type of directory). This
+is also used for roles and groups, so that, for instance, one can
+easily add additional properties to groups.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSWiki/doc</path>
+    <title>CPSWiki</title>
+    <text>CPSWiki implements a simple Wiki capability within a CPS portal.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSWorkflow/doc</path>
+    <title>CPSWorkflow</title>
+    <text>CPSWorkflow implements workflow capabilities for a CPS
+portal.  Workflows control the control and flow of documents in
+the workspaces and sections of the portal.  Roles determine who
+can preform which steps in the workflow.  New workflows can be
+defined in a product's source code or in ``portal_workflow`` in
+the ZMI.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CalCore/doc</path>
+    <title>CalCore</title>
+    <text>
+CPSSharedCalendar, iCalendar, CalCore, and CalZope
+provide a shared calendaring system for CPS.
+    </text>
+  </directory>
+</directories>

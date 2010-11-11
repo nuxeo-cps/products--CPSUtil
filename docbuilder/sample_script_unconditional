@@ -1,0 +1,5 @@
+#!/bin/sh -v
+./doc_tools/build_cps_doc.py -u --html -x doc_tools/doc_directories.xml
+./doc_tools/build_cps_doc.py -i --html -x doc_tools/doc_directories.xml
+./doc_tools/build_cps_doc.py -g cps_docs.tar.gz --dist-include="html" \
+    -x doc_tools/doc_directories.xml
