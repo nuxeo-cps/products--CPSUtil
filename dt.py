@@ -79,6 +79,7 @@ def zdt2dt(zdt, naive=False):
     if zdt is None:
         return None
     # Daylights can't be known from DateTime
+    import pdb; pdb.set_trace()
     if naive:
         return datetime.fromtimestamp(zdt.timeTime())
 
@@ -110,10 +111,10 @@ def dt2zdt(dt):
     First, for these examples to run anywhere and anytime on earth
     we have to make DateTime believe that we are in GMT+4,
     independently of local daylight saving policy.
-    >>> orig = DateTime.localZone
-    >>> def fakeLocalZone(self, ltm=None):
-    ...     return 'GMT+4'
-    >>> DateTime.localZone = fakeLocalZone
+    >>> save_localzone0 = DateTime._localzone0
+    >>> DateTime._multipleZones = False
+    >>> save_mutipleZones = DateTime._multipleZones
+    >>> DateTime._localzone0 = 'GMT+4'
 
     Now let's go
     >>> dt2zdt(datetime(2013, 4, 7, 11, 20, 5))
@@ -123,7 +124,8 @@ def dt2zdt(dt):
     >>> dt2zdt(datetime(2013, 4, 7, 11, 20, 5, 123790))
     DateTime('2013/04/07 11:20:05.124 GMT+4')
 
-    >>> DateTime.localZone = orig # reverting the monkey patch
+    >>> DateTime._localzone0 = save_localzone0
+    >>> DateTime._multipleZones = save_mutipleZones
     """
 
     if dt is None:
