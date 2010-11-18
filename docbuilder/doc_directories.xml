@@ -50,6 +50,25 @@ replaced by CPSSharedCalendar.
     <path>./CPSDesignerThemes/doc</path>
     <title>CPSDesignerThemes</title>
     <text>
+CPSDesignerThemes is the standard theming system for CPS 3.5.
+
+Themes are designed to be almost static XHTML web sites, to give web designers
+maximal flexibility. They can be viewed as static sites in an ordinary browser,
+so that the designer can actually work without a CPS server around.
+
+Each theme page defines a whole structure that can be applied in a CPS context.
+Portlet slots to render, and portlets external skinning are defined within the
+pages.
+
+The typical work flow would be to start as a static site, then either to work
+directly on a CPS server to style the portlets or to include in the
+working theme pages sample portlets content taken from a CPS portal, e.g.,
+simply copy/pasting from the browser html source view. This latter approach
+does not require deep access to the server system : just user level access to
+the web portal.
+
+Any sample content within the slots is discarded by CPS while using the theme.
+
     </text>
   </directory>
   <!-- ============================================ -->
