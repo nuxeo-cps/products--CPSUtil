@@ -32,7 +32,20 @@ _resources = {} # resource id -> definition
 
 REQUEST_REGISTRY_KEY = '_cps_rsrc_registry'
 
-class GlobalMethodResource(object):
+class BaseResource(object):
+
+    def getDepends(self):
+        """Iterable of dependencies as resource ids."""
+        return self._depends
+
+    def setDepends(self, depends):
+        if isinstance(depends, basestring):
+            depends = (depends, )
+        self._depends = depends
+
+    depends = property(getDepends, setDepends)
+
+class GlobalMethodResource(BaseResource):
     """For method (ZPT, .py) based resources.
 
     The id is deduced from the method name."""
@@ -43,13 +56,13 @@ class GlobalMethodResource(object):
 
     @classmethod
     def register(cls, method_name, depends=()):
-        rid = ('gmeth', cls.__name__, method_name)
+        rid = ';'.join(('gmeth', cls.__name__, method_name))
         if rid in _resources:
             return rid
         _resources[rid] = cls(method_name, depends=depends)
         return rid
 
-class HtmlResource(object):
+class HtmlResource(BaseResource):
     """A resource represented by the html fragment that includes it.
 
     >>> HtmlResource.register('foo',
@@ -107,8 +120,8 @@ def _dump_resource(rid, acc, dumped, base_url=None):
     dumped is a set keeping trace of dumped resources
 
     >>> HtmlResource.register('r1', '<h1>')
-    >>> HtmlResource.register('r2', '<h2>', depends=('r1',))
-    >>> HtmlResource.register('r3', '<h3>', depends=('r1',))
+    >>> HtmlResource.register('r2', '<h2>', depends='r1')
+    >>> HtmlResource.register('r3', '<h3>', depends='r1')
     >>> HtmlResource.register('r4', '<h4>', depends=('r2', 'r3'))
     >>> dumped = set()
     >>> acc = []; _dump_resource('r4', acc, dumped); acc

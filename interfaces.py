@@ -39,12 +39,19 @@ class IForceBodySetupEnviron(ISetupEnviron):
 class IResource(Interface):
     """A resource such as javascript, stylesheets"""
 
-    rid = Attribute("Unique identifier among all known resources")
+    rid = Attribute("""Unique identifier among all known resources.
 
-    depends = Attribute("Iterable of other resources that this resource "
-                        "depends on, meaning that it must been included "
-                        "after them. Ordering of them is respected, too."
-                        )
+                       Must be hashable and non iterable.
+                    """)
+
+    depends = Attribute(
+        """Iterable of other resources that this resource depends on.
+
+        Usually, this means that this resource must been included after them
+        Internal ordering of them is respected, too.
+        For resources deriving from BaseResource, setting a single string value
+        is supported.
+        """)
 
     def html(base_url=None):
         """Produce html code suitable for inclusion in head element.
