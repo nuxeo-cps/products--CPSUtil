@@ -18,35 +18,38 @@
 # $Id$
 """resource registries, to track external resources to include in wep pages."""
 import logging
+from zope.interface import implements
 from AccessControl import ModuleSecurityInfo
 from Products.CMFCore.utils import getToolByName
 
-logger = logging.getLogger('Products.CPSUtil.resourceregistry')
+from interfaces import IResource
 
-security = ModuleSecurityInfo('Products.CPSUtil.resourceregistry')
+logger = logging.getLogger(__name__)
+
+security = ModuleSecurityInfo(__name__)
 
 _resources = {} # resource id -> definition
 
 REQUEST_REGISTRY_KEY = '_cps_rsrc_registry'
 
-class Resource(object):
-    def html(self, **kw):
-        raise NotImplementedError
-
-class GlobalMethodResource(Resource):
+class GlobalMethodResource(object):
     """For method (ZPT, .py) based resources.
 
     The id is deduced from the method name."""
 
+    def __init__(self, meth, depends=()):
+        self.meth = meth
+        self.depends = depends
+
     @classmethod
-    def register(cls, method_name):
+    def register(cls, method_name, depends=()):
         rid = ('gmeth', cls.__name__, method_name)
         if rid in _resources:
             return rid
-        _resources[rid] = cls(method_name)
+        _resources[rid] = cls(method_name, depends=depends)
         return rid
 
-class HtmlResource(Resource):
+class HtmlResource(object):
     """A resource represented by the html fragment that includes it.
 
     >>> HtmlResource.register('foo',
@@ -56,18 +59,23 @@ class HtmlResource(Resource):
     >>> _resources['foo'].html(base_url='/mycps/')
     '<script type="text/javascript">foo();</script>'
     """
-    def __init__(self, html):
+
+    implements(IResource)
+
+    def __init__(self, rid, html, depends=()):
+        self.id = rid
         self.fragment = html
+        self.depends = depends
 
     def html(self, **kw):
         """Return appropriate inclusion fragment."""
         return self.fragment
 
     @classmethod
-    def register(cls, rid, fragment):
+    def register(cls, rid, fragment, depends=()):
         if rid in _resources:
             raise ValueError('Existing resource by this id : %r' % rid)
-        _resources[rid] = cls(fragment)
+        _resources[rid] = cls(rid, fragment, depends=depends)
 
 
 class JSGlobalMethodResource(GlobalMethodResource):
@@ -80,16 +88,56 @@ class JSGlobalMethodResource(GlobalMethodResource):
     '<script type="text/javascript" src="/mycps/prototype.js"></script>'
     """
 
+    implements(IResource)
+
     template = ('<script type="text/javascript" src="%(base_url)s%(name)s">'
                 '</script>')
-
-    def __init__(self, js_method):
-        self.meth = js_method
 
     def html(self, base_url=None):
         if base_url is None:
             base_url = ''
         return self.template % dict(base_url=base_url, name=self.meth)
+
+
+def _dump_resource(rid, acc, dumped, base_url=None):
+    """Accumulator based dumping of resources.
+
+    Takes care of unicity and dependencies.
+    Dumped resources are accumulated in acc (must be a list)
+    dumped is a set keeping trace of dumped resources
+
+    >>> HtmlResource.register('r1', '<h1>')
+    >>> HtmlResource.register('r2', '<h2>', depends=('r1',))
+    >>> HtmlResource.register('r3', '<h3>', depends=('r1',))
+    >>> HtmlResource.register('r4', '<h4>', depends=('r2', 'r3'))
+    >>> dumped = set()
+    >>> acc = []; _dump_resource('r4', acc, dumped); acc
+    ['<h1>', '<h2>', '<h3>', '<h4>']
+
+    Redundancy avoidance:
+    >>> acc = []; _dump_resource('r4', acc, dumped); acc
+    []
+    >>> HtmlResource.register('r5', '<h5>', depends=('r2', 'r3'))
+    >>> HtmlResource.register('r6', '<h6>', depends=('r5', 'r1'))
+    >>> acc = []; _dump_resource('r6', acc, dumped); acc
+    ['<h5>', '<h6>']
+    >>> dumped = set() # flushing history
+    >>> acc = []; _dump_resource('r6', acc, dumped); acc
+    ['<h1>', '<h2>', '<h3>', '<h5>', '<h6>']
+
+    There is no protection against loops in this method.
+    They produce the maximum recursion RuntimeError.
+    TODO add protection in registrations (cheaper to do just once)
+    """
+    if rid in dumped:
+        return
+    r = _resources[rid]
+    for drid in r.depends:
+        if drid not in dumped:
+            _dump_resource(drid, acc, dumped, base_url=base_url)
+    acc.append(r.html(base_url=base_url))
+    dumped.add(rid)
+
 
 class RequestResourceRegistry(object):
     """Transient, request dependent resource registry.
@@ -115,19 +163,18 @@ class RequestResourceRegistry(object):
 
         Resources that have already been dumped are *not* included.
         Therefore, the caller must ensure proper inclusion in the final
-        HTML document.
+        HTML document in order not to confuse subsequent calls (for other
+        categories, e.g.)
         """
-        cat_req = self.required.get(category, ())
+        cat_req = self.required.get(category, set())
         dumped = self.dumped
+        base_url = self.base_url
         res = []
         for rid in cat_req:
-            if rid in dumped:
-                continue
-            r = _resources.get(rid)
-            if r is None:
-                logger.warn("Unknow resource id : %r", rid)
-            res.append(r.html(base_url=self.base_url))
-            dumped.add(rid)
+            try:
+                _dump_resource(rid, res, dumped, base_url=base_url)
+            except KeyError, e:
+                logger.warn("Unknow resource id : %r", str(e))
         return '\n'.join(res)
 
 def require_resource(rid, category=None, context=None):

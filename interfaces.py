@@ -19,7 +19,7 @@
 #
 # $Id$
 
-from zope.interface import Interface
+from zope.interface import Interface, Attribute
 from Products.GenericSetup.interfaces import IBody, ISetupEnviron
 
 class IRAMCacheManager(Interface):
@@ -35,3 +35,20 @@ class IForceBodySetupEnviron(ISetupEnviron):
 
     Used by adapters who don't normally export bodies, just nodes
     Example: widget XML adapter."""
+
+class IResource(Interface):
+    """A resource such as javascript, stylesheets"""
+
+    rid = Attribute("Unique identifier among all known resources")
+
+    depends = Attribute("Iterable of other resources that this resource "
+                        "depends on, meaning that it must been included "
+                        "after them. Ordering of them is respected, too."
+                        )
+
+    def html(base_url=None):
+        """Produce html code suitable for inclusion in head element.
+
+        base_url is useful in case the inclusion is done by a URI
+        specification, and is typically the portal url.
+        """
