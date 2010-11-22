@@ -194,20 +194,37 @@ def require_resource(rid, category=None, context=None):
     """Convenience function."""
     get_request_resource_registry(context).require(rid, category=category)
 
-def get_request_resource_registry(context):
+def get_request_resource_registry(context, base_url=None):
+    """Return the resource registry tied to context.
+
+    There is at most one, and it's created if needed.
+    base_url is used only in that case.
+    """
     if context is None:
         raise ValueError("need at least the context")
     request = context.REQUEST
 
     reg = getattr(request, REQUEST_REGISTRY_KEY, None)
     if reg is None:
-        # TODO base_url is also provided by CPSSkins in request
-        base_url = getToolByName(context, 'portal_url').getBaseUrl()
+        if base_url is None:
+            base_url = getToolByName(context, 'portal_url').getBaseUrl()
         reg = RequestResourceRegistry(base_url=base_url)
         setattr(request, REQUEST_REGISTRY_KEY, reg)
     return reg
 
 security.declarePublic('dump_category')
-def dump_category(context, category):
-    base_url = getToolByName(context, 'portal_url').getBaseUrl()
-    return get_request_resource_registry(context).dumpCategory(category)
+def dump_category(context, category, base_url=None):
+    """Dumps the category for given context.
+
+    Spawns a new registry if needed. There can be at most one for a given
+    context. base_url is used if provided, otherwise, it is deduced from the
+    context at registry creation time only.
+    This shortcut is useful in case base_url is already known and/or provides
+    more independency from a full CPS context (in tests, notably).
+
+    TODO++ time to make a request-cached global similar as CPSSkins' and
+    guarantee that it's immediately available once the portal is traversed.
+    These getToolByName lines are getting long
+    """
+    reg = get_request_resource_registry(context, base_url=base_url)
+    return reg.dumpCategory(category)
