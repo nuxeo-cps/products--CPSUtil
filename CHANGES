@@ -3,9 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- #2274: DateTime/datetime conversion
-- Added docbuilder (static doc builder)
-- Added minjson
+-
 Bug fixes
 ~~~~~~~~~
 -
