@@ -1,4 +1,23 @@
 ===========================================================
+Package: CPSUtil 1.9.0
+===========================================================
+First release built by: gracinet at: 2010-11-27T04:26:46
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2274: DateTime/datetime conversion
+- Added docbuilder (static doc builder)
+- Added minjson
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.8.0
 ===========================================================
 First release built by: gracinet at: 2010-10-13T11:46:46
