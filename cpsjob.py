@@ -31,17 +31,26 @@ import logging
 
 import optparse
 optparser = optparse.OptionParser(
-    usage="usage: %prog [options] <portal id> [job args]")
-optparser.add_option('-u', '--username', dest='user_id', default='cpsjob',
-                     help="the identifier of the transient unrestricted "
+    usage="usage: %prog [options] PORTAL_ID [job args]")
+base_opts = optparse.OptionGroup(optparser, "cpsjob common options",
+                                 "These are the options available to all "
+                                 "scripts based on the cpsjob launcher.")
+base_opts.add_option('-u', '--username', '--user-id',
+                     dest='user_id', default='cpsjob',
+                     help="the identifier of the unrestricted "
                      "user to run as (will appear, e.g, in "
                      "status history of modified documents). "
+                     "Must be the id of an existing user with management "
+                     "rights on the specified portal (will be enforced). "
                      "Defaults to '%default'."
                      )
-optparser.add_option('--loglevel', dest='log_level', default='INFO',
-                     help="Log level (standard logging module levels)"
-                     "Defaults to '%default'."
+base_opts.add_option('--loglevel', dest='log_level', default='INFO',
+                     help="Log level. These are the standard predefined "
+                     "levels of the python logging module. In ascending order "
+                     ": NOTSET, DEBUG, INFO, WARNING, ERROR or CRITICAL. "
+                     "Defaults to '%default'.", metavar="LEVEL"
                      )
+optparser.add_option_group(base_opts)
 
 # Taken from ZopeTestCase.
 # Not imported because import as side-effect of switching to testing ZODB
