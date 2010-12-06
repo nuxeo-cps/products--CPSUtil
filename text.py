@@ -134,6 +134,20 @@ def truncateText(text, size=25):
     mid_size = (size - 3) / 2
     return text[:mid_size] + '...' + text[-mid_size:]
 
+ModuleSecurityInfo(__name__).declarePublic('summarize')
+def summarize(text='', max_words=20):
+    """summarize the text by returning the first max_words
+    """
+    if not max_words:
+        return text
+    if not text:
+        return ''
+    split_text = text.split(' ', max_words)[0:max_words]
+    res = ''
+    if split_text:
+        res = ' '.join(split_text) + ' ...'
+    return res
+
 def isUtf8(text):
     try:
         text = unicode(text, 'utf-8', 'strict')
