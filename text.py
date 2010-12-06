@@ -39,7 +39,7 @@ ACCENTED_CHARS_TRANSLATIONS = string.maketrans(
 
 ENTITY_RE = re.compile(r'&#(\d+);')
 
-logger = logging.getLogger('Products.CPSUtil.text')
+logger = logging.getLogger(__name__)
 
 def entity_transcode(match_obj):
     """Replace numeric XML entity by corresponding unicode string."""
@@ -85,7 +85,7 @@ def uni_lower(s):
     elif not isinstance(s, basestring):
         raise ValueError("Expected string input, got %r" % s)
 
-ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toAscii')
+ModuleSecurityInfo(__name__).declarePublic('toAscii')
 def toAscii(s):
     """Change accented and special characters by ASCII characters.
 
@@ -104,7 +104,7 @@ def toAscii(s):
     s = s.replace('ß', 'ss')
     return s
 
-ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('toLatin9')
+ModuleSecurityInfo(__name__).declarePublic('toLatin9')
 def toLatin9(obj):
     if isinstance(obj, dict):
         for k, v in obj.items():
@@ -126,7 +126,7 @@ def _unicodeToLatin9(s):
         #&#8217;
         return s.encode('iso-8859-15', 'ignore')
 
-ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('truncateText')
+ModuleSecurityInfo(__name__).declarePublic('truncateText')
 def truncateText(text, size=25):
     """Middle truncature."""
     if text is None or len(text) < size:
@@ -215,7 +215,7 @@ def winToLatin9_errors(exc):
 
 codecs.register_error('latin9_fallback', winToLatin9_errors)
 
-ModuleSecurityInfo('Products.CPSUtil.text').declarePublic('get_final_encoding')
+ModuleSecurityInfo(__name__).declarePublic('get_final_encoding')
 def get_final_encoding(context):
     """Return the encoding in which HTML pages are produced.
 
