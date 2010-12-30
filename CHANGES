@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- factorized summarize function from Content & RSS portlets.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
