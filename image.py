@@ -82,11 +82,15 @@ def parse_size_spec(spec):
     (1024, None)
     >>> parse_size_spec('l800')
     800
+    >>> parse_size_spec('full') is None
+    True
     >>> try: parse_size_spec('x1024')
     ... except ValueError, m: print str(m).split(':')[1].strip()
     'x1024'
     """
     spec = spec.strip() # does not hurt
+    if spec == 'full':
+        return
     m = IMG_SZ_LARGEST_REGEXP.match(spec)
     if m is not None:
         return int(m.group(1))
@@ -113,11 +117,15 @@ def parse_size_spec_as_dict(spec):
     {'width': 1024}
     >>> parse_size_spec_as_dict('l800')
     {'largest': 800}
+    >>> parse_size_spec_as_dict('full')
+    {}
     >>> try: parse_size_spec_as_dict('x1024')
     ... except ValueError, m: print str(m).split(':')[1].strip()
     'x1024'
     """
     parsed = parse_size_spec(spec)
+    if parsed is None:
+        return {}
 
     if isinstance(parsed, int):
         return dict(largest=parsed)
