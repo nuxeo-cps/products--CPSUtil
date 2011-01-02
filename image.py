@@ -18,7 +18,11 @@
 import re
 import math
 from StringIO import StringIO
-import PIL.Image # TODO protect
+try:
+    import PIL.Image
+    PIL_OK = True
+except ImportError:
+    PIL_OK = False
 
 from Acquisition import aq_base
 from OFS.Image import getImageInfo as zopeGetImageInfo
@@ -35,25 +39,34 @@ IMG_SZ_LARGEST_REGEXP = re.compile(r'^l(\d+)$')
 def imageInfo(img):
     """Return content_type, width, height for img (string, file-like or Image).
     """
-    if hasattr(aq_base(img), 'width'):
+    img = aq_base(img)
+    if hasattr(img, 'width'):
         return img.content_type, img.width, img_height
+    elif hasattr(img, 'seek'):
+        img_header = img.read(30)
+        img.seek(0)
     elif isinstance(img, str):
+        img_header = img[:30]
         img = StringIO(img)
 
-    try:
-        img = PIL.Image.open(img)
-        width, height = img.size
-        format = img.format
-    except IOError, e: # TODO a lot
-        format = 'application/octet-stream'
-        width, height = -1, -1
+    format, width, height = zopeGetImageInfo(img_header)
+    if width < 0 or height < 0 and PIL_OK:
+        try:
+            img = PIL.Image.open(img)
+            width, height = img.size
+            if not format:
+                format = PIL.Image.MIME.get(img.format,
+                                            'application/octet-stream')
+        except IOError, e: # TODO a lot
+            format = 'application/octet-stream'
+            width, height = -1, -1
 
     if width < 0:
         width = None
     if height < 0:
         height = None
 
-    return format, width, height # TODO XXX convert e.g JPEG -> image/jpeg
+    return format, width, height
 
 def imageGeometry(img):
     """Return width, height for provided image (string, file-like or Image)."""
