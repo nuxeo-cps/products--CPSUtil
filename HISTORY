@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.10.0
+===========================================================
+First release built by: gracinet at: 2011-01-03T01:14:42
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2234: factorized new image utilities here
+Bug fixes
+~~~~~~~~~
+- Improved presentation of cpsjob options
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.9.2
 ===========================================================
 First release built by: gracinet at: 2010-12-30T12:43:22
