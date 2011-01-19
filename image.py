@@ -42,7 +42,7 @@ IMG_SZ_LARGEST_REGEXP = re.compile(r'^l(\d+)$')
 class SizeSpecError(ValueError):
     """Special exception for this module's size specifications."""
 
-def imageInfo(img):
+def info(img):
     """Return content_type, width, height for img (string, file-like or Image).
     """
     img = aq_base(img)
@@ -74,21 +74,21 @@ def imageInfo(img):
 
     return format, width, height
 
-def imageGeometry(img):
+def geometry(img):
     """Return width, height for provided image (string, file-like or Image)."""
-    return imageInfo(img)[1:]
+    return info(img)[1:]
 
-def _proportionalDim(dim1, target_dim1, dim2):
+def _proportional_dim(dim1, target_dim1, dim2):
     """Deduce dimension 2 from the stretch of dim1."""
     return int(math.floor(dim2 * float(target_dim1)/dim1 + 0.5))
 
-def _geometryFromLargest(img, size):
+def _geometry_from_largest(img, size):
     """Compute width, height from the wished largest dimension."""
-    w, h = imageGeometry(img)
+    w, h = geometry(img)
     if w > h:
-        return size, _proportionalDim(w, size, h)
+        return size, _proportional_dim(w, size, h)
     else:
-        return _proportionalDim(h, size, w), size
+        return _proportional_dim(h, size, w), size
 
 def parse_size_spec(spec):
     """Return width, height or raise SizeSpecError.
@@ -163,23 +163,23 @@ def parse_size_spec_as_dict(spec):
     return dict((k, v) for k, v in zip(('width', 'height'), parsed)
                 if v is not None)
 
-def resized_img_geometry(img, spec):
+def resized_geometry(img, spec):
     """Return corresponding width, height for a size specification on img."""
 
     sz = parse_size_spec(spec)
     if isinstance(sz, int):
-        return _geometryFromLargest(img, sz)
+        return _geometry_from_largest(img, sz)
 
-    w, h = imageGeometry(img)
+    w, h = geometry(img)
 
     if spec == 'full':
         return w, h
 
     rw, rh = sz
     if rw is None:
-        return _proportionalDim(h, rh, w), rh
+        return _proportional_dim(h, rh, w), rh
     elif rh is None:
-        return rw, _proportionalDim(w, rw, h)
+        return rw, _proportional_dim(w, rw, h)
 
     return rw, rh
 
