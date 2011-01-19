@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2325: moved image resizing methods from CPSCore
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

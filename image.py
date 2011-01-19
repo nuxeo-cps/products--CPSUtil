@@ -26,6 +26,8 @@ except ImportError:
 
 from Acquisition import aq_base
 from OFS.Image import getImageInfo as zopeGetImageInfo
+from OFS.Image import Image
+from Products.CPSUtil.file import ofsFileHandler
 
 IMG_SZ_FULLSPEC_REGEXP = re.compile(r'^(\d+)x(\d+)$')
 
@@ -35,13 +37,17 @@ IMG_SZ_WIDTH_REGEXP = re.compile(r'^w(\d+)$')
 
 IMG_SZ_LARGEST_REGEXP = re.compile(r'^l(\d+)$')
 
+"""High level image manipulating library for CPS."""
+
+class SizeSpecError(ValueError):
+    """Special exception for this module's size specifications."""
 
 def imageInfo(img):
     """Return content_type, width, height for img (string, file-like or Image).
     """
     img = aq_base(img)
     if hasattr(img, 'width'):
-        return img.content_type, img.width, img_height
+        return img.content_type, img.width, img.height
     elif hasattr(img, 'seek'):
         img_header = img.read(30)
         img.seek(0)
@@ -85,7 +91,18 @@ def _geometryFromLargest(img, size):
         return _proportionalDim(h, size, w), size
 
 def parse_size_spec(spec):
-    """Return width, height or raise BadRequest.
+    """Return width, height or raise SizeSpecError.
+
+    where spec can be:
+       - full: untransformed
+       - 320x200: full size spec (width plus height)
+       - w320: width spec: height will keep aspect ratio
+       - h200: height spec: width will keep aspect ratio
+       - l540: largest dimension spec: wished size of the largest dimension,
+                                       keeping aspect ratio
+
+
+
 
     >>> parse_size_spec('320x200')
     (320, 200)
@@ -98,7 +115,7 @@ def parse_size_spec(spec):
     >>> parse_size_spec('full') is None
     True
     >>> try: parse_size_spec('x1024')
-    ... except ValueError, m: print str(m).split(':')[1].strip()
+    ... except SizeSpecError, m: print str(m).split(':')[1].strip()
     'x1024'
     """
     spec = spec.strip() # does not hurt
@@ -117,7 +134,7 @@ def parse_size_spec(spec):
     if m is not None:
         return None, int(m.group(1))
 
-    raise ValueError('Incorrect image size specification: %r' % spec)
+    raise SizeSpecError('Incorrect image size specification: %r' % spec)
 
 def parse_size_spec_as_dict(spec):
     """Return a dict suitable as kwargs for e.g., makeSizeSpec
@@ -165,6 +182,26 @@ def resized_img_geometry(img, spec):
         return rw, _proportionalDim(w, rw, h)
 
     return rw, rh
+
+def resize(src, width, height, resized_id):
+    """Return OFS.Image.Image or None if cannot resize."""
+
+    if not PIL_OK:
+        logger.warn("Resizing can't be done until PIL is installed")
+        return
+
+    fileio = ofsFileHandler(src)
+    try:
+        img = PIL.Image.open(fileio)
+        newimg = img.resize((width, height), PIL.Image.ANTIALIAS)
+        outfile = StringIO()
+        newimg.save(outfile, format=img.format)
+    except (NameError, IOError, ValueError, SystemError), err:
+            logger.warning("Failed to resize image %r (%r). Error: %s), ",
+                           src.title, img, err)
+            return
+
+    return Image(resized_id, src.title, outfile)
 
 
 
