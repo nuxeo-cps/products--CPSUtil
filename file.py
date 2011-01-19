@@ -113,6 +113,39 @@ class OFSFileIO(object):
             self.pos += len(res)
             return res
 
+    def readline(self):
+        """Readline as from a file object with no universal new line support.
+
+        For details, do python -c "print file.__doc__"
+
+        # ! using \n in literals confuses doctest
+
+        >>> fobj = File('fid', 'title', chr(10).join(('ab', 'cd', 'b')))
+        >>> fio = OFSFileIO(fobj)
+        >>> fio.readline()[:-1]
+        'ab'
+        >>> fio.tell()
+        3
+        >>> fio.readline()[:-1]
+        'cd'
+        >>> fio.tell()
+        6
+        >>> fio.read()
+        'b'
+        """
+        r = None
+        found = -1
+        res = []
+        while r != '' and found == -1:
+            r = self.read(1024)
+            found = r.find('\n')
+            if found != -1:
+                res.append(r[:found+1]) # including \n, yes
+                self.pos -= len(r) - found - 1
+                break
+            res.append(r)
+        return ''.join(res)
+
     def tell(self):
         return self.pos
 

@@ -18,6 +18,7 @@
 # $Id$
 
 import unittest
+from Testing.ZopeTestCase import doctest
 
 import rfc822
 import cPickle
@@ -180,6 +181,8 @@ def test_suite():
     suite.addTest(unittest.makeSuite(FileTest))
     suite.addTest(unittest.makeSuite(PersistentFixupTest))
     suite.addTest(unittest.makeSuite(FileUploadTests))
+    suite.addTest(doctest.DocTestSuite('Products.CPSUtil.file'))
+
     return suite
 
 if __name__ == '__main__':
