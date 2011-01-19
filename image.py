@@ -17,6 +17,7 @@
 
 import re
 import math
+import logging
 from StringIO import StringIO
 try:
     import PIL.Image
@@ -39,6 +40,8 @@ IMG_SZ_LARGEST_REGEXP = re.compile(r'^l(\d+)$')
 
 """High level image manipulating library for CPS."""
 
+logger = logging.getLogger(__name__)
+
 class SizeSpecError(ValueError):
     """Special exception for this module's size specifications."""
 
@@ -54,6 +57,8 @@ def info(img):
     elif isinstance(img, str):
         img_header = img[:30]
         img = StringIO(img)
+    else:
+        raise ValueError("%r" % img)
 
     format, width, height = zopeGetImageInfo(img_header)
     if width < 0 or height < 0 and PIL_OK:
@@ -183,8 +188,10 @@ def resized_geometry(img, spec):
 
     return rw, rh
 
-def resize(src, width, height, resized_id):
-    """Return OFS.Image.Image or None if cannot resize."""
+def resize(src, width, height, resized_id, raw=False):
+    """Return OFS.Image.Image or None if cannot resize.
+
+    If raw is True, the raw binary string is served."""
 
     if not PIL_OK:
         logger.warn("Resizing can't be done until PIL is installed")
@@ -198,10 +205,9 @@ def resize(src, width, height, resized_id):
         newimg.save(outfile, format=img.format)
     except (NameError, IOError, ValueError, SystemError), err:
             logger.warning("Failed to resize image %r (%r). Error: %s), ",
-                           src.title, img, err)
+                           src.title, src, err)
             return
-
+    if raw:
+        return outfile.getvalue()
     return Image(resized_id, src.title, outfile)
-
-
 
