@@ -61,7 +61,7 @@ def info(img):
         raise ValueError("%r" % img)
 
     format, width, height = zopeGetImageInfo(img_header)
-    if width < 0 or height < 0 and PIL_OK:
+    if (width < 0 or height < 0) and PIL_OK:
         try:
             img = PIL.Image.open(img)
             width, height = img.size
