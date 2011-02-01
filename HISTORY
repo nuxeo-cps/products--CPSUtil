@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.10.1
+===========================================================
+First release built by: gracinet at: 2011-02-01T21:22:00
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2325: moved image resizing methods from CPSCore
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.10.0
 ===========================================================
 First release built by: gracinet at: 2011-01-03T01:14:42
