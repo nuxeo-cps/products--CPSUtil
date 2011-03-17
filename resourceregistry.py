@@ -62,6 +62,25 @@ class GlobalMethodResource(BaseResource):
         _resources[rid] = cls(method_name, depends=depends)
         return rid
 
+class LocalMethodResource(BaseResource):
+    """For method (ZPT, .py) based resources to be applied in a context.
+
+    The id is deduced from the method name.
+    Locality of rendering will be enforced simply by using relative path URIs.
+    """
+
+    def __init__(self, meth, depends=()):
+        self.meth = meth
+        self.depends = depends
+
+    @classmethod
+    def register(cls, method_name, depends=()):
+        rid = ';'.join(('lmeth', cls.__name__, method_name))
+        if rid in _resources:
+            return rid
+        _resources[rid] = cls(method_name, depends=depends)
+        return rid
+
 class HtmlResource(BaseResource):
     """A resource represented by the html fragment that includes it.
 
@@ -89,6 +108,27 @@ class HtmlResource(BaseResource):
         if rid in _resources:
             raise ValueError('Existing resource by this id : %r' % rid)
         _resources[rid] = cls(rid, fragment, depends=depends)
+
+
+class JSLocalMethodResource(LocalMethodResource):
+    """Represent JS resources that are provided by a method in context.
+
+    >>> rid = JSLocalMethodResource.register('display_rte.js')
+    >>> _resources[rid].html()
+    '<script type="text/javascript" src="display_rte.js"></script>'
+    >>> _resources[rid].html(base_url='/mycps/')
+    '<script type="text/javascript" src="display_rte.js"></script>'
+    """
+
+    implements(IResource)
+
+    template = ('<script type="text/javascript" src="%(name)s">'
+                '</script>')
+
+    def html(self, base_url=None):
+        if base_url is None:
+            base_url = ''
+        return self.template % dict(name=self.meth)
 
 
 class JSGlobalMethodResource(GlobalMethodResource):

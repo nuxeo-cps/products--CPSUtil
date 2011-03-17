@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2329: implemented JSLocalMethodResource for these needs
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
