@@ -27,7 +27,7 @@ except ImportError:
 
 from Acquisition import aq_base
 from OFS.Image import getImageInfo as zopeGetImageInfo
-from OFS.Image import Image
+from OFS.Image import Image, File
 from Products.CPSUtil.file import ofsFileHandler
 
 IMG_SZ_FULLSPEC_REGEXP = re.compile(r'^(\d+)x(\d+)$')
@@ -51,7 +51,12 @@ def info(img):
     img = aq_base(img)
     if hasattr(img, 'width'):
         return img.content_type, img.width, img.height
-    elif hasattr(img, 'seek'):
+
+    if isinstance(img, File):
+        img = ofsFileHandler(img)
+
+    # now we are working either on python file-like object or on str
+    if hasattr(img, 'seek'):
         img_header = img.read(30)
         img.seek(0)
     elif isinstance(img, str):
