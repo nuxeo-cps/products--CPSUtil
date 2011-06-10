@@ -18,9 +18,30 @@
 import unittest
 from Testing.ZopeTestCase import doctest
 
+import os
+from OFS.Image import Image
+from Products.CPSUtil import image
+
+DATA_DIR = os.path.join(os.path.split(__file__)[0], 'data')
+
+class ImageTestCase(unittest.TestCase):
+
+    def test_tiff(self):
+        img = open(os.path.join(DATA_DIR, 'test.tif'))
+        self.assertEquals(image.geometry(img), (28, 14))
+
+        img = Image('img', 'test.tif', img)
+        # forcing content_type because if incorrect, this won't test #2406
+        # properly (in unit tests, we often get application/octet-stream
+        # and this is enough for the new code to ignore Zope's stored info).
+        img.content_type = 'image/tiff'
+        self.assertEquals(image.geometry(img), (28, 14))
+
+
 def test_suite():
     return unittest.TestSuite((
         doctest.DocTestSuite('Products.CPSUtil.image'),
+        unittest.makeSuite(ImageTestCase),
         ))
 
 if __name__ == '__main__':

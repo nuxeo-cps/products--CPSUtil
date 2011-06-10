@@ -49,8 +49,11 @@ def info(img):
     """Return content_type, width, height for img (string, file-like or Image).
     """
     img = aq_base(img)
-    if hasattr(img, 'width'):
-        return img.content_type, img.width, img.height
+    if hasattr(img, 'meta_type') and img.meta_type == 'Image':
+        ct, w, h = img.content_type, img.width, img.height
+        # Zope Image object can be buggy (tiff)
+        if isinstance(w, int) and isinstance(h, int) and ct.startswith('image/'):
+            return ct, w, h
 
     if isinstance(img, File):
         img = ofsFileHandler(img)
