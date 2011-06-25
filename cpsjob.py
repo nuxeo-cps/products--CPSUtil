@@ -29,6 +29,8 @@ import sys
 import os
 import logging
 
+import transaction
+
 import optparse
 optparser = optparse.OptionParser(
     usage="usage: %prog [options] PORTAL_ID [job args]")
@@ -49,6 +51,9 @@ base_opts.add_option('--loglevel', dest='log_level', default='INFO',
                      "levels of the python logging module. In ascending order "
                      ": NOTSET, DEBUG, INFO, WARNING, ERROR or CRITICAL. "
                      "Defaults to '%default'.", metavar="LEVEL"
+                     )
+base_opts.add_option('--pdb', action='store_true',
+                     help="If set, runs with pdb post mortem debugging."
                      )
 optparser.add_option_group(base_opts)
 
@@ -141,6 +146,26 @@ def bootstrap(app):
     portal = get_portal(app, arguments[0])
     login(portal, options.user_id)
     return portal, options, arguments[1:]
+
+def run(app, call, *args, **kwargs):
+    """Directly execute a callable with extra facilities.
+
+    The callable must take portal, args and options as first positional
+    arguments.
+
+    args and options are produced by cpsjob.optparse, an OptionsParser
+    instance, which can be customized before calling this runner.
+    """
+    portal, options, arguments = bootstrap(app)
+    try:
+        call(portal, arguments, options, *args, **kwargs)
+    except:
+        if not options.pdb:
+            raise
+        import pdb
+        pdb.post_mortem(sys.exc_info()[2])
+    else:
+        transaction.commit()
 
 if __name__ == '__main__':
     parse_args() # what else could we do without the app object ?

@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- #2408: cpsjob now has a runner and option for post mortem debugging
 Bug fixes
 ~~~~~~~~~
 - #2406: error in tiff OFS.Image object resising

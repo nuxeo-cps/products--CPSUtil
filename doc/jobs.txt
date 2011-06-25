@@ -79,10 +79,13 @@ tree caches, you can do::
 WRITING JOBS
 ============
 
-A job for ``zopectl run`` typically includes the following lines::
+A job for ``zopectl run`` typically looks like this (new in CPSUtil
+1.11 / CPS 3.5.3)::
 
- >>> from Products.CPSUtil.cpsjob import bootstrap
- >>> portal, options, arguments = bootstrap(app)
+ >>> def job(portal, arguments, options):
+ ...   # do something
+ >>> from Products.CPSUtil import cpsjob
+ >>> cpsjob.run(job)
 
 ``portal`` is the portal object. ``options`` and ``arguments`` as are
 provided by the ``optparse`` module, the latter being stripped from
@@ -92,22 +95,35 @@ Apart from that, they follow the same rules as any piece of unrestricted
 code. You can do anything that does not expect the REQUEST object to
 be a real one (see below), and import any module from Zope or application code.
 
+It is possible to separate the bootstrapping (getting the portal
+object, parse command-line) and actual execution::
+
+ >>> from Products.CPSUtil.cpsjob import bootstrap
+ >>> portal, options, arguments = bootstrap(app)
+ >>> # do something on the portal
+
+This was the preferred way of doing before the introduction of
+``cpsjob.run``. It is still supported, but transaction commit
+
 Persisting changes
 ------------------
+If the job is being launched by ``cpsjob.run``, there's nothing
+special to be done.
 
-Unlike External Methods, or code running in the context of an HTTP
-request, a CPS job has to invoke itself the transaction commit,
-otherwise nothing will be persisted::
+Otherwise, the code has to perform transaction commits explicitely::
 
   >>> import transaction
   >>> transaction.commit()
 
-This is really the same as within a ``zopectl debug`` session.
+Note also that long jobs should at least use transaction
+savepoints (to reclaim RAM) or commits.
+
+There is currently no replay facility in case of conflicts.
 
 Job arguments and options
 -------------------------
 To accept more command line options, add them to ``cpsjob.optparser``
-before the call to ``bootstrap``. The later does the parsing::
+before the call to ``bootstrap`` or ``run``::
 
  >>> from Products.CPSUtil import cpsjob
  >>> cpsjob.optparser.add_option('-e', '--example', dest='exmp', default='val')
@@ -123,21 +139,23 @@ Sample job
 This job prints the creation date of the portal, or of a document specified by
 its relative path from the portal::
 
-  from Products.CPSUtil.cpsjob import bootstrap
+  from Products.CPSUtil import cpsjob
   from zope.interface import implements
   from Products.CPSCore.interfaces import ICPSProxy, ICPSSite
 
-  portal, options, ars = bootstrap(app)
-  rpath = args and args[0] or ''
-  ob = portal.unrestrictedTraverse(rpath)
+  def print_date(portal, args, options):
+      rpath = args and args[0] or ''
+      ob = portal.unrestrictedTraverse(rpath)
 
-  if ICPSSite.providedBy(ob):
-      print "Found the portal object"
-  elif not ICPSProxy.providedBy(ob):
-      raise RuntimeError("Object at '%s' is not a CPS Proxy." % rpath)
-  else:
-      print "\nFound CPS proxy at '%s'" % rpath
-  print "Creation date: %s" % ob.created() # Dublin core API
+      if ICPSSite.providedBy(ob):
+          print "Found the portal object"
+      elif not ICPSProxy.providedBy(ob):
+          raise RuntimeError("Object at '%s' is not a CPS Proxy." % rpath)
+      else:
+          print "\nFound CPS proxy at '%s'" % rpath
+      print "Creation date: %s" % ob.created() # Dublin core API
+
+  cpsjob.run(app, print_date)
 
 Wrapping an external method as a job
 ------------------------------------
@@ -150,15 +168,13 @@ external methods through the HTTP library.
 It's easy to wrap an external method in a cps job, therefore making it
 much more suited for automated tasks.
 Here's an example that's equivalent to a call of ``ext_meth`` on the
-portal::
+portal, with no query arguments::
 
-  >>> from Products.CPSUtil.cpsjob import bootstrap
-  >>> portal = bootstrap[0]
-  >>> portal.ext_meth()
-  >>> import transaction; transaction.commit()
+  >>> from Products.CPSUtil import cpsjob
+  >>> def job(portal, args, options):
+  >>>     portal.ext_meth()
+  >>> cpsjob.run(app, job)
 
-Don't forget the explicit commit: most external methods won't do it,
-since they are written with the implicit transaction handling in mind.
 
 Jobs and conflicts
 ------------------
@@ -166,6 +182,9 @@ Jobs and conflicts
 As of now, there is no helper to handle database conflicts. If a
 ``ConflictError`` is being raised, the current job transaction will
 rollback, and the job will exit.
+
+This may be problematic if the job does periodic transaction commits,
+since the rollback will then be partial.
 
 .. Emacs
 .. Local Variables:
