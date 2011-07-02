@@ -35,6 +35,8 @@ Steps to have this script functional:
 - Optionally enable the CPU affinity support by setting the USE_AFFINITY
   variable to True. You need the ``taskset`` installed on your system.
   This is part of the ``schedutils`` package and works on 2.6+ kernels only.
+  XXX GR: does not work: sets the CPU affinity for the launcher, not the
+  worker process
 
 - Register this script in the various runlevels of the server.
 
@@ -100,13 +102,14 @@ if len(sys.argv) > 1:
 else:
     arg = ''
 
-if not arg in ('start', 'stop', 'restart', 'status'):
-    print "Usage: /etc/init.d/zopes {start|stop|restart|status}"
+if not arg in ('start', 'stop', 'restart', 'status', 'logreopen'):
+    print "Usage: /etc/init.d/zopes {start|stop|restart|status|logreopen}"
     sys.exit(1)
 
 for instance, affinity in INSTANCES:
     print instance, ":"
     # use only the first ctl script out of the following
+    # NdGR: we should ensure lauchnig of zeo servers before the others
     for cmd in ('zasyncctl', 'zopectl', 'zeoctl'):
         full_cmd = "%s/bin/%s" % (instance, cmd)
         if os.path.exists(full_cmd):

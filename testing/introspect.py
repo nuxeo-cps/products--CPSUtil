@@ -22,6 +22,16 @@ Doing this here makes only one to maintain accross the major ongoing Zope
 migration
 """
 
+import os
 from App.version_txt import getZopeVersion
+import Products.Five
 
 ZOPE_VERSION = getZopeVersion()
+five_path = os.path.split(Products.Five.__file__)[0]
+vfile = open(os.path.join(five_path, 'version.txt'))
+vstring = vfile.read()
+vfile.close()
+split = vstring.split()
+assert split[0] == 'Five'
+
+FIVE_VERSION = tuple(int(x) for x in split[1].split('.'))
