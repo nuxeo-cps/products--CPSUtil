@@ -24,6 +24,7 @@ import unittest
 from Products.CPSUtil.html import XhtmlSanitizer
 from Products.CPSUtil.html import HTMLSanitizer
 from Products.CPSUtil.html import sanitize
+from Products.CPSUtil.html import getHtmlBody
 
 class Test(unittest.TestCase):
 
@@ -135,6 +136,9 @@ class Test(unittest.TestCase):
         html_sanitizer.feed(html_in2)
         res = html_sanitizer.getResult()
         self.assertEquals(res, html_out2)
+
+    def testHtmlBody(self):
+        self.assertEquals(getHtmlBody(''), '')
 
 
     def testHtmlSanitizing(self):
