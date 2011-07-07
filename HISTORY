@@ -1,4 +1,23 @@
 ===========================================================
+Package: CPSUtil 1.11.0
+===========================================================
+First release built by: gracinet at: 2011-07-07T17:47:17
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2408: cpsjob now has a runner and option for post mortem debugging
+Bug fixes
+~~~~~~~~~
+- #2406: error in tiff OFS.Image object resising
+- #2402: image downloading/resizing stack now understands File objects
+- #2329: implemented JSLocalMethodResource for these needs
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.10.1
 ===========================================================
 First release built by: gracinet at: 2011-02-01T21:22:00
