@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2416: resizing problem with Image objects that need the zope aq context
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
