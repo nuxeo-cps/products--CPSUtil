@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.11.1
+===========================================================
+First release built by: gracinet at: 2011-08-09T19:36:15
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2416: resizing problem with Image objects that need the zope aq context
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.11.0
 ===========================================================
 First release built by: gracinet at: 2011-07-07T17:47:17
