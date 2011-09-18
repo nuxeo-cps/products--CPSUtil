@@ -21,6 +21,8 @@
 Provide the opportunity to react after a ZMI properties change.
 """
 
+from copy import deepcopy
+
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
@@ -113,3 +115,23 @@ class PostProcessingPropertyManagerHelpers(PropertyManagerHelpers):
         ob = self.context
         if isinstance(ob, PropertiesPostProcessor):
             ob._postProcessProperties()
+
+def sync_prop_defs(ob):
+    """Update instance property definitions from class property definitions.
+
+    Does not remove properties that have been removed from the class
+    Does not create new properties yet
+    See #2449.
+    """
+    if not '_properties' in ob.__dict__:
+        # no instance level property definitions
+        return
+
+    cls_props = dict( (p['id'], p) for p in ob.__class__._properties)
+    def keep_or_update(prop):
+        """Return updated prop from class if available, prop itself otherwise.
+        """
+        return deepcopy(cls_props.get(prop['id'], prop))
+
+    ob._properties = tuple(keep_or_update(prop) for prop in ob._properties)
+    ob._p_changed = 1

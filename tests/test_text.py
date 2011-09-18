@@ -1,6 +1,5 @@
-# -*- coding: ISO-8859-15 -*-
 # (C) Copyright 2005 Nuxeo SARL <http://nuxeo.com>
-# Author: Tarek Ziadé <tz@nuxeo.com>
+# Author: Tarek Ziad'e <tz@nuxeo.com>
 #         Olivier Grisel <og@nuxeo.com>
 #
 # This program is free software; you can redistribute it and/or modify
