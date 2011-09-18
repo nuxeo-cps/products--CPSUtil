@@ -120,7 +120,7 @@ def sync_prop_defs(ob):
     """Update instance property definitions from class property definitions.
 
     Does not remove properties that have been removed from the class
-    Does not create new properties yet
+    Needed new properties will be created.
     See #2449.
     """
     if not '_properties' in ob.__dict__:
@@ -134,4 +134,10 @@ def sync_prop_defs(ob):
         return deepcopy(cls_props.get(prop['id'], prop))
 
     ob._properties = tuple(keep_or_update(prop) for prop in ob._properties)
+
+    # now add new class level properties
+    ob_props = set(p['id'] for p in ob._properties)
+    ob._properties += tuple(pdef for pid, pdef in cls_props.items()
+                            if pid not in ob_props)
+
     ob._p_changed = 1

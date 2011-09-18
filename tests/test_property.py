@@ -40,6 +40,17 @@ class TestUpdatePropDef(unittest.TestCase):
                         mode='w'),
                 dict(id='newprop')))
 
+    def test_new_prop(self):
+        ob = self.cls()
+        ob._properties = deepcopy(ob._properties) + (dict(id='newprop'),)
+        self.cls._properties += (dict(id='newclassprop'),)
+        sync_prop_defs(ob)
+        self.assertEquals(ob._properties, (
+                dict(id='classprop', type='string', label='somelabel',
+                        mode='w'),
+                dict(id='newprop'),
+                dict(id='newclassprop'),))
+
 
 
 def test_suite():
