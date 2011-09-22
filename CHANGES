@@ -3,9 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- #2425 (related): FolderWithoutConflicts
-- PropertiesPostProcessor module now called property to hold more helpers
-- #2449: utility to upgrade property definitions
+-
 Bug fixes
 ~~~~~~~~~
 -
