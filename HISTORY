@@ -1,4 +1,23 @@
 ===========================================================
+Package: CPSUtil 1.12.0
+===========================================================
+First release built by: gracinet at: 2011-09-23T00:28:33
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2425 (related): FolderWithoutConflicts
+- PropertiesPostProcessor module now called property to hold more helpers
+- #2449: utility to upgrade property definitions
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.11.1
 ===========================================================
 First release built by: gracinet at: 2011-08-09T19:36:15
