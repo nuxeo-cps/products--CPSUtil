@@ -173,15 +173,17 @@ def _generateAnotherId(id):
 
 SAFE_CHARS_FOR_FILE_NANME = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
 
-def generateFileName(name, context=None):
+def generateFileName(name, context=None, ascii=True):
     """Generate a safe file name (without any special characters) from the
     given name.
     """
-    name = toAscii(name, context=None)
+    if ascii:
+        name = toAscii(name, context=None)
     translation_table = string.maketrans(r"'\;/ &:",
                                          r"_______")
     name = name.translate(translation_table)
-    name = ''.join([c for c in name if c in SAFE_CHARS_FOR_FILE_NANME])
+    if ascii:
+        name = ''.join([c for c in name if c in SAFE_CHARS_FOR_FILE_NANME])
     name = name.lstrip('_.').rstrip('_')
 
     return name
