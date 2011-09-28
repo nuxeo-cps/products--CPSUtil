@@ -6,6 +6,7 @@ New features
 - Creation of the stable CPS-3.5 branch
 Bug fixes
 ~~~~~~~~~
+- #2458: New option not to degrade file names to ASCII
 - #2457: Wrong degradation of some accented characters
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
