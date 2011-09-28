@@ -6,7 +6,7 @@ New features
 - Creation of the stable CPS-3.5 branch
 Bug fixes
 ~~~~~~~~~
--
+- #2457: Wrong degradation of some accented characters
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

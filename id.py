@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-15 -*-
+# -*- coding: iso-8859-15 -*-
 # (C) Copyright 2003-2005 Nuxeo SARL <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
@@ -173,15 +173,11 @@ def _generateAnotherId(id):
 
 SAFE_CHARS_FOR_FILE_NANME = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
 
-def generateFileName(name):
+def generateFileName(name, context=None):
     """Generate a safe file name (without any special characters) from the
     given name.
     """
-    # Sometimes the given filename is in Unicode
-    if isinstance(name, unicode):
-        name = name.encode('iso-8859-15', 'replace')
-
-    name = toAscii(name)
+    name = toAscii(name, context=None)
     translation_table = string.maketrans(r"'\;/ &:",
                                          r"_______")
     name = name.translate(translation_table)
