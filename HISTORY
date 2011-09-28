@@ -1,4 +1,22 @@
 ===========================================================
+Package: CPSUtil 1.13.0-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2011-09-28T20:54:55
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- Creation of the stable CPS-3.5 branch
+Bug fixes
+~~~~~~~~~
+- #2458: New option not to degrade file names to ASCII
+- #2457: Wrong degradation of some accented characters
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.12.0
 ===========================================================
 First release built by: gracinet at: 2011-09-23T00:28:33
