@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2458: relaxed for spaces too and tested unicode case
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
