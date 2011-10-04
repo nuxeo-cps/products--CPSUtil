@@ -183,6 +183,12 @@ class Test(unittest.TestCase):
        self.assertEquals(generateFileName("MyDocument.sxw"), 'MyDocument.sxw')
        self.assertEquals(generateFileName(u"Proc\xe9dures finales.sxw"),
                          'Procedures_finales.sxw')
+       self.assertEquals(generateFileName(u"Proc\xe9dures finales.sxw",
+                                          ascii=False),
+                         u"Proc\xe9dures finales.sxw")
+       self.assertEquals(generateFileName(u"Proc\xe9dures/finales.sxw",
+                                          ascii=False),
+                         u"Proc\xe9dures_finales.sxw")
 
 
        # check removing of special leading and trailing characters
