@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# print the doc if no args
+if [ -z $1 ]; then
+ cat <<EOF
+
+ Usage: $0 <path> [zope testrunner further options]
+
+ This run all CPS tests from <path> (a Zope instance), 
+
+EOF
+  exit 0
+fi
+
+INSTANCE=$1
+shift
+
+$INSTANCE/bin/zopectl test -m'!^Products[.](CMF|UnicodeLexicon|GenericSetup|PortalTransforms|ZMIntrospection|TranslationService)' $@
