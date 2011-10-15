@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-15 -*-
+# -*- coding: iso-8859-15 -*-
 # (C) Copyright 2003-2005 Nuxeo SARL <http://nuxeo.com>
 # Authors:
 # M.-A. Darche <madarche@nuxeo.com>
@@ -173,19 +173,30 @@ def _generateAnotherId(id):
 
 SAFE_CHARS_FOR_FILE_NANME = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.'
 
-def generateFileName(name):
+FILENAME_TRANS = string.maketrans(r"'\;/&:",
+                                  r"______")
+
+FILENAME_TRANS_UNICODE = dict((ord(c), u'_') for c in ur"'\;/&:")
+
+# we consider that asking for ascii degradation is correlated to refuse of ' '
+FILENAME_TRANS_ASCII = string.maketrans(r" '\;/&:",
+                                        r"_______")
+
+def generateFileName(name, context=None, ascii=True):
     """Generate a safe file name (without any special characters) from the
     given name.
     """
-    # Sometimes the given filename is in Unicode
-    if isinstance(name, unicode):
-        name = name.encode('iso-8859-15', 'replace')
+    if ascii:
+        name = toAscii(name, context=None)
+        trans = FILENAME_TRANS_ASCII
+    elif isinstance(name, str):
+        trans = FILENAME_TRANS
+    elif isinstance(name, unicode):
+        trans = FILENAME_TRANS_UNICODE
 
-    name = toAscii(name)
-    translation_table = string.maketrans(r"'\;/ &:",
-                                         r"_______")
-    name = name.translate(translation_table)
-    name = ''.join([c for c in name if c in SAFE_CHARS_FOR_FILE_NANME])
+    name = name.translate(trans)
+    if ascii:
+        name = ''.join([c for c in name if c in SAFE_CHARS_FOR_FILE_NANME])
     name = name.lstrip('_.').rstrip('_')
 
     return name

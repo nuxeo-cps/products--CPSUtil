@@ -86,16 +86,22 @@ def uni_lower(s):
         raise ValueError("Expected string input, got %r" % s)
 
 ModuleSecurityInfo(__name__).declarePublic('toAscii')
-def toAscii(s):
+def toAscii(s, context=None):
     """Change accented and special characters by ASCII characters.
 
-    >>> toAscii('caf\xe9')
+    >>> class FakePortal:
+    ...       pass
+    >>> portal = FakePortal()
+    >>> portal.default_charset = 'utf7'
+    >>> toAscii(u'caf\xe9'.encode('utf7'), context=portal)
     'cafe'
-    >>> toAscii(u'caf\xe9-\u1234')
+    >>> toAscii(u'caf\xe9-\u1234', context=None)
     'cafe-?'
     """
-    if isinstance(s, unicode):
-        s = s.encode('iso-8859-15', 'replace')
+    if isinstance(s, str):
+        s = s.decode(get_final_encoding(context), 'ignore')
+
+    s = s.encode('iso-8859-15', 'replace')
     s = s.translate(ACCENTED_CHARS_TRANSLATIONS)
     s = s.replace('Æ', 'AE')
     s = s.replace('æ', 'ae')
@@ -252,11 +258,15 @@ def get_final_encoding(context):
 
     All we can test here is that there's no error. Value depends on zope.conf
     >>> from_conf = get_final_encoding(portal)
+    >>> from_conf_nocontext = get_final_encoding(None)
+    >>> from_conf == from_conf_nocontext
+    True
     """
+    if context is not None:
+        charset = context.default_charset
+        if charset != 'unicode':
+            return charset
 
-    charset = context.default_charset
-    if charset != 'unicode':
-        return charset
     # see Zope2.Startup.datatypes
     return Converters.default_encoding
 
