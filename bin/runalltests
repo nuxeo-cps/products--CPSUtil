@@ -23,10 +23,19 @@ errorlog="/tmp/test_cps-errors-$timestamp.log"
 touch $errorlog # for people wanting to tail it right away
 echo $errorlog
 report="/tmp/test_cps-report"
+if [ -f etc/test.conf ]; then
+   conffile=etc/test.conf
+else
+   conffile=etc/zope.conf
+fi
+
 EXIT_CODE=0
-for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
-   logfile="/tmp/test_cps-$x-$timestamp.log"
-   bin/zopectl test --dir Products/$x > $logfile 2>&1
+for prodinit in `ls Products/CPS*/__init__.py`
+do
+   proddir=`dirname $prodinit`
+   prodname=`echo $proddir | cut -d '/' -f 2`
+   logfile="/tmp/test_cps-$prodname-$timestamp.log"
+   bin/zopectl test --config-file=$conffile --dir $proddir > $logfile 2>&1
    grep "^Total" $logfile > $report
 
    if [ -s $report ]; then
@@ -43,16 +52,16 @@ for x in `ls -d Products/CPS* | sed 's/Products\///g'`; do
        import_pbms=`grep -A10 "^Test-modules with import problems" $logfile`
        if [ ! -z "$import_pbms" ];
        then
-	   echo "\nIMPORT PROBLEMS FOR $x" >> $errorlog
+	   echo "\nIMPORT PROBLEMS FOR $prodname" >> $errorlog
 	   echo $import_pbms >> $errorlog
        else
-	   echo "\nDON'T UNDERSTAND tests results for $x" >> $errorlog
+	   echo "\nDON'T UNDERSTAND tests results for $prodname" >> $errorlog
 	   cat $logfile >> $errorlog
        fi
    else
        if [ ! -z "$analysed" ]; then
 	   EXIT_CODE=1
-	   echo "BROKEN TESTS FOR $x" >> $errorlog
+	   echo "BROKEN TESTS FOR $prodname" >> $errorlog
 	   cat $logfile >> $errorlog
        fi
    fi
