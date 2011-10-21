@@ -88,6 +88,12 @@ class FolderWithoutConflictTestCase(unittest.TestCase):
 
 class IncreasingDateTimeTestCase(unittest.TestCase):
 
+    def test_repr_str(self):
+        dt = DateTime(2011, 10, 21)
+        idt = conflictresolvers.IncreasingDateTime('idt').set(dt)
+        self.assertEquals(repr(idt), "IncreasingDateTime('2011/10/21')")
+        self.assertEquals(str(idt), '2011/10/21')
+
     def test_comparisons(self):
         d1 = DateTime(2011, 10, 21)
         id1 = conflictresolvers.IncreasingDateTime('id1').set(d1)

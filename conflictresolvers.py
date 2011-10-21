@@ -40,6 +40,12 @@ class IncreasingDateTime(SimpleItem):
         newState['value'] = max(savedState['value'], newState['value'])
         return newState
 
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return 'Increasing' + repr(self.value)
+
     def __eq__(self, other):
         return self.value == other
 
