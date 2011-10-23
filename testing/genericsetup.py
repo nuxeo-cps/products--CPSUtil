@@ -50,7 +50,7 @@ class TarballTester:
     """
 
     def _getFileData(self, dir_path, file_path):
-        file_path = os.path.join(Products.__path__[0], dir_path, file_path)
+        file_path = os.path.join(dir_path, file_path)
         try:
             f = open(file_path, 'r')
         except IOError:
