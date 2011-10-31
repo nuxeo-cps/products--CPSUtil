@@ -30,6 +30,7 @@ import os
 import logging
 
 import transaction
+from zope.app.component.hooks import setSite
 
 import optparse
 optparser = optparse.OptionParser(
@@ -75,7 +76,7 @@ def makerequest(app, stdout=sys.stdout, host=None, port=None):
 
     # set Zope3-style default skin so that the request is usable for
     # Zope3-style view look-ups
-    from zope.app.publication.browser import setDefaultSkin
+    from zope.publisher.browser import setDefaultSkin
     setDefaultSkin(request)
 
     return app.__of__(RequestContainer(REQUEST=request))
@@ -85,7 +86,7 @@ def get_portal(app, portal_id):
     app = makerequest(app)
     from Products.CPSCore.portal import CPSSite
     try:
-        return getattr(app, portal_id)
+        portal = getattr(app, portal_id)
     except AttributeError:
         found = False
     else:
@@ -93,6 +94,13 @@ def get_portal(app, portal_id):
 
     if not found or not isinstance(portal, CPSSite):
         raise RuntimeError("Not the id of a CPS portal : '%s'", portal_id)
+
+    # simulate z3 traversal to get the right local Site Manager
+#    request = object()
+    setSite(portal)
+#    ev = BeforeTraverseEvent(portal, request)
+#    threadSiteSubscriber(portal, ev)
+    return portal
 
 def login(portal, user_id, roles=('Manager', 'Member')):
     """Lookup and log user in.
