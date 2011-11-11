@@ -30,6 +30,7 @@ class IncreasingDateTime(SimpleItem):
 
     def set(self, value):
         self.value = value
+        return self
 
     def __init__(self, zid, **kw):
         self.value = None # works with max and DateTime ordering
@@ -38,6 +39,30 @@ class IncreasingDateTime(SimpleItem):
     def _p_resolveConflict(self, oldState, savedState, newState):
         newState['value'] = max(savedState['value'], newState['value'])
         return newState
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return 'Increasing' + repr(self.value)
+
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return self.value != other
+
+    def __gt__(self, other):
+        return self.value > other
+
+    def __lt__(self, other):
+        return self.value < other
+
+    def __ge__(self, other):
+        return self.value >= other
+
+    def __le__(self, other):
+        return self.value <= other
 
 _missing = object() # local marker for dict missing values
 

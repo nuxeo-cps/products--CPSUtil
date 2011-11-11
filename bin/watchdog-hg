@@ -36,9 +36,15 @@ else
    checkout=$2
 fi
 
+# prepare place for log
+logdir=$HOME/log/watchdog
+mkdir -p $logdir
+runslog=$logdir/runs.log
+
 # checkout update process
 timestamp=`date +%F-%T`
-updatelog="/tmp/test_cps-hgupdate-$timestamp.log"
+echo "$timestamp starting update test for $checkout" >> $runslog
+updatelog="$logdir/test_cps-hgupdate-$timestamp.log"
 touch $updatelog
 
 if [ x$3 = "x--fresh" ];
@@ -71,6 +77,8 @@ if [ $? -ne 0 ]; then
   cat $updatelog
 else
   rm $error_log $updatelog
+  endtime=`date +%F-%T`
+  echo "$endtime Ran all tests with no failure " >> $runslog
 fi
 
 

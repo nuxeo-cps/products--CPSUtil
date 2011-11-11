@@ -1,4 +1,5 @@
 import unittest
+from DateTime import DateTime
 from Products.CPSUtil import conflictresolvers
 
 DESCA = dict(id='a', meta_type='T')
@@ -85,9 +86,40 @@ class FolderWithoutConflictTestCase(unittest.TestCase):
         resolved = self.folder._p_resolveConflict(old, commited, newstate)
         self.assertEquals(resolved, None)
 
+class IncreasingDateTimeTestCase(unittest.TestCase):
+
+    def test_repr_str(self):
+        dt = DateTime(2011, 10, 21)
+        idt = conflictresolvers.IncreasingDateTime('idt').set(dt)
+        self.assertEquals(repr(idt), "IncreasingDateTime('2011/10/21')")
+        self.assertEquals(str(idt), '2011/10/21')
+
+    def test_comparisons(self):
+        d1 = DateTime(2011, 10, 21)
+        id1 = conflictresolvers.IncreasingDateTime('id1').set(d1)
+        self.assertTrue(id1 > None)
+        self.assertTrue(None < id1)
+        self.assertEquals(id1, id1)
+        self.assertEquals(id1, d1)
+        self.assertTrue(id1 >= id1)
+        self.assertTrue(id1 <= id1)
+        self.assertTrue(id1 >= d1)
+        self.assertTrue(id1 <= d1)
+
+        d2 = DateTime(2011, 10, 22)
+        id2 = conflictresolvers.IncreasingDateTime('id2').set(d2)
+        self.assertNotEqual(d1, id2)
+        self.assertNotEqual(id1, id2)
+
+        self.assertTrue(id2 > id1)
+        self.assertTrue(id1 < id2)
+        self.assertTrue(id2 > d1)
+        self.assertTrue(d1 < d2)
+
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FolderWithoutConflictTestCase),
+        unittest.makeSuite(IncreasingDateTimeTestCase),
         ))
 

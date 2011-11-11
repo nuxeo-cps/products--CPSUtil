@@ -37,6 +37,8 @@ logger = logging.getLogger('Products.CPSSkins.crashshield')
 class CrashShieldException(Exception):
     pass
 
+DISABLED = False 
+
 def shield_apply(obj, meth, *args, **kwargs):
     """Shielded application of a method.
 
@@ -47,6 +49,9 @@ def shield_apply(obj, meth, *args, **kwargs):
 
     The caller can use __traceback_info__ to provide details
     """
+    if DISABLED:
+        return getattr(obj, meth)(*args, **kwargs)
+
     try:
         return getattr(obj, meth)(*args, **kwargs)
     except ConflictError: # must go through
