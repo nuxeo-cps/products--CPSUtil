@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.14.0-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2011-12-19T15:40:44
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2503: Add a document browser in the TinyMCE link popup
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.13.2-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2011-11-23T19:59:07
