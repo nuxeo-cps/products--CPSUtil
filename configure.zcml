@@ -26,17 +26,9 @@
       interface=".interfaces.IRAMCacheManager"
       />
 
-  <five:traversable
-      class="Products.StandardCacheManagers.RAMCacheManager.RAMCacheManager"
-      />
-
   <five:implements
       class="Products.StandardCacheManagers.AcceleratedHTTPCacheManager.AcceleratedHTTPCacheManager"
       interface=".interfaces.IAcceleratedHTTPCacheManager"
-      />
-
-  <five:traversable
-      class="Products.StandardCacheManagers.AcceleratedHTTPCacheManager.AcceleratedHTTPCacheManager"
       />
 
   <!-- XML export as ZMI tab -->
