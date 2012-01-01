@@ -32,6 +32,8 @@ import logging
 import transaction
 from zope.app.component.hooks import setSite
 
+from Acquisition import aq_base
+
 import optparse
 optparser = optparse.OptionParser(
     usage="usage: %prog [options] PORTAL_ID [job args]")
@@ -95,11 +97,15 @@ def get_portal(app, portal_id):
     if not found or not isinstance(portal, CPSSite):
         raise RuntimeError("Not the id of a CPS portal : '%s'", portal_id)
 
-    # simulate z3 traversal to get the right local Site Manager
-#    request = object()
-    setSite(portal)
-#    ev = BeforeTraverseEvent(portal, request)
-#    threadSiteSubscriber(portal, ev)
+
+    # enable local registries. The older Five Site Manager leads to
+    # infinite lookup recursions in portal traversal or in setSite.
+    # The cpsugrade job will fix it, just don't fall in the loop there,
+    # that job might be the current one.
+    components = getattr(aq_base(portal), '_components', '')
+    if not components.__class__.__name__ == 'FiveSiteManager':
+        setSite(portal)
+
     return portal
 
 def login(portal, user_id, roles=('Manager', 'Member')):
