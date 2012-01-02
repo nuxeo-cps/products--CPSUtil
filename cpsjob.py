@@ -106,6 +106,7 @@ def get_portal(app, portal_id):
     if not components.__class__.__name__ == 'FiveSiteManager':
         setSite(portal)
 
+    portal.setupCurrentSkin(REQUEST=portal.REQUEST)
     return portal
 
 def login(portal, user_id, roles=('Manager', 'Member')):
