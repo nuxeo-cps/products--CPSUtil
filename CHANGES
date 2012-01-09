@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
-- Disabled logging in runalltests (made continuous integration unreadable)
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
