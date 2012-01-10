@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- runalltests: --nowarnings made some tests fail
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
