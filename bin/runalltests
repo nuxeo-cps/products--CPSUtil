@@ -35,7 +35,7 @@ do
    proddir=`dirname $prodinit`
    prodname=`echo $proddir | cut -d '/' -f 2`
    logfile="/tmp/test_cps-$prodname-$timestamp.log"
-   bin/zopectl test --config-file=$conffile --nowarnings --dir $proddir > $logfile 2>/dev/null
+   bin/zopectl test --config-file=$conffile --dir $proddir > $logfile 2>/dev/null
    grep "^Total" $logfile > $report
 
    if [ -s $report ]; then
