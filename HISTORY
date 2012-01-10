@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.14.1-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2012-01-09T16:11:44
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- Disabled logging in runalltests (made continuous integration unreadable)
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.14.0-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2011-12-19T15:40:44
