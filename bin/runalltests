@@ -30,10 +30,16 @@ else
 fi
 
 EXIT_CODE=0
-for prodinit in `ls Products/CPS*/__init__.py`
-do
-   proddir=`dirname $prodinit`
-   prodname=`echo $proddir | cut -d '/' -f 2`
+if [ -f Products/BUNDLE_MANIFEST.xml ]; then
+    # This is a bundle ! We assume hgbundler is on the path
+    prods=`hgbundler clones-list --bundle-dir=Products --attributes-filter=testing:continuous --toplevel-only`
+else # fallback to old dirty way
+    prods=`ls Products/CPS*/__init__.py`
+fi
+
+for prodname in $prods; do
+   prodname=`echo $prodname | cut -d '/' -f 2`
+   proddir=Products/$prodname
    logfile="/tmp/test_cps-$prodname-$timestamp.log"
    bin/zopectl test --config-file=$conffile --dir $proddir > $logfile 2>/dev/null
    grep "^Total" $logfile > $report
