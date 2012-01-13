@@ -3,10 +3,13 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
+- new module for http utilities
 -
 Bug fixes
 ~~~~~~~~~
 - #2518: runalltests now read from bundle itself, thanks to filtering of #2517
+- helper for If-Modified-Since requests
+- runalltests: --nowarnings made some tests fail
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
