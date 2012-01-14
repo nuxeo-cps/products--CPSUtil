@@ -61,3 +61,8 @@ def is_modified_since(request, lastmod):
         return False
 
     return True
+
+def set_if_modified_since_header(request, since):
+    """Utilitary function to insulate a part that may change in future Zope."""
+    request.environ['IF_MODIFIED_SINCE'] = since
+

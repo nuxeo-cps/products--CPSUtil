@@ -31,7 +31,7 @@ class HttpUtilsTestCase(ZopeTestCase):
         """Set the header in request and call the tested function.
 
         Almost single point of upgrade for these tests."""
-        self.request.environ['IF_MODIFIED_SINCE'] = since
+        http.set_if_modified_since_header(self.request, since)
         return http.is_modified_since(self.request, lastmod)
 
     def assertStatus(self, status):
