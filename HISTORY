@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.14.2-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2012-01-16T15:29:33
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2518: runalltests now read from bundle itself, thanks to filtering of #2517
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.14.1-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2012-01-09T16:11:44
