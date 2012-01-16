@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
-- #2518: runalltests now read from bundle itself, thanks to filtering of #2517
+-
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
