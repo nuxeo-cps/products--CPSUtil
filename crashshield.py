@@ -14,8 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
-#
-# $Id$
+
+"""Generic crash shield and error handling.
+
+This is notably used to prevent a faulty portlet to break the whole page
+"""
 
 import sys
 import inspect
@@ -24,20 +27,22 @@ import logging
 
 # provides __traceback_info__
 from zExceptions.ExceptionFormatter import format_exception
+
 from Acquisition import aq_acquire
 from AccessControl import Unauthorized
+from AccessControl import ModuleSecurityInfo
 from ZODB.POSException import ConflictError
 
-from Products.CMFCore.utils import getToolByName
+security = ModuleSecurityInfo(__name__)
 
-logger = logging.getLogger('Products.CPSSkins.crashshield')
+logger = logging.getLogger(__name__)
 
-"""Crash shield and error handling for CPSSkins."""
+RESPONSE_ERROR_RENDERING_MARKER = '_cps_error_rendering'
 
 class CrashShieldException(Exception):
     pass
 
-DISABLED = False 
+DISABLED = False
 
 def shield_apply(obj, meth, *args, **kwargs):
     """Shielded application of a method.
@@ -57,7 +62,8 @@ def shield_apply(obj, meth, *args, **kwargs):
     except ConflictError: # must go through
         raise
     except Unauthorized: # must go through except while rendering an error
-        if getToolByName(obj, 'portal_themes').isErrorRendering():
+        resp = obj.REQUEST.RESPONSE
+        if getattr(resp, RESPONSE_ERROR_RENDERING_MARKER, False):
             logger.debug("Catched Unauthorized exception while rendering an "
                          "error page")
             raise CrashShieldException() # no logging
@@ -95,3 +101,6 @@ def shield_apply(obj, meth, *args, **kwargs):
                      ''.join(cformatted), tbi, tb)
         raise CrashShieldException()
 
+security.declarePublic('mark_as_error_rendering')
+def mark_as_error_rendering(request):
+    setattr(request.RESPONSE, RESPONSE_ERROR_RENDERING_MARKER, True)
