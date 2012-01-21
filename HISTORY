@@ -1,4 +1,24 @@
 ===========================================================
+Package: CPSUtil 1.15.0
+===========================================================
+First release built by: gracinet at: 2012-01-21T22:23:50
+Requires
+~~~~~~~~
+- Zope 2.10 / CMF 2.1.1
+New features
+~~~~~~~~~~~~
+- new module for http utilities
+-
+Bug fixes
+~~~~~~~~~
+- #2518: runalltests now read from bundle itself, thanks to filtering of #2517
+- helper for If-Modified-Since requests
+- runalltests: --nowarnings made some tests fail
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.14.2-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2012-01-16T15:29:33
