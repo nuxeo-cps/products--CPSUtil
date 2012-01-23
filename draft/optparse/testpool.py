@@ -25,18 +25,18 @@ def do_calculation(data):
 
     return str(data * 2) + ':' + app
 
-def run_script(args=None):
+def run_script(script=None ,sio=None):
     """
     This function is intended to be a "buffer" for sub-processes that will be 
     created
     """
-    os.system('python '+args[0] +' -b 243')
-    sio=args[1]
+    os.system('python '+script +' -b 243')
+    
     if sio:
-        args[1].write(multiprocessing.current_process().name + ("-"*12) 
+        sio.write(multiprocessing.current_process().name + ("-"*12) 
                   +str(os.getpid()))
-        args[1].flush()
-        args[1].seek(0)
+        sio.flush()
+        sio.seek(0)
         print(sio.read())
         sio.seek(0)
 
@@ -47,7 +47,7 @@ def generate_scripts_names():
     """
     Pretty obvious for now but provides cleaner architecture
     """
-    scripts = ['rep1/fichier.py','rep2/fichier.py','rep3/fichier.py'] * 2
+    scripts = ['rep1/fichier.py','rep2/fichier.py','rep3/fichier.py'] * 1
     
     #Pour ne pas avoir a ecrire $n$ scripts
     
@@ -71,7 +71,7 @@ def generateStringIOs(list_or_int=1):
             
 if __name__ == '__main__':
 
-    pool_size = multiprocessing.cpu_count() * 2
+    pool_size = multiprocessing.cpu_count() * 1
     scripts = generate_scripts_names()
     sios=generateStringIOs(scripts)
     print 'creating %r processes'%pool_size
@@ -81,21 +81,42 @@ if __name__ == '__main__':
     #pool_outputs = pool.map(do_calculation, inputs)
     new_inputs=[]
     #import pdb;pdb.set_trace()
+    """
     for i in range(len(scripts)):
         x=scripts[i]
         y=sios[i]
         y.write('test')
         e=[x,y]
         new_inputs.append(e)
+    """
+    newer_inputs=[]
+    for i in range(len(scripts)):
+        newer_inputs.append({'script':scripts[i],'sio':sios[i]})
+
     
+    p_list=[]
+    for a in newer_inputs:
+        p_list.append(multiprocessing.Process(target=run_script ,kwargs=a))
+        
+    for p  in p_list:
+        p.start()
+        p.join()
+    """
+    Can't see a straightforward option unless recoding some pool features
+    so as to launch n processes and when one og them is done launching a new 
+    on using a lock between provder anec consumer ...
+
+    """
     #not sure about arguments handling,thus i tried with this list
-    pool_out2 = pool.map(run_script,new_inputs)
-    pool.close()
-    pool.join()
+    #pool_out2 = pool.map(run_script,newer_inputs)
+    #pool.close()
+    #pool.join()
  
     
   
     import pdb;pdb.set_trace()
+    """
     for s in sios:
         s.seek(0)
         print(s.read())
+    """
