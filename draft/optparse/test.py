@@ -6,6 +6,5 @@ def f(x):
 if __name__ == '__main__':
     pool = Pool(processes=5)              # start 4 worker processes
     result = pool.apply_async(f, [10])    # evaluate "f(10)" asynchronously
-    pdb.set_trace()
     print result.get(timeout=1)           # prints "100" unless your computer is *very* slow
     print pool.map(f, range(10))   

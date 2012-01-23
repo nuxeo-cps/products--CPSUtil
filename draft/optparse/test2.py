@@ -3,6 +3,8 @@ import os
 
 from testpool import generate_scripts_names ,generateStringIOs
 
+#some test fo cgoutte
+
 def pooled_task(sio = None, script = None):
     #sio=a['sio']
     #script=a['script']
@@ -42,7 +44,7 @@ if __name__ == '__main__':
         p.join()
         
     print 'joined !! '
-    import pdb; pdb.set_trace()
+    
     for x in sios:
         x.seek(0)
         print(x.read())
