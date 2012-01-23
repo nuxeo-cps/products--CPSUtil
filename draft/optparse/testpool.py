@@ -5,6 +5,7 @@ import pdb
 from random import random 
 import os
 from StringIO import StringIO
+import sys
 
 def do_calculation(data):
     """
@@ -47,7 +48,7 @@ def generate_scripts_names():
     """
     Pretty obvious for now but provides cleaner architecture
     """
-    scripts = ['rep1/fichier.py','rep2/fichier.py','rep3/fichier.py'] * 1
+    scripts = ['rep1/fichier.py','rep2/fichier.py','rep3/fichier.py'] * 4
     
     #Pour ne pas avoir a ecrire $n$ scripts
     
@@ -71,7 +72,7 @@ def generateStringIOs(list_or_int=1):
             
 if __name__ == '__main__':
 
-    pool_size = multiprocessing.cpu_count() * 1
+    pool_size = multiprocessing.cpu_count() * 2
     scripts = generate_scripts_names()
     sios=generateStringIOs(scripts)
     print 'creating %r processes'%pool_size
@@ -114,9 +115,10 @@ if __name__ == '__main__':
  
     
   
-    import pdb;pdb.set_trace()
+    #import pdb;pdb.set_trace()
     """
     for s in sios:
         s.seek(0)
         print(s.read())
     """
+    sys.stdout.flush()
