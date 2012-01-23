@@ -11,13 +11,13 @@ def do_calculation(data):
     """
     Old function to be removed
     """
-    i=0
-    sname=multiprocessing.current_process().name
-    app ='' 
+    i = 0
+    sname = multiprocessing.current_process().name
+    app = '' 
     if sname!='MainProcess':
-	app=sname.split('-')[1]
+	app = sname.split('-')[1]
         ts = 0.2*(1+random())
-        if app=='1':
+        if app == '1':
             ts=0.1
         sleep(ts)
         i += 1
@@ -26,7 +26,7 @@ def do_calculation(data):
 
     return str(data * 2) + ':' + app
 
-def run_script(script=None ,sio=None):
+def run_script(script = None, sio = None):
     """
     This function is intended to be a "buffer" for sub-processes that will be 
     created
@@ -57,9 +57,9 @@ def generate_scripts_names():
 def generateStringIOs(list_or_int=1):
     t = type(list_or_int)
     if t == type([]) or t==type(()):
-        l=len(list_or_int)
+        l = len(list_or_int)
     elif type(list_or_int)==type(0):
-        l=list_or_int
+        l = list_or_int
     #Il doit y avoir plus elegant/pythonique ...
     else:
         raise(TypeError)
@@ -74,13 +74,13 @@ if __name__ == '__main__':
 
     pool_size = multiprocessing.cpu_count() * 2
     scripts = generate_scripts_names()
-    sios=generateStringIOs(scripts)
+    sios = generateStringIOs(scripts)
     print 'creating %r processes'%pool_size
     
     pool = multiprocessing.Pool(processes=pool_size)
     
     #pool_outputs = pool.map(do_calculation, inputs)
-    new_inputs=[]
+    new_inputs = []
     #import pdb;pdb.set_trace()
     """
     for i in range(len(scripts)):
@@ -90,14 +90,14 @@ if __name__ == '__main__':
         e=[x,y]
         new_inputs.append(e)
     """
-    newer_inputs=[]
+    newer_inputs = []
     for i in range(len(scripts)):
         newer_inputs.append({'script':scripts[i],'sio':sios[i]})
 
     
-    p_list=[]
+    p_list = []
     for a in newer_inputs:
-        p_list.append(multiprocessing.Process(target=run_script ,kwargs=a))
+        p_list.append( multiprocessing.Process( target = run_script,kwargs = a))
         
     for p  in p_list:
         p.start()
