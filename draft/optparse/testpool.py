@@ -25,7 +25,7 @@ def do_calculation(data):
 
     return str(data * 2) + ':' + app
 
-def run_script(command = None):
+def run_script(scripts = None):
     """
     This function is intended to be a "buffer" for sub-processes that will be 
     created
@@ -35,28 +35,28 @@ def run_script(command = None):
 def start_process():
     print 'Starting', multiprocessing.current_process().name
 
-def generate_commands():
+def generate_scripts_names():
     """
     Pretty obvious for now but provides cleaner architecture
     """
-    commands = ['rep1/fichier.py','rep2/fichier.py','rep3/fichier.py'] * 10
+    scripts = ['rep1/fichier.py','rep2/fichier.py','rep3/fichier.py'] * 10
     
     #Pour ne pas avoir a ecrire 30 scripts
     
-    return commands
+    return scripts
     
     
 
 if __name__ == '__main__':
 
     pool_size = multiprocessing.cpu_count() * 2
-    
+    scripts = generate_scripts_name()
     print 'creating %r processes'%pool_size
 
     pool = multiprocessing.Pool(processes=pool_size)
     
     #pool_outputs = pool.map(do_calculation, inputs)
-    pool_out2 = pool.map(run_script, generate_commands())
+    pool_out2 = pool.map(run_script, scripts)
     pool.close() # no more tasks
     pool.join()  # wrap up current tasks
  
