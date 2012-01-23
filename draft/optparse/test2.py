@@ -31,7 +31,7 @@ if __name__ == '__main__':
     for x in ll:
         Q1.put({'sio':sios[x],'script':sn[x]})
     
-    #import pdb;pdb.set_trace()
+
     p_list=[]
     for x in range(nb):
         p_list.append(multiprocessing.Process(target = tl,args = (Q1,)))
