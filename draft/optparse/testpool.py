@@ -81,7 +81,7 @@ if __name__ == '__main__':
     
     #pool_outputs = pool.map(do_calculation, inputs)
     new_inputs = []
-    #import pdb;pdb.set_trace()
+ 
     """
     for i in range(len(scripts)):
         x=scripts[i]
@@ -115,7 +115,7 @@ if __name__ == '__main__':
  
     
   
-    #import pdb;pdb.set_trace()
+ 
     """
     for s in sios:
         s.seek(0)
