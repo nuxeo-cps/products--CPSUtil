@@ -2,7 +2,7 @@ import os
 import subprocess
 import multiprocessing
 import shlex
-from time import clock
+from time import time
 from testpool import generate_scripts_names ,generateStringIOs
 
 #Merging with gracinet's idea
@@ -40,7 +40,7 @@ def do_thing(scr_obj = None):
     """
     res = {}
 
-    t1 = clock()
+    t1 = time()
     if not scr_obj:
         return "No task provided"
     ags = scr_obj.system_instr()
@@ -48,12 +48,12 @@ def do_thing(scr_obj = None):
     son = subprocess.Popen(ags)
     print "spid %r pid %r "%(son.pid,os.getpid())
     if os.waitpid(son.pid,0):
-        print times()
-        res['duration'] = clock()-t1
+        
+        res['duration'] = time()-t1
     return res
 
 if __name__ == '__main__':
-
+    t0 = time()
     scripts = [scriptObject(x, options = '-b 4') for x in generate_scripts_names()]
     print('the following commands will be executed')
     for x in scripts:
@@ -61,6 +61,10 @@ if __name__ == '__main__':
 
     p = multiprocessing.Pool(processes = 1)
     resultat = p.map(do_thing, scripts)
-
+    s = 0
     for x in resultat:
         print x['duration']
+        s +=x['duration']
+
+    tf=time()-t0
+    print ('%r %r'%(tf,s))

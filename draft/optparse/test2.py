@@ -1,6 +1,6 @@
 import multiprocessing
 import os 
-
+from time import time,clock
 from testpool import generate_scripts_names ,generateStringIOs
 
 #some test fo cgoutte
@@ -18,11 +18,15 @@ def pooled_task(sio = None, script = None):
 
 def tl(a):
     while(not a.empty()):
+        t1=time()
         x = a.get()
         pooled_task(**x)
-        
+        t2=time()
+        print "%r "%(t2-t1)
 
 if __name__ == '__main__':
+    clock()
+    t0=time()
     Q1=multiprocessing.Queue()
     sn=generate_scripts_names()
     sn *= 5
@@ -44,10 +48,10 @@ if __name__ == '__main__':
         p.join()
         
     print 'joined !! '
-    
-    for x in sios:
-        x.seek(0)
-        print(x.read())
+    print clock()
+    ###for x in sios:
+    #    x.seek(0)
+    #    print(x.read())
 
 
 
