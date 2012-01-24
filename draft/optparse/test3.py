@@ -35,6 +35,8 @@ def do_thing(scr_obj = None):
     Here try to monitor time taken since real tasks may take quite a long time 
     to complete. Then they the longest test should be lauch first so as to avoid
     having to wait for them to complete
+    a good thing would be to pickle results (in the future) for now i'll juste try to 
+    have them computed
     """
     res = {}
 
