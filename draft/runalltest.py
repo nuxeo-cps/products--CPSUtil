@@ -4,7 +4,7 @@
 #TODO :  put licence
 #
 
-import os import *
+from os import listdir, system
 import glob
 import optparse
 
@@ -29,5 +29,20 @@ if  __name__ == '__main__':
     
     #To be continued
 
+    conffile='etc/zope.conf'
+    if 'test.conf' in os.listdir('etc'):
+        conffile = 'etc/test.conf'
     
+    if 'BUNDLE_MANIFEST.xml' in os.listdir('Products'):
+        prods = os.system('hgbundler clones-list' 
+       + ' ' + '--bundle-dir=Products'
+       + ' ' + '--attributes-filter=testing:continuous' 
+       + ' ' + '--toplevel-only')
+    
+    else:
+        prods = glob.glob('Products/CPS*/__init__.py')
+
+    for name  in prods :
+        proddir='Products'+'/'+'name'
+        
     
