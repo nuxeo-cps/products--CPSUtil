@@ -4,7 +4,7 @@
 #TODO :  put licence
 #
 
-import os import 
+import os import *
 import glob
 import optparse
 
