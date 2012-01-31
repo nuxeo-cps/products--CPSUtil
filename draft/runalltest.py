@@ -14,6 +14,10 @@ This file aims to replace the previous runalltest shell script
 this scripts [runalltests] can (could) be found in CPSUtils/bin/runalltests and
  aims to test all cps products one at the time using a single command
 """
+    class runalltestParser():
+        
+        __init__(self):
+            pass
 
 if  __name__ == '__main__':
     #print the doc if no args
