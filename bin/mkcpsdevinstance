@@ -58,6 +58,9 @@ parser.add_option('--zope-version', default='',
 parser.add_option('--no-portal', action='store_true',
                   help="Create the Zope instance with correct products, but "
                   "does not create the portal.")
+parser.add_option('--skip-existing', action='store_true',
+                  help="With this option, nothing happens if a directory of "
+                  "the same name exists.")
 
 options, args = parser.parse_args()
 if len(args) != 1:
@@ -76,6 +79,14 @@ else:
    zhome = ZOPE_HOME_PATTERN % zversion
 
 instance_home = args[0]
+
+if os.path.exists(instance_home):
+    if options.skip_existing:
+        print "%r already existing. Skipping" % instance_home
+        sys.exit(0)
+    else:
+        print "Error: %r already existing." % instance_home
+        sys.exit(2)
 
 os.system('%s/bin/mkzopeinstance.py -d %s -u %s -s %s' % (
     zhome, instance_home, options.user_and_pwd, ZOPE_CPS_SKEL))
