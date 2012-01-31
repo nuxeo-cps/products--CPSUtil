@@ -22,6 +22,7 @@ This script relies on the knowledge of the Zope home,
 that's why it can't directly be distributed with CPS itself
 """
 import os
+import sys
 
 ZOPE_VERSIONS = ('2.10', '2.9') # first has precedence
 ZOPE_HOME_PATTERN = '/opt/Zope-%s'
@@ -54,6 +55,9 @@ parser.add_option('--zope-version', default='',
                        "(2.9 for CPS 3.5 < 3.5.3, "
                        "2.9 or 2.10 for CPS >= 3.5.3). Useful only if both "
                        "are on the system, check contents of /opt")
+parser.add_option('--no-portal', action='store_true',
+                  help="Create the Zope instance with correct products, but "
+                  "does not create the portal.")
 
 options, args = parser.parse_args()
 if len(args) != 1:
@@ -101,6 +105,9 @@ else:
     os.system('hg clone %s %s/Products' % (url, instance_home))
 
 os.system('%s --bundle-dir=%s make-clones' % (hgbundler, products_dir))
+if options.no_portal:
+    print "Zope instance ready. You requested not to create a portal."
+    sys.exit(0)
 
 cmd = '%s/bin/zopectl run %s/%s -u %s cps ' % (
     instance_home, instance_home, SITE_CREATE_JOB, user_id)
