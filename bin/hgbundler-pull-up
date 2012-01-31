@@ -25,21 +25,20 @@ else
    checkout=$2
 fi
 
+set -x
 # prepare place for log
 logdir=$zope_path/log
 mkdir -p $logdir
 
 # checkout update process
-timestamp=`date +%F-%T`
-echo "$timestamp starting update test for $checkout" >> $runslog
-updatelog="$logdir/update.log"
+updatelog=`readlink -f "$logdir/update.log"`
 rm $updatelog
 touch $updatelog
 
 cd $checkout
 
    echo "Pulling on previously known repos in $checkout (can get new tags)" \
-&& hgmap pull >> $updatelogs \
+&& hgmap pull >> $updatelog \
 && echo pull/up on bundle $checkout >> $updatelog \
 && hg pull -u >> $updatelog \
 && echo "Making new clones" >> $updatelog \
