@@ -6,7 +6,8 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2541: resynchronize mkcpsdevinstance
+- #2542: new useful options in mkcpsdevinstance for continuous integration
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

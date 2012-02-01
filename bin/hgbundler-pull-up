@@ -1,0 +1,56 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+ cat <<EOF
+ This script does all necessary steps to pull and update the products
+ directory if managed by hgbundler of a CPS instance
+
+ Usage: hgbundler-pull-update <zope_path> [<bundle>] 
+
+ it is assumed that <zope_path> is a Zope instance.
+ in case <bundle> is missing, <zope_path>/Products must be a CPS bundle
+ checkout. Otherwise <zope_path>/Products is assumed to be a symbolic link to
+ such a checkout. 
+
+ Logging is done in the <zope_path>/log/update.log
+EOF
+  exit 0
+fi
+
+zope_path=$1
+
+if [ -z $2 ]; then
+   checkout=$zope_path/Products
+else
+   checkout=$2
+fi
+
+set -x
+# prepare place for log
+logdir=$zope_path/log
+mkdir -p $logdir
+
+# checkout update process
+updatelog=`readlink -f "$logdir/update.log"`
+rm $updatelog
+touch $updatelog
+
+cd $checkout
+
+echo "Pulling on previously known repos in $checkout (can get new tags)"
+if ! hgmap pull >> $updatelog ; then echo "FAILED w/ status $?"; exit 10; fi
+
+echo pull/up on bundle $checkout >> $updatelog 
+if ! hg pull -u >> $updatelog; then echo "FAILED w/ status $?"; exit 11; fi
+
+echo "Making new clones" >> $updatelog
+if ! hgbundler make-clones >> $updatelog 2>&1 ; then echo "FAILED w/ status $?"; exit 12; fi
+
+echo "Final general update" >> $updatelog
+if ! hgbundler update-clones >> $updatelog 2>&1 ; then echo "FAILED w/ status $?"; exit 13; fi
+
+echo "Update finished" >> $updatelog
+
+
+
+
