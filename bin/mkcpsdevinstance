@@ -1,4 +1,4 @@
-#!/opt/python-2.4/bin/python
+#!/usr/bin/env python
 # Copyright (c) 2010 Georges Racinet <http://www.racinet.fr>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -22,13 +22,16 @@ This script relies on the knowledge of the Zope home,
 that's why it can't directly be distributed with CPS itself
 """
 import os
+import sys
+from urlparse import parse_qs
 
-ZOPE_VERSIONS = ('2.10', '2.9') # first has precedence
+ZOPE_VERSIONS = ('2.10',) # first has precedence
 ZOPE_HOME_PATTERN = '/opt/Zope-%s'
 HGBUNDLER_PATH = os.environ['PATH'].split(':')
 HGBUNDLER_PATH.append('/opt/hgbundler/bin')
-ZOPE_CPS_SKEL = '/etc/opt/cps-3.5/zope-dev-skel'
+ZOPE_CPS_SKEL = '/etc/opt/cps-3.6/zope-dev-skel'
 SITE_CREATE_JOB = 'Products/CPSDefault/jobs/makecpssite.py'
+REVISION_URL_ARGS = ('tag', 'branch', 'rev')
 
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] <target directory>")
@@ -36,8 +39,9 @@ default_bundle = 'https://hg.cps-cms.org/CPS/bundles?subpath=CPS-3-full'
 default_themes = 'Products/CPSDefault/themes'
 parser.add_option('-b', '--bundle-url', dest="bundle_url",
                   default=default_bundle,
-                  help=("Remote bundle repo url. Use subpath argument to "
-                  "specify that the bundle is a subdirectory. "
+                  help=("Remote bundle repo url. Use 'subpath' argument to "
+                  "specify that the bundle is a subdirectory. Use 'branch', "
+                  "'tag' or 'rev' to control update of the repo."
                   "Defaults to %r") % default_bundle)
 parser.add_option('-t', '--root-themes-container',
                   dest='themes', default=default_themes,
@@ -51,9 +55,14 @@ parser.add_option('--posix-owner', dest="posix_owner", default='',
                       "(needed to run as root, typically set to zope:zope)")
 parser.add_option('--zope-version', default='',
                   help="Specify Zope version to be used "
-                       "(2.9 for CPS 3.5 < 3.5.3, "
-                       "2.9 or 2.10 for CPS >= 3.5.3). Useful only if both "
-                       "are on the system, check contents of /opt")
+                       "(2.10 is currently the only viable for CPS >= 3.6.0)."
+                 )
+parser.add_option('--no-portal', action='store_true',
+                  help="Create the Zope instance with correct products, but "
+                  "does not create the portal.")
+parser.add_option('--skip-existing', action='store_true',
+                  help="With this option, nothing happens if a directory of "
+                  "the same name exists.")
 
 options, args = parser.parse_args()
 if len(args) != 1:
@@ -73,14 +82,40 @@ else:
 
 instance_home = args[0]
 
+if os.path.exists(instance_home):
+    if options.skip_existing:
+        print "%r already existing. Skipping" % instance_home
+        sys.exit(0)
+    else:
+        print "Error: %r already existing." % instance_home
+        sys.exit(2)
+
 os.system('%s/bin/mkzopeinstance.py -d %s -u %s -s %s' % (
-    zhome, instance_home, options.user_and_pwd, ZOPE_CPS_SKEL))
+        zhome, instance_home, options.user_and_pwd, ZOPE_CPS_SKEL))
+
 if options.posix_owner:
     os.system('chown -R %s %s' % (options.posix_owner, instance_home))
 user_id, _ = options.user_and_pwd.split(':')
 
-url = options.bundle_url
-split = url.split('?subpath=', 1)
+def parse_url(url):
+    """Return url for hg and arguments dict."""
+
+    split = url.split('?', 1)
+    if len(split) == 1:
+        url_args = {}
+    else:
+        url_args = parse_qs(split[1])
+        for k, v in url_args.items():
+            if len(v) > 1:
+                raise ValueError("Url arguments are single-valued")
+            url_args[k] = v[0]
+
+    revargs = [k for k in REVISION_URL_ARGS if k in url_args]
+    if len(revargs) > 1:
+        raise ValueError("Only one of %r can be specified" % REVISION_URL_ARGS)
+
+    return split[0], url_args
+
 products_dir = instance_home + '/Products'
 
 for p in HGBUNDLER_PATH:
@@ -90,17 +125,28 @@ for p in HGBUNDLER_PATH:
 else:
     raise RuntimeError("Could not find hgbundler on the path nor in /opt")
 
+url, url_args = parse_url(options.bundle_url)
 
-if len(split) == 2:
-    subpath = split[1]
-    url = split[0]
-    os.system('hg clone %s %s/bundle' % (url, instance_home))
+subpath = url_args.get('subpath', '')
+if subpath:
+    repodir = os.path.join(instance_home, 'bundle')
     os.system('ln -s bundle/%s %s' % (subpath, products_dir))
 else:
-    subpath = ''
-    os.system('hg clone %s %s/Products' % (url, instance_home))
+    repodir = products_dir
+
+os.system('hg clone %s %s' % (url, repodir))
+
+for revkey in REVISION_URL_ARGS: # garanteed that only one is present
+    rev = url_args.get(revkey)
+    if not rev:
+        continue
+    print "Updating to %s %s" % (revkey, rev)
+    os.system('cd %s; hg update %s' % (repodir, rev))
 
 os.system('%s --bundle-dir=%s make-clones' % (hgbundler, products_dir))
+if options.no_portal:
+    print "Zope instance ready. You requested not to create a portal."
+    sys.exit(0)
 
 cmd = '%s/bin/zopectl run %s/%s -u %s cps ' % (
     instance_home, instance_home, SITE_CREATE_JOB, user_id)
