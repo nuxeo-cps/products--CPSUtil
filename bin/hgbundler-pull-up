@@ -37,15 +37,19 @@ touch $updatelog
 
 cd $checkout
 
-   echo "Pulling on previously known repos in $checkout (can get new tags)" \
-&& hgmap pull >> $updatelog \
-&& echo pull/up on bundle $checkout >> $updatelog \
-&& hg pull -u >> $updatelog \
-&& echo "Making new clones" >> $updatelog \
-&& hgbundler make-clones >> $updatelog 2>&1 \ 
-&& echo "Final general update" >> $updatelog \
-&& hgbundler update-clones >> $updatelog 2>&1 \
-&& echo update finished >> $updatelog
+echo "Pulling on previously known repos in $checkout (can get new tags)"
+if ! hgmap pull >> $updatelog ; then echo "FAILED w/ status $?"; exit 10; fi
+
+echo pull/up on bundle $checkout >> $updatelog 
+if ! hg pull -u >> $updatelog; then echo "FAILED w/ status $?"; exit 11; fi
+
+echo "Making new clones" >> $updatelog
+if ! hgbundler make-clones >> $updatelog 2>&1 ; then echo "FAILED w/ status $?"; exit 12; fi
+
+echo "Final general update" >> $updatelog
+if ! hgbundler update-clones >> $updatelog 2>&1 ; then echo "FAILED w/ status $?"; exit 13; fi
+
+echo "Update finished" >> $updatelog
 
 
 
