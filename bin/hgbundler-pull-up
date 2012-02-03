@@ -19,13 +19,22 @@ fi
 
 zope_path=$1
 
-if [ -z $2 ]; then
+if [ -z "$2" ]; then
    checkout=$zope_path/Products
 else
    checkout=$2
 fi
 
-set -x
+instance_update_script=$checkout/CPSUtil/bin/hgbundler-pull-up
+if [ -x $instance_update_script ]; then
+  if [ ! $0 -ef $instance_update_script ]; then
+    echo "Relaying to version of this script found in $instance_update_script"
+    $instance_update_script $zope_path
+    exit $?
+  fi
+fi
+
+
 # prepare place for log
 logdir=$zope_path/log
 mkdir -p $logdir
