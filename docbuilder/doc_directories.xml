@@ -35,14 +35,18 @@ replaced by CPSSharedCalendar.
   <directory>
     <path>./CPSCore/doc</path>
     <title>CPSCore</title>
-    <text>
+    <text>CPSCore provides the essential functionalities of CPS : proxies
+(multiple access points to versioned content), indexing, caching of folder
+structure (``portal_trees``) for fast navigation, and general integration
+with the underlying Content Managing Framework (CMF) layer.
     </text>
   </directory>
   <!-- ============================================ -->
   <directory>
     <path>./CPSDefault/doc</path>
     <title>CPSDefault</title>
-    <text>
+    <text>CPSDefault is the default integration component putting all the
+products from the CPS-3-base distribution together.
     </text>
   </directory>
   <!-- ============================================ -->
@@ -84,6 +88,8 @@ such as users.  In addition, a CPSDirectory provides the following:
 - A container for "links" to entries in other directories, so that changes
   made to the entries do not have to be reported on several
   directories.
+
+CPSDirectory relies on the concepts of CPSSchemas (schemas, layouts, adapters).
     </text>
   </directory>
 
@@ -91,11 +97,11 @@ such as users.  In addition, a CPSDirectory provides the following:
   <directory>
     <path>./CPSDocument/doc</path>
     <title>CPSDocument</title>
-    <text>CPSDocument provides the following:
+    <text>CPSDocument provides the CPS document type system by building on
+CPSSchemas core concepts. It adds notably:
 
-- Support for flexible documents, specifically documents
-  containing a variety of widget type, which can be added and edited
-  by the user.
+- Support for flexible documents, namely documents whose structure (layouts,
+  schemas) can be dynamically edited by the user.
 - Support text transformation from a variety of source types, e.g.
   StructuredText, reStructuredText, MSWord-like conversions.
 - Document rendering (generation) and display.
@@ -178,7 +184,9 @@ thus giving CPS a basic synchronization capability between two portals.
     <title>CPSSchemas</title>
     <text>
 CPSSchemas supports the definition of CPS document types.  It is
-used, for example, by CPSTypeMaker.
+used, for example, by CPSTypeMaker. It provides abstract data descriptors
+(schemas and field), form specifications (layouts and widgets) and a storage
+adapter system to apply on schemas.
     </text>
   </directory>
 
@@ -245,7 +253,9 @@ portal.  Workflows control the control and flow of documents in
 the workspaces and sections of the portal.  Roles determine who
 can preform which steps in the workflow.  New workflows can be
 defined in a product's source code or in ``portal_workflow`` in
-the ZMI.
+the ZMI. Workflows are hooked to document types in a placeful way,
+through ``.cps_workflow_configuration`` objects in ZMI. This is, e.g, how
+in CPSDefault workflows in workspaces and sections can differ.
     </text>
   </directory>
 
