@@ -89,9 +89,9 @@ HtmlIndexFileName = 'index%s'
 PdfIndexFileName = 'index_pdf%s'
 
 IndexHeader = '''\
-=================
-CPS Documentation
-=================
+=====================
+CPS 3.6 Documentation
+=====================
 
 .. sectnum::    :depth: 4
 .. contents::   :depth: 4
@@ -100,14 +100,15 @@ CPS Documentation
 Introduction
 ============
 CPS is made of products for the Zope 2 application server.
-This document provides links to documentation of each of these products.
+This document aims at providing links to documentation for each of these
+products.
 
 CPS products are organized in three distributions:
 
 - `CPS-3-base`: the minimal set of products up to the first fully integrated
   application (CPSDefault).
 - `CPS-3`, also known as `CPS-Standard` and formerly `CPS-Platform`: a superset
-  of CPS-3-base, adding a few commonly used extensions.
+  of CPS-3-base, adding some commonly used extensions.
 - `CPS-3-full`: the set of all the actively maintained products.
 
 This page follows this structure: first CPS-3-base products (up to CPSDefault),
@@ -116,7 +117,7 @@ CPS-3-full.
 
 Additional information can be found at `the cps-cms.org website <http://cps-cms.org>`_.
 
-Older documentation links (some may be currently broken):
+Older documentation links (some may currently be broken):
 
 - `CPS Project: Documentation <http://www.cps-project.org/sections/documentation>`_
 
