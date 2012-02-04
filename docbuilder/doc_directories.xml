@@ -165,10 +165,10 @@ representing labeled relations between objects.
     <path>./CPSRemoteController/doc</path>
     <title>CPSRemoteController</title>
     <text>
-CPSRemoteController provides the ability to to run Python scripts,
-outside of the CPS environment that manipulate a CPS portal,
-including the users, groups, documents, and other objects at that
-site.
+CPSRemoteController provides an XML-RPC API to manipulate a CPS portal and
+content. This includes notably users, groups, and of course documents.
+A client of that API to run inside a CPS portal is also included,
+thus giving CPS a basic synchronization capability between two portals.
     </text>
   </directory>
 
