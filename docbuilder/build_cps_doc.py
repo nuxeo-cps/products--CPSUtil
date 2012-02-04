@@ -99,11 +99,24 @@ CPS Documentation
 
 Introduction
 ============
+CPS is made of products for the Zope 2 application server.
+This document provides links to documentation of each of these products.
 
-This document provides links to documentation on each of the CPS
-products.
+CPS products are organized in three distributions:
 
-Additional documentation is at:
+- `CPS-3-base`: the minimal set of products up to the first fully integrated
+  application (CPSDefault).
+- `CPS-3`, also known as `CPS-Standard` and formerly `CPS-Platform`: a superset
+  of CPS-3-base, adding a few commonly used extensions.
+- `CPS-3-full`: the set of all the actively maintained products.
+
+This page follows this structure: first CPS-3-base products (up to CPSDefault),
+then CPS-3-standard (up to CPSSharedCalendar) and finally some products from
+CPS-3-full.
+
+Additional information can be found at `the cps-cms.org website <http://cps-cms.org>`_.
+
+Older documentation links (some may be currently broken):
 
 - `CPS Project: Documentation <http://www.cps-project.org/sections/documentation>`_
 
