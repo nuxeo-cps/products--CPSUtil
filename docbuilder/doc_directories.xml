@@ -207,8 +207,11 @@ through the CPS portal.
   <directory>
     <path>./CPSSubscriptions/doc</path>
     <title>CPSSubscriptions</title>
-    <text>CPSSubscriptions is a CPS3
-product that handles event subscriptions and notifications.
+    <text>CPSSubscriptions provides the ability to manage user subscriptions
+to events occurring in the portal, such as document creation, publication, etc.
+It also takes care of sending the corresponding notifications. Like most
+CPS-3-base, it is highly expandable. For instance, CPSSharedCalendar leverages
+CPSSubscriptions to notify users of their attendance status changes.
     </text>
   </directory>
 
