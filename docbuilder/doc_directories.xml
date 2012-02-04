@@ -241,11 +241,11 @@ easily add additional properties to groups.
     <path>./CPSUserForms/doc</path>
     <title>CPSUserForms</title>
     <text>CPSUserForms give contributors the ability to create and publish
-    forms to be filled by readers, and store the resulting data. It leverages
-    CPSDocument flexible documents for the form construction and CPSDirectory
-    for the storage. It comes with a predefined ``User Form`` document type,
-    on which integrators can expand by adding new template widgets, or by
-    creating their form document types.
+forms to be filled by readers, and store the resulting data. It leverages
+CPSDocument flexible documents for the form construction and CPSDirectory
+for the storage. It comes with a predefined ``User Form`` document type,
+on which integrators can expand by adding new template widgets, or by
+creating their form document types.
     </text>
   </directory>
 
