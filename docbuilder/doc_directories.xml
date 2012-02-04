@@ -17,22 +17,6 @@
 
   <!-- ============================================ -->
   <directory>
-    <path>./CPSBlog/doc</path>
-    <title>CPSBlog</title>
-    <text>A simple Blog product for CPS.
-    </text>
-  </directory>
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSCalendar/doc</path>
-    <title>CPSCalendar</title>
-    <text>
-**Note:** CPSCalendar is obsolete and no longer maintained.  It is
-replaced by CPSSharedCalendar.
-    </text>
-  </directory>
-  <!-- ============================================ -->
-  <directory>
     <path>./CPSCore/doc</path>
     <title>CPSCore</title>
     <text>CPSCore provides the essential functionalities of CPS : proxies
@@ -41,55 +25,31 @@ structure (``portal_trees``) for fast navigation, and general integration
 with the underlying Content Managing Framework (CMF) layer.
     </text>
   </directory>
+
   <!-- ============================================ -->
   <directory>
-    <path>./CPSDefault/doc</path>
-    <title>CPSDefault</title>
-    <text>CPSDefault is the default integration component putting all the
-products from the CPS-3-base distribution together.
-    </text>
-  </directory>
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSDesignerThemes/doc</path>
-    <title>CPSDesignerThemes</title>
+    <path>./CPSSchemas/doc</path>
+    <title>CPSSchemas</title>
     <text>
-CPSDesignerThemes is the standard theming system for CPS 3.5.
-
-Themes are designed to be almost static XHTML web sites, to give web designers
-maximal flexibility. They can be viewed as static sites in an ordinary browser,
-so that the designer can actually work without a CPS server around.
-
-Each theme page defines a whole structure that can be applied in a CPS context.
-Portlet slots to render, and portlets external skinning are defined within the
-pages.
-
-The typical work flow would be to start as a static site, then either to work
-directly on a CPS server to style the portlets or to include in the
-working theme pages sample portlets content taken from a CPS portal, e.g.,
-simply copy/pasting from the browser html source view. This latter approach
-does not require deep access to the server system : just user level access to
-the web portal.
-
-Any sample content within the slots is discarded by CPS while using the theme.
-
+CPSSchemas supports the definition of CPS document types.  It is
+used, for example, by CPSTypeMaker. It provides abstract data descriptors
+(schemas and field), form specifications (layouts and widgets) and a storage
+adapter system to apply on schemas.
     </text>
   </directory>
+
   <!-- ============================================ -->
   <directory>
-    <path>./CPSDirectory/doc</path>
-    <title>CPSDirectory</title>
-    <text>A CPSDirectory is a container for holding other things
-such as users.  In addition, a CPSDirectory provides the following:
-
-- Authentication services for entries.
-- A proxy for other directories.
-- A consolidated view of other directories.
-- A container for "links" to entries in other directories, so that changes
-  made to the entries do not have to be reported on several
-  directories.
-
-CPSDirectory relies on the concepts of CPSSchemas (schemas, layouts, adapters).
+    <path>./CPSWorkflow/doc</path>
+    <title>CPSWorkflow</title>
+    <text>CPSWorkflow implements workflow capabilities for a CPS
+portal.  Workflows control the control and flow of documents in
+the workspaces and sections of the portal.  Roles determine who
+can preform which steps in the workflow.  New workflows can be
+defined in a product's source code or in ``portal_workflow`` in
+the ZMI. Workflows are hooked to document types in a placeful way,
+through ``.cps_workflow_configuration`` objects in ZMI. This is, e.g, how
+in CPSDefault workflows in workspaces and sections can differ.
     </text>
   </directory>
 
@@ -110,104 +70,19 @@ CPSSchemas core concepts. It adds notably:
 
   <!-- ============================================ -->
   <directory>
-    <path>./CPSForum/doc</path>
-    <title>CPSForum</title>
-    <text>CPSForum enables the site designer to add discussion
-forum capabilities to a CPS site.
-    </text>
-  </directory>
+    <path>./CPSDirectory/doc</path>
+    <title>CPSDirectory</title>
+    <text>A CPSDirectory is a container for holding other things
+such as users.  In addition, a CPSDirectory provides the following:
 
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSI18n/doc</path>
-    <title>CPSI18n</title>
-    <text>
-CPSI18n provides translation services for CPS products.
-    </text>
-  </directory>
+- Authentication services for entries.
+- A proxy for other directories.
+- A consolidated view of other directories.
+- A container for "links" to entries in other directories, so that changes
+  made to the entries do not have to be reported on several
+  directories.
 
-  <directory>
-    <path>./CPSNavigation/doc</path>
-    <title>CPSNavigation</title>
-    <text>CPSNavigation makes it very easy to create a kind of Explorer for
-each of the following:
-
-- Documents
-
-  - using portal_tree for folders and documents
-
-- All Vocabularies
-
-  - Hierarchy vocabulary
-
-- Directories
-
-  - acl_users
-
-  - ldap
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSPortlets/doc</path>
-    <title>CPSPortlets</title>
-    <text>
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSRelation/doc</path>
-    <title>CPSRelation</title>
-    <text>
-The Relation Tool can manage several and different kinds of graphs
-representing labeled relations between objects.
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSRemoteController/doc</path>
-    <title>CPSRemoteController</title>
-    <text>
-CPSRemoteController provides an XML-RPC API to manipulate a CPS portal and
-content. This includes notably users, groups, and of course documents.
-A client of that API to run inside a CPS portal is also included,
-thus giving CPS a basic synchronization capability between two portals.
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSSchemas/doc</path>
-    <title>CPSSchemas</title>
-    <text>
-CPSSchemas supports the definition of CPS document types.  It is
-used, for example, by CPSTypeMaker. It provides abstract data descriptors
-(schemas and field), form specifications (layouts and widgets) and a storage
-adapter system to apply on schemas.
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSSharedCalendar/doc</path>
-    <title>CPSSharedCalendar</title>
-    <text>
-CPSSharedCalendar, iCalendar, CalCore, and CalZope
-provide a shared calendaring system for CPS.
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
-    <path>./CPSSkins/doc</path>
-    <title>CPSSkins</title>
-    <text>
-CPSSkins enables the manager of a CPS portal to customize the look
-and feel of a CPS portal using a WYSIWYG editor that is accessed
-through the CPS portal.
+CPSDirectory relies on the concepts of CPSSchemas (schemas, layouts, adapters).
     </text>
   </directory>
 
@@ -238,14 +113,128 @@ easily add additional properties to groups.
 
   <!-- ============================================ -->
   <directory>
-    <path>./CPSUserForms/doc</path>
-    <title>CPSUserForms</title>
-    <text>CPSUserForms give contributors the ability to create and publish
-forms to be filled by readers, and store the resulting data. It leverages
-CPSDocument flexible documents for the form construction and CPSDirectory
-for the storage. It comes with a predefined ``User Form`` document type,
-on which integrators can expand by adding new template widgets, or by
-creating their form document types.
+    <path>./CPSI18n/doc</path>
+    <title>CPSI18n</title>
+    <text>
+CPSI18n provides translation helpers for CPS products developers.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSPortlets/doc</path>
+    <title>CPSPortlets</title>
+    <text>
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSDesignerThemes/doc</path>
+    <title>CPSDesignerThemes</title>
+    <text>
+CPSDesignerThemes is the standard theming system for CPS 3.5.
+
+Themes are designed to be almost static XHTML web sites, to give web designers
+maximal flexibility. They can be viewed as static sites in an ordinary browser,
+so that the designer can actually work without a CPS server around.
+
+Each theme page defines a whole structure that can be applied in a CPS context.
+Portlet slots to render, and portlets external skinning are defined within the
+pages.
+
+The typical work flow would be to start as a static site, then either to work
+directly on a CPS server to style the portlets or to include in the
+working theme pages sample portlets content taken from a CPS portal, e.g.,
+simply copy/pasting from the browser html source view. This latter approach
+does not require deep access to the server system : just user level access to
+the web portal.
+
+Any sample content within the slots is discarded by CPS while using the theme.
+
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSSkins/doc</path>
+    <title>CPSSkins</title>
+    <text>
+CPSSkins enables the manager of a CPS portal to customize the look
+and feel of a CPS portal using a WYSIWYG editor that is accessed
+through the CPS portal. It was the standard theming system for CPS
+in CPS 3.3 and CPS 3.4.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSNavigation/doc</path>
+    <title>CPSNavigation</title>
+    <text>CPSNavigation makes it very easy to create a kind of Explorer for
+each of the following:
+
+- Documents
+
+  - using portal_tree for folders and documents
+
+- All Vocabularies
+
+  - Hierarchy vocabulary
+
+- Directories
+
+  - acl_users
+
+  - ldap
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSDefault/doc</path>
+    <title>CPSDefault</title>
+    <text>CPSDefault is the default integration component putting all the
+products from the CPS-3-base distribution together.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSRelation/doc</path>
+    <title>CPSRelation</title>
+    <text>
+The Relation Tool can manage several and different kinds of graphs
+representing labeled relations between objects.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSRemoteController/doc</path>
+    <title>CPSRemoteController</title>
+    <text>
+CPSRemoteController provides an XML-RPC API to manipulate a CPS portal and
+content. This includes notably users, groups, and of course documents.
+A client of that API to run inside a CPS portal is also included,
+thus giving CPS a basic synchronization capability between two portals.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSBlog/doc</path>
+    <title>CPSBlog</title>
+    <text>A simple Blog product for CPS.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSForum/doc</path>
+    <title>CPSForum</title>
+    <text>CPSForum enables the site designer to add discussion
+forum capabilities to a CPS site.
     </text>
   </directory>
 
@@ -259,21 +248,6 @@ creating their form document types.
 
   <!-- ============================================ -->
   <directory>
-    <path>./CPSWorkflow/doc</path>
-    <title>CPSWorkflow</title>
-    <text>CPSWorkflow implements workflow capabilities for a CPS
-portal.  Workflows control the control and flow of documents in
-the workspaces and sections of the portal.  Roles determine who
-can preform which steps in the workflow.  New workflows can be
-defined in a product's source code or in ``portal_workflow`` in
-the ZMI. Workflows are hooked to document types in a placeful way,
-through ``.cps_workflow_configuration`` objects in ZMI. This is, e.g, how
-in CPSDefault workflows in workspaces and sections can differ.
-    </text>
-  </directory>
-
-  <!-- ============================================ -->
-  <directory>
     <path>./CalCore/doc</path>
     <title>CalCore</title>
     <text>
@@ -281,4 +255,31 @@ CPSSharedCalendar, iCalendar, CalCore, and CalZope
 provide a shared calendaring system for CPS.
     </text>
   </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSSharedCalendar/doc</path>
+    <title>CPSSharedCalendar</title>
+    <text>
+CPSSharedCalendar, iCalendar, CalCore, and CalZope
+provide a shared calendaring system for CPS.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
+    <path>./CPSUserForms/doc</path>
+    <title>CPSUserForms</title>
+    <text>CPSUserForms give contributors the ability to create and publish
+forms to be filled by readers, and store the resulting data. It leverages
+CPSDocument flexible documents for the form construction and CPSDirectory
+for the storage. It comes with a predefined ``User Form`` document type,
+on which integrators can expand by adding new template widgets, or by
+creating their form document types.
+
+CPSUserForms is the most recent of CPS products : it entered the CPS-3-full
+distribution for the CPS 3.5.4 release.
+    </text>
+  </directory>
+
 </directories>

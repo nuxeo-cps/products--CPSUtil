@@ -110,6 +110,10 @@ CPS products are organized in three distributions:
   of CPS-3-base, adding a few commonly used extensions.
 - `CPS-3-full`: the set of all the actively maintained products.
 
+This page follows this structure: first CPS-3-base products (up to CPSDefault),
+then CPS-3-standard (up to CPSSharedCalendar) and finally some products from
+CPS-3-full.
+
 Additional information can be found at `the cps-cms.org website <http://cps-cms.org>`_.
 
 Older documentation links (some may be currently broken):
