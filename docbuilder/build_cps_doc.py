@@ -89,9 +89,9 @@ HtmlIndexFileName = 'index%s'
 PdfIndexFileName = 'index_pdf%s'
 
 IndexHeader = '''\
-=================
-CPS Documentation
-=================
+=====================
+CPS 3.5 Documentation
+=====================
 
 .. sectnum::    :depth: 4
 .. contents::   :depth: 4
