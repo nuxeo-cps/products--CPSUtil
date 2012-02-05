@@ -160,6 +160,10 @@ Any sample content within the slots is discarded by CPS while using the theme.
     <path>./CPSSkins/doc</path>
     <title>CPSSkins</title>
     <text>
+CPSSkins has not been ported to CPS-3.6 yet. Being not necessary for proper
+operation, it does not ship with any of the three standard distributions.
+Here's nevertheless a short description:
+
 CPSSkins enables the manager of a CPS portal to customize the look
 and feel of a CPS portal using a WYSIWYG editor that is accessed
 through the CPS portal. It was the standard theming system for CPS
