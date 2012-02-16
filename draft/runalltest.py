@@ -4,7 +4,7 @@
 #TODO :  put licence
 #
 import pdb
-from os import listdir, system
+import os
 import glob
 import optparse
 
@@ -51,17 +51,25 @@ if  __name__ == '__main__':
     conf='etc/zope.conf'
     if 'test.conf' in os.listdir('etc'):
         conf = 'etc/test.conf'
-    
     if 'BUNDLE_MANIFEST.xml' in os.listdir('Products'):
-        prods = os.system('hgbundler clones-list' 
+        
+        cmd = ( 'hgbundler clones-list' 
        + ' ' + '--bundle-dir=Products'
        + ' ' + '--attributes-filter=testing:continuous' 
        + ' ' + '--toplevel-only')
-    
-    else:
-        prods = glob.glob('Products/CPS*/__init__.py')
+        #debug stuff   
+        (sin,sout) = os.popen2(cmd)
+        prods = sout.read()
 
-    for name  in prods :
-        proddir='Products'+'/'+'name'
-        
-    
+    else:
+        prods = glob.glob('./Products/CPS*/__init__.py')
+
+    dirs = os.listdir('Products')
+
+    tasks = list()
+    for name  in prods.split('\n') :
+        if not name in dirs:
+            continue
+        proddir = 'Products'+'/'+name
+        print proddir        
+        tasks.append(' ')
