@@ -7,7 +7,7 @@ import pdb
 import os
 import glob
 import optparse
-
+import multiprocessing
 """
 This file aims to replace the previous runalltest shell script
 !-for now i (cgoutte) try to translate the file from shell script to python
@@ -32,6 +32,9 @@ class runalltestParser():
                         'enhance time perfomances'
                         )
 
+def f(s):
+    os.system(s)
+
 if  __name__ == '__main__':
     #print the doc if no args
     #later
@@ -47,12 +50,11 @@ if  __name__ == '__main__':
     #To be continued
     Parser=runalltestParser()   
     Parser.p.parse_args()
-        
+    os.chdir('/home/cgoutte/CPSINSTANCES/cps3.5') 
     conf='etc/zope.conf'
     if 'test.conf' in os.listdir('etc'):
         conf = 'etc/test.conf'
     if 'BUNDLE_MANIFEST.xml' in os.listdir('Products'):
-        
         cmd = ( 'hgbundler clones-list' 
        + ' ' + '--bundle-dir=Products'
        + ' ' + '--attributes-filter=testing:continuous' 
@@ -63,13 +65,21 @@ if  __name__ == '__main__':
 
     else:
         prods = glob.glob('./Products/CPS*/__init__.py')
-
+ 
+    #prods = glob.glob('./Products/CPS*/__init__.py')
+    #prods = '\n'.join(prods)
     dirs = os.listdir('Products')
-
+    #since we have an empty line at the end of hgbundler's stdout
     tasks = list()
     for name  in prods.split('\n') :
         if not name in dirs:
             continue
         proddir = 'Products'+'/'+name
-        print proddir        
-        tasks.append(' ')
+        print proddir 
+        c1 = 'bin/zopectl test --dir ' 
+        c2 = ' 2 > /dev/null'
+        tasks.append(c1 + proddir +c2)
+    for t in tasks :
+        os.system(t)
+    #pool = multiprocessing.Pool(3)
+    #pool.map(f,tasks)

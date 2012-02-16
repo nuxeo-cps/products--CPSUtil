@@ -10,7 +10,7 @@ def pooled_task(sio = None, script = None):
     #script=a['script']
     print "pt :" + multiprocessing.current_process().name
     if script is not None:
-        os.system('python '+script)
+        os.system('python '+script);
     if sio:
         sio.write('Test')
         sio.seek(0)
@@ -32,15 +32,17 @@ if __name__ == '__main__':
     sn *= 5
     sios = generateStringIOs(sn)
     nb=12
+    #number of processes,
     ll = len(sn)
     ll = range(ll)
     for x in ll:
         Q1.put({'sio':sios[x],'script':sn[x]})
-    
-
+    #This needs much more comments    
+    #Queues are a good way to store tasks and provide processes
     p_list=[]
     for x in range(nb):
         p_list.append(multiprocessing.Process(target = tl,args = (Q1,)))
+    #this way all the (nb) processes receive the same argument
     for p in p_list:
         p.start()
 
