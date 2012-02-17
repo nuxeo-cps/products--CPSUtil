@@ -205,6 +205,18 @@ products from the CPS-3-base distribution together.
 
   <!-- ============================================ -->
   <directory>
+    <path>./CPSTramline</path>
+    <title>CPSTramline</title>
+    <text>This product makes it possible to store files on the filesystem
+    instead of inside the ZODB. To do so it provides CPSTramlineFileField
+    and CPSTramlineFileWidget as well as mixin classes to easily enhance
+    fields and widgets derived from CPSField and CPSAttachedFileWidget.
+    This product relies on Apache httpd + mod_python.
+    </text>
+  </directory>
+
+  <!-- ============================================ -->
+  <directory>
     <path>./CPSRelation/doc</path>
     <title>CPSRelation</title>
     <text>
