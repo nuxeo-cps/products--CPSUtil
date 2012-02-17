@@ -1,11 +1,17 @@
-#!/bin/sh -v
+#!/bin/bash
 
 pushd .
 cd ../..
 
+# Generating doc
 CPSUtil/docbuilder/build_cps_doc.py --html -x CPSUtil/docbuilder/doc_directories.xml
+
+# Generating indexes
 CPSUtil/docbuilder/build_cps_doc.py -i --html -x CPSUtil/docbuilder/doc_directories.xml
-CPSUtil/docbuilder/build_cps_doc.py -g cps_docs.tar.gz --dist-include="html" \
-    -x CPSUtil/docbuilder/doc_directories.xml
+
+# Generating doc archive
+#CPSUtil/docbuilder/build_cps_doc.py -g cps_docs.tar.gz --dist-include="html" \
+#    -x CPSUtil/docbuilder/doc_directories.xml
 
 popd
+
