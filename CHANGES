@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- runing runalltests in concurrency with itself could lead to false positives
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
