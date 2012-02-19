@@ -22,7 +22,7 @@ timestamp=`date +%F-%T`
 errorlog="/tmp/test_cps-errors-$timestamp.log"
 touch $errorlog # for people wanting to tail it right away
 echo $errorlog
-report="/tmp/test_cps-report"
+report="/tmp/test_cps-report-$timestamp"
 if [ -f etc/test.conf ]; then
    conffile=etc/test.conf
 else
