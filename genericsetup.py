@@ -28,10 +28,13 @@ from xml.dom.minidom import Node
 
 from Acquisition import aq_base
 
+from Products.CMFCore.utils import getToolByName
 from Products.GenericSetup.utils import _LineWrapper
 from Products.GenericSetup.utils import _Element
 from Products.GenericSetup.utils import XMLAdapterBase
 from Products.GenericSetup.utils import ObjectManagerHelpers
+from Products.GenericSetup.utils import exportObjects
+from Products.GenericSetup.utils import importObjects
 
 from Products.CPSUtil.property import PostProcessingPropertyManagerHelpers
 
@@ -123,3 +126,26 @@ class PropertiesSubObjectsXMLAdapter(XMLAdapterBase,
         self._logger.info("%r imported.", self.context)
 
     node = property(_exportNode, _importNode)
+
+def tool_steps(tool_id, logger_id=None):
+    """Return export/import step functions for specified tool."""
+
+    def importer(context):
+        """Import tool configuration
+        """
+        site = context.getSite()
+        tool = getToolByName(site, tool_id)
+        importObjects(tool, '', context)
+
+    def exporter(context):
+        """Export tool configuration
+        """
+        site = context.getSite()
+        tool = getToolByName(site, tool_id, None)
+        if tool is None:
+            logger = context.getLogger(logger_id)
+            logger.info("Nothing to export.")
+            return
+        exportObjects(tool, '', context)
+
+    return exporter, importer
