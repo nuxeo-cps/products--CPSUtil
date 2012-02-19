@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
--
+- #2537: GenericSetupAdapter for objects with properties and subobjects
 Bug fixes
 ~~~~~~~~~
 - runing runalltests in concurrency with itself could lead to false positives

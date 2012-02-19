@@ -1,9 +1,13 @@
 # (C) Copyright 2006 Nuxeo SAS <http://nuxeo.com>
-# Author: Florent Guillaume <fg@nuxeo.com>
+# (C) Copyright 2012 CPS-CMS Community <http://cps-cms.org/>
+# Authors:
+#     Florent Guillaume <fg@nuxeo.com>
+#     G. Racinet <gracinet@cps-cms.org>
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as published
-# by the Free Software Foundation.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,19 +15,28 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 """Helpers for GenericSetup
 """
 
 import cgi
+
+from zope.interface import implements
 from zope.tal.taldefs import attrEscape
 from xml.dom.minidom import Node
 
+from Acquisition import aq_base
+
 from Products.GenericSetup.utils import _LineWrapper
 from Products.GenericSetup.utils import _Element
+from Products.GenericSetup.utils import XMLAdapterBase
+from Products.GenericSetup.utils import ObjectManagerHelpers
+
+from Products.CPSUtil.property import PostProcessingPropertyManagerHelpers
+
+from Products.GenericSetup.interfaces import IBody
+from Products.GenericSetup.interfaces import ISetupEnviron
 
 
 class StrictTextElement(_Element):
@@ -80,3 +93,33 @@ def getExactNodeText(node):
             continue
         texts.append(child.nodeValue)
     return ''.join(texts)
+
+class PropertiesSubObjectsXMLAdapter(XMLAdapterBase,
+                                     PostProcessingPropertyManagerHelpers,
+                                     ObjectManagerHelpers):
+
+    implements(IBody)
+
+    def __init__(self, context, environ):
+        super(PropertiesSubObjectsXMLAdapter, self).__init__(context, environ)
+        base = aq_base(context)
+        self.name = getattr(base, 'generic_setup_name', 'generic')
+        self.LOGGER_ID = getattr(base, 'generic_setup_logger', 'generic')
+
+    def _exportNode(self):
+        node = self._getObjectNode('object')
+        node.appendChild(self._extractProperties())
+        node.appendChild(self._extractObjects())
+        self._logger.info("%r tool exported.", self.context)
+        return node
+
+    def _importNode(self, node):
+        """Import the object from the DOM node.
+        """
+        if self.environ.shouldPurge():
+            self._purgeProperties()
+        self._initProperties(node)
+        self._initObjects(node)
+        self._logger.info("%r imported.", self.context)
+
+    node = property(_exportNode, _importNode)
