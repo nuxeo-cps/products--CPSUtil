@@ -19,6 +19,24 @@ New internal features
 - 
 
 ===========================================================
+Package: CPSUtil 1.14.3-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2012-02-18T23:00:05
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2541: resynchronize mkcpsdevinstance
+- #2542: new useful options in mkcpsdevinstance for continuous integration
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.14.2-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2012-01-16T15:29:33
