@@ -8,29 +8,17 @@ import os
 import glob
 import optparse
 import multiprocessing
+from subprocess import Popen, PIPE
+import shlex
+import sys
+from time import time
 """
 This file aims to replace the previous runalltest shell script
 !-for now i (cgoutte) try to translate the file from shell script to python
 this scripts [runalltests] can (could) be found in CPSUtils/bin/runalltests and
  aims to test all cps products one at the time using a single command
+Products that should be tested should be either in an uppder directory name products or provided
 """
-class runalltestParser():
-        
-    def __init__(self):
-        self.p = optparse.OptionParser()
-        self.p.add_option('-i','--integration',action='store_true'
-                        ,default=False,
-                        help='use if you want to run integration' +
-                        'tests, can\'t be used with -c',dest='integration')
-        self.p.add_option('-c','--continuous',dest='continuous',
-                        action='store_true',default=False,
-                        help='use if you want to run continuous test,'+
-                        ' incompatible with -c')
-        self.p.add_option('-p','--processes',dest='nbprocesses',
-                        default=1,help='this option allows you to choose how '+
-                        'many processes you would like to use, this may '+
-                        'enhance time perfomances'
-                        )
 
 def f(s):
     os.system(s)
@@ -48,38 +36,65 @@ if  __name__ == '__main__':
     # else get all Products/CPS*/__init__.py
     
     #To be continued
-    Parser=runalltestParser()   
-    Parser.p.parse_args()
-    os.chdir('/home/cgoutte/CPSINSTANCES/cps3.5') 
-    conf='etc/zope.conf'
+    Parser=optparse.OptionParser()
+    Parser.add_option('-i','--integration', action = 'store_true'
+                        ,default = False,
+                        help = 'use if you want to run integration' +
+                        'tests', dest = 'integration')
+
+    Parser.add_option('-p','--processes', dest = 'nbprocesses',
+                        default = 1, help = 'this option allows you to choose how '+
+                        'many processes you would like to use, this may '+
+                        'enhance time perfomances'
+                        )
+    Parser.add_option('-b','--Bundle_dir',dest = 'Bundle_dir', default = 'Products',
+                        help = 'Name of the (upper) folder that contains (Zope)' +
+                        'products which should be tested')  
+
+    (options,args) = Parser.parse_args()
+    while not options.Bundle_dir in os.listdir(os.getcwd()):
+        os.chdir('..')
+
+    if options.integration:
+        attrib_filter = '--attributes-filter=testing:integration'
+    
+    else :
+        attrib_filter = '--attributes-filter=testing:continuous'
+    conf = 'etc/zope.conf'
     if 'test.conf' in os.listdir('etc'):
         conf = 'etc/test.conf'
+    
     if 'BUNDLE_MANIFEST.xml' in os.listdir('Products'):
         cmd = ( 'hgbundler clones-list' 
-       + ' ' + '--bundle-dir=Products'
-       + ' ' + '--attributes-filter=testing:continuous' 
+       + ' ' + '--bundle-dir='+options.Bundle_dir
+       + ' ' + attrib_filter 
        + ' ' + '--toplevel-only')
-        #debug stuff   
-        (sin,sout) = os.popen2(cmd)
-        prods = sout.read()
+        hgb = Popen(shlex.split(cmd),stdout=PIPE)
+        prods = hgb.stdout.read().split('\n')[0:-1]
+        #since we have an empty line at the end of hgbundler's stdout
 
     else:
-        prods = glob.glob('./Products/CPS*/__init__.py')
- 
-    #prods = glob.glob('./Products/CPS*/__init__.py')
-    #prods = '\n'.join(prods)
-    dirs = os.listdir('Products')
-    #since we have an empty line at the end of hgbundler's stdout
+        subdirs = glob.glob('./Products/CPS*/__init__.py')
+        prods = [rep.split('/')[2] for rep in subdirs]     
+
+    dirs = os.listdir(options.Bundle_dir)
     tasks = list()
-    for name  in prods.split('\n') :
-        if not name in dirs:
-            continue
+
+    for name  in prods :
         proddir = 'Products'+'/'+name
         print proddir 
-        c1 = 'bin/zopectl test --dir ' 
-        c2 = ' 2 > /dev/null'
-        tasks.append(c1 + proddir +c2)
-    for t in tasks :
-        os.system(t)
-    #pool = multiprocessing.Pool(3)
-    #pool.map(f,tasks)
+        c1 = 'bin/zopectl test --config-file='+conf+' --dir ' 
+        tasks.append(c1 + proddir)
+
+    t0=time()    
+
+    for command in tasks :        
+        t = time()        
+        proc = Popen(shlex.split(command),bufsize = -1, stdout = PIPE, stderr = PIPE)
+        print('running command ' + command)
+        (sout,serr) = proc.communicate()
+        print('done in %.3f second(s)' % (time() - t))
+
+    print('='*80)
+    print('+' + ' Ran all theses tests in %.3f second(s)' % (time() - t0) )
+    print('='*80)    
