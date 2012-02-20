@@ -121,6 +121,7 @@ class PropertiesSubObjectsXMLAdapter(XMLAdapterBase,
         """
         if self.environ.shouldPurge():
             self._purgeProperties()
+            self._purgeObjects()
         self._initProperties(node)
         self._initObjects(node)
         self._logger.info("%r imported.", self.context)
