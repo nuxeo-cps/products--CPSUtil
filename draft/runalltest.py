@@ -36,23 +36,25 @@ if  __name__ == '__main__':
     # else get all Products/CPS*/__init__.py
     
     #To be continued
-    Parser=optparse.OptionParser()
-    Parser.add_option('-i','--integration', action = 'store_true'
-                        ,default = False,
+    Parser = optparse.OptionParser()
+    Parser.add_option('-i', '--integration', action = 'store_true'
+                        , default = False,
                         help = 'use if you want to run integration' +
                         'tests', dest = 'integration')
+    Parser.add_option('-y', '--yes', action = 'store_true', default = False,
+                        help = "There seems to be another attribute, in bundle manifest file"
 
-    Parser.add_option('-p','--processes', dest = 'nbprocesses',
+    Parser.add_option('-p', '--processes', dest = 'nbprocesses',
                         default = 1, help = 'this option allows you to choose how '+
                         'many processes you would like to use, this may '+
                         'enhance time perfomances'
                         )
-    Parser.add_option('-b','--Bundle_dir',dest = 'Bundle_dir', default = 'Products',
+    Parser.add_option('-b', '--Bundle_dir', dest = 'bundle_dir', default = 'Products',
                         help = 'Name of the (upper) folder that contains (Zope)' +
                         'products which should be tested')  
 
-    (options,args) = Parser.parse_args()
-    while not options.Bundle_dir in os.listdir(os.getcwd()):
+    options, args = Parser.parse_args()
+    while not options.bundle_dir in os.listdir(os.getcwd()):
         os.chdir('..')
 
     if options.integration:
@@ -66,10 +68,10 @@ if  __name__ == '__main__':
     
     if 'BUNDLE_MANIFEST.xml' in os.listdir('Products'):
         cmd = ( 'hgbundler clones-list' 
-       + ' ' + '--bundle-dir='+options.Bundle_dir
+       + ' ' + '--bundle-dir='+options.bundle_dir
        + ' ' + attrib_filter 
        + ' ' + '--toplevel-only')
-        hgb = Popen(shlex.split(cmd),stdout=PIPE)
+        hgb = Popen(shlex.split(cmd), stdout = PIPE)
         prods = hgb.stdout.read().split('\n')[0:-1]
         #since we have an empty line at the end of hgbundler's stdout
 
@@ -83,7 +85,7 @@ if  __name__ == '__main__':
     for name  in prods :
         proddir = 'Products'+'/'+name
         print proddir 
-        c1 = 'bin/zopectl test --config-file='+conf+' --dir ' 
+        c1 = 'bin/zopectl test --config-file=' + conf + ' --dir ' 
         tasks.append(c1 + proddir)
 
     t0=time()    
@@ -92,7 +94,7 @@ if  __name__ == '__main__':
         t = time()        
         proc = Popen(shlex.split(command),bufsize = -1, stdout = PIPE, stderr = PIPE)
         print('running command ' + command)
-        (sout,serr) = proc.communicate()
+        sout, serr = proc.communicate()
         print('done in %.3f second(s)' % (time() - t))
 
     print('='*80)
