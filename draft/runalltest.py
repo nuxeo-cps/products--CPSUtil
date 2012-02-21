@@ -41,7 +41,7 @@ if  __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option('-a', '--all', action = 'store_true'
                         , default = False,
-                        help = 'use if you want all the tests to be run' +
+                        help = 'use if you want all the tests to be run'
                         , dest = 'all')
 
     parser.add_option('-p', '--processes', dest = 'nbprocesses',
@@ -112,32 +112,36 @@ if  __name__ == '__main__':
         sout, serr = proc.communicate()
         textout = sout.split('\n')          
         ok = False 
-        t1=time()
+        t1 = time()
         
         for l in textout:
              if res_pattern.search(l) and succes_pattern.search(l):
                 ok = True
         
+        elap_seconds = t1 - t
         print task[-1] + ':',
+        
         if not ok :
-            sum_up[task[-1]]='FAIL'
-            print 'FAIL',
-            print(': in %.3g second(s)' % (t1 - t))
+            st = 'FAIL'
+            sum_up[task[-1]] = st
 
         else :
-            sum_up[task[-1]]='OK'
-            print 'OK' ,
-            print(': in %.3g second(s)' % (t1 - t))
+            st = 'OK'
+            sum_up[task[-1]] = 'OK'
+        
+        print task[-1] + ':' + st + ' : in %.3g second(s)' % elap_seconds
+
         #Using semicolons for easier later parsing
         
     s = ''
-    s = s+ '+' +'='*79 +'\n'
-    s =s + ('|' + ' *** Ran all theses %r tests in %.3g second(s) \o/ ***\n' %
+    s = s + '+' + '=' * 79 + '\n'
+    s = s + ('|' + ' *** Ran all theses %r tests in %.3g second(s) \o/ ***\n' %
     ( len(tasks) , time() - t0) )
-    s = s+ '+' +'='*79 +'\n'
+    s = s + '+' + '=' * 79 + '\n'
     print s
     #Then builbot or any other program/use knows we are done
+    
     for x, y in sum_up.items():
-        s = s +  '|'+ x +' :  ' + y + '\n'
-    s = s +'\\'+ 78*'-' +'/'   
+        s = s +  '|' + x + ' : ' + y + '\n'
+    s = s + '\\' + 78 * '-' + '/'   
 
