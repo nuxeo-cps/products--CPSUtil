@@ -41,8 +41,8 @@ if  __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option('-a', '--all', action = 'store_true'
                         , default = False,
-                        help = 'use if you want al the test to be run' +
-                        'tests', dest = 'all')
+                        help = 'use if you want all the tests to be run' +
+                        , dest = 'all')
 
     parser.add_option('-p', '--processes', dest = 'nbprocesses',
                         default = 1, help = 'this option allows you to choose how '+
@@ -118,35 +118,26 @@ if  __name__ == '__main__':
              if res_pattern.search(l) and succes_pattern.search(l):
                 ok = True
         
-        instance =  os.getcwd()
-        print task[-1] + '   ',
+        print task[-1] + ':',
         if not ok :
-            os.chdir(options.output_dir)
-            logfile = open(task[-1].split('/')[1] + '.log', 'w')
-            logfile.write(sout)
-            logfile.close()
             sum_up[task[-1]]='FAIL'
             print 'FAIL',
-            print(' in %.3f second(s)' % (t1 - t))
+            print(': in %.3g second(s)' % (t1 - t))
 
         else :
             sum_up[task[-1]]='OK'
             print 'OK' ,
-            print(' in %.3f second(s)' % (t1 - t))
-
-        os.chdir(instance)
+            print(': in %.3g second(s)' % (t1 - t))
+        #Using semicolons for easier later parsing
         
     s = ''
     s = s+ '+' +'='*79 +'\n'
-    s =s + ('|' + ' *** Ran all theses %r tests in %.3f second(s) \o/ ***\n' %
+    s =s + ('|' + ' *** Ran all theses %r tests in %.3g second(s) \o/ ***\n' %
     ( len(tasks) , time() - t0) )
     s = s+ '+' +'='*79 +'\n'
-    
+    print s
+    #Then builbot or any other program/use knows we are done
     for x, y in sum_up.items():
         s = s +  '|'+ x +' :  ' + y + '\n'
     s = s +'\\'+ 78*'-' +'/'   
-    print s
-    sum_up_file = open('summup.txt','w')
-    sum_up_file.write(s)
-    sum_up_file.close()
 
