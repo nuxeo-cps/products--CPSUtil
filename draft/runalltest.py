@@ -22,9 +22,6 @@ this scripts [runalltests] can (could) be found in CPSUtils/bin/runalltests and
 Products that should be tested should be either in an uppder directory name products or provided
 """
 
-def f(s):
-    os.system(s)
-
 if  __name__ == '__main__':
     #print the doc if no args
     #later
@@ -57,27 +54,34 @@ if  __name__ == '__main__':
                        help = 'output directory for tests reports relative to instance')
 
     options, args = parser.parse_args()
+    
+    
+    #check if bundle_dir  and output_dir options are ok
     while not options.bundle_dir in os.listdir(os.getcwd()):
         os.chdir('..')
     
+    if not options.output_dir in os.listdir(os.getcwd()):
+        os.mkdir(options.output_dir)
+    #clearly fail-unsafe method
+    
     if options.all:
-        attrib_filters = ['--attributes-filter=testing:yes','--attributes-filter=testing:continuous']
+        attrib_filters = ['--attributes-filter=testing:yes', '--attributes-filter=testing:continuous']
         
     else :
         attrib_filters = ['--attributes-filter=testing:continuous']
 
     conf = 'etc/zope.conf'
+    
     if 'test.conf' in os.listdir('etc'):
         conf = 'etc/test.conf'
     
-    if 'BUNDLE_MANIFEST.xml' in os.listdir('Products'):
+    if 'BUNDLE_MANIFEST.xml' in os.listdir(options.bundle_dir):
         prods = set()
         for attrib_filter in attrib_filters :       
-            cmd = ( 'hgbundler', 'clones-list', 
+            cmd = ('hgbundler', 'clones-list', 
                      '--bundle-dir='+options.bundle_dir ,
-                     attrib_filter , '--toplevel-only' 
-                    )
-            hgb = Popen((cmd), stdout=PIPE)
+                     attrib_filter , '--toplevel-only')
+            hgb = Popen(cmd, stdout=PIPE)
             prods = prods.union(hgb.stdout.read().split('\n')[0:-1])
         #since we have an empty line at the end of hgbundler's stdout
 
@@ -85,9 +89,10 @@ if  __name__ == '__main__':
         subdirs = glob.glob('./Products/CPS*/__init__.py')
         prods = [rep.split('/')[2] for rep in subdirs]     
 
-    dirs = os.listdir(options.bundle_dir)
     tasks = list()
-
+    t0=time() 
+    sum_up = {}
+    
     for name  in prods :
         proddir = 'Products'+'/'+name
         print proddir + ' will be tested ' 
@@ -95,16 +100,8 @@ if  __name__ == '__main__':
                         proddir ])
     
     print('%r components will be tested'%len(tasks))
-
-    t0=time()    
-
     res_pattern = re.compile("Ran [0-9]* tests with")
     succes_pattern = re.compile("0 failures and 0 errors")
-    sum_up = {}
-
-    if not options.output_dir in os.listdir(os.getcwd()):
-        os.mkdir(options.output_dir)
-    #write files in the proper place
 
     for task in tasks :        
         t = time()        
@@ -123,20 +120,17 @@ if  __name__ == '__main__':
         
         if not ok :
             st = 'FAIL'
-            sum_up[task[-1]] = st
-
         else :
             st = 'OK'
-            sum_up[task[-1]] = 'OK'
         
+        sum_up[task[-1]] = st
         print task[-1] + ':' + st + ' : in %.3g second(s)' % elap_seconds
-
         #Using semicolons for easier later parsing
         
     s = ''
     s = s + '+' + '=' * 79 + '\n'
     s = s + ('|' + ' *** Ran all theses %r tests in %.3g second(s) \o/ ***\n' %
-    ( len(tasks) , time() - t0) )
+    (len(tasks) , time() - t0) )
     s = s + '+' + '=' * 79 + '\n'
     print s
     #Then builbot or any other program/use knows we are done
