@@ -67,9 +67,12 @@ if  __name__ == '__main__':
     if 'BUNDLE_MANIFEST.xml' in os.listdir(options.bundle_dir):
         prods = set()
         for attrib_filter in attrib_filters :       
+            level = '' 
+            if attrib_filter == '--attributes-filter=testing:continuous':
+                level = '--toplevel-only'
             cmd = ('hgbundler', 'clones-list', 
                      '--bundle-dir='+options.bundle_dir ,
-                     attrib_filter , '--toplevel-only')
+                     attrib_filter , level )
             hgb = Popen(cmd, stdout=PIPE)
             prods = prods.union(hgb.stdout.read().split('\n')[0:-1])
         #since we have an empty line at the end of hgbundler's stdout
