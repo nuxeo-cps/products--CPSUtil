@@ -23,18 +23,7 @@ Products that should be tested should be either in an uppder directory name prod
 """
 
 if  __name__ == '__main__':
-    #print the doc if no args
-    #later
-
-    #check if there is a test.conf or fallback to zope.conf
-    #store the path to it
-
-    #generate prods list
-    # -> Check if there is a bundle manifest file
-    # if yes then run `hgbundler clones-list --bundle-dir=Products --attributes-filter=testing:continuous --toplevel-only`
-    # else get all Products/CPS*/__init__.py
     
-    #To be continued
     parser = optparse.OptionParser()
     parser.add_option('-a', '--all', action = 'store_true'
                         , default = False,
