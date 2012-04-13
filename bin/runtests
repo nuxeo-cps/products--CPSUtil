@@ -124,7 +124,9 @@ def main():
                 broken.append(name)
         except RuntimeError:
             unknown.append(name)
-        print('done in %.3f second(s)' % (time() - t))
+        print 'Ran tests for %s in %.3f second(s)' % time() - t
+        # for real-time following, and possibly to avoid builbot timeouts
+        sys.stdout.flush()
 
     print('='*72)
     print('+' + ' Ran all tests for %d packages in %.3f second(s)' % (
