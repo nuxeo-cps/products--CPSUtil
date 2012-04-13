@@ -130,7 +130,7 @@ def main():
     print('+' + ' Ran all tests for %d packages in %.3f second(s)' % (
             len(tasks), time() - t0))
     print('='*72)
-    if not broken:
+    if not broken and not unknown:
         print "ALL SUCCESSFUL"
         sys.exit(0)
 
