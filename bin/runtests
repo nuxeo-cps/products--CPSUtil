@@ -67,21 +67,27 @@ def list_testable_prods(options):
     hgb = Popen(pargs, stdout=PIPE)
     return [p.strip() for p in hgb.stdout.readlines()]
 
-MULTI_LAYER_SUMMARY_RE = re.compile(
-    r'Total: (\d+) tests (\d+) failures (\d+) errors')
-SIMPLE_SUMMARY_RE = re.compile(
-    r'Ran (\d+) tests with (\d+) failures and (\d+) errors')
+# list of regexps to apply in order to get the summary, by order of precedence
+SUMMARY_REGEXPS = tuple(re.compile(regexp) for regexp in (
+    r'Total: (?P<tests>\d+) tests, (?P<fail>\d+) failures, '
+    '(?P<err>\d+) errors',
+    r'Total: (?P<tests>\d+) tests (?P<fail>\d+) failures (?P<err>\d+) errors',
+    r'Ran (?P<tests>\d+) tests with (?P<fail>\d+) failures and '
+    '(?P<err>\d+) errors',
+))
+
 
 def is_broken_test(output):
     """Parse test run output and return a value that evals to True if broken.
     """
-    summary = MULTI_LAYER_SUMMARY_RE.search(output)
-    if not summary:
-        summary = SIMPLE_SUMMARY_RE.search(output)
+    for regexp in SUMMARY_REGEXPS:
+        summary = regexp.search(output)
+        if summary is not None:
+            break
     else:
-        import pdb; pdb.set_trace()
+        raise RuntimeError
 
-    failures, errors = int(summary.group(2)), int(summary.group(3))
+    failures, errors = int(summary.group('fail')), int(summary.group('err'))
     return failures or errors
 
 def main():
@@ -103,6 +109,7 @@ def main():
                     '-s', 'Products.' + name]))
 
     broken = []
+    unknown = []
     reports = {}
     t0=time()
 
@@ -111,9 +118,13 @@ def main():
         proc = Popen(command, bufsize=-1, stdout=PIPE, stderr=PIPE)
         sout, serr = proc.communicate()
         # we ignore stderr, as it's mostly made of pollution through logging
-        if is_broken_test(sout):
-            broken.append(name)
-            reports[name] = sout
+        reports[name] = sout
+        try:
+            if is_broken_test(sout):
+                broken.append(name)
+        except RuntimeError:
+            import pdb; pdb.set_trace()
+            unknown.append(name)
         print('done in %.3f second(s)' % (time() - t))
 
     print('='*72)
@@ -124,10 +135,14 @@ def main():
         print "ALL SUCCESSFUL"
         sys.exit(0)
 
+    print ("COULD NOT INTERPRET TESTS IN:" + os.linesep
+           + os.linesep.join(unknown))
+    print
+    print
     print("FOUND BROKEN TESTS IN:" + os.linesep + os.linesep.join(broken))
     print
     print
-    for name in broken:
+    for name in unknown + broken:
         print "TEST RUN DETAILS FOR %s" % name
         print reports[name]
         print
