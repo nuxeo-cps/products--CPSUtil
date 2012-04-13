@@ -19,6 +19,23 @@ New internal features
 - 
 
 ===========================================================
+Package: CPSUtil 1.14.4-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2012-02-19T14:14:20
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- runing runalltests in concurrency with itself could lead to false positives
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.14.3-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2012-02-18T23:00:05

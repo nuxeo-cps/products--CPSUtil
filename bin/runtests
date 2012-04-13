@@ -1,0 +1,153 @@
+#!/usr/bin/env python
+# (C) Copyright 2012 CPS-CMS Community <http://cps-cms.org/>
+# Authors:
+#     C. Goutte <cgoutte@anybox.fr>
+#     G. Racinet <gracinet@cps-cms.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+import sys
+import optparse
+import re
+import multiprocessing
+from subprocess import Popen, PIPE
+from time import time
+"""
+This file aims to replace the previous runalltest shell script
+"""
+
+optparser = optparse.OptionParser(usage="%prog path-to-zope-instance")
+optparser.add_option('-i', '--integration', action='store_true',
+                    help="Use if you want to run tests from sub-bundles. "
+                     "Useful before release of custom projects, that "
+                     "typically include one of the main CPS bundles")
+optparser.add_option('-y', '--yes', action = 'store_true', default = False,
+                     help="Use this if you want to run tests for all "
+                     "products that have the testing='yes' attribute")
+optparser.add_option('-p', '--processes', dest='nbprocesses',
+                     default=1, help="this option allows you to choose how "
+                     "many processes you would like to use, this may "
+                     "enhance time performance")
+optparser.add_option('-b', '--bundle-dir', default='Products',
+                     help="Name of the (upper) folder that contains (Zope) "
+                     "products which should be tested")
+
+
+
+def list_testable_prods(options):
+    """List all products to be tested."""
+
+    pargs = ['hgbundler', 'clones-list']
+    if options.bundle_dir:
+        pargs.append('--bundle-dir=' + options.bundle_dir)
+
+    def allow_testing(attr_value):
+        """Add one value for testing attribute to the selected ones."""
+        pargs.append('--attributes-filter=testing:' + attr_value)
+
+    allow_testing('continuous')
+    if options.yes:
+        allow_testing('yes')
+
+    if not options.integration:
+        pargs.append('--toplevel-only')
+
+    hgb = Popen(pargs, stdout=PIPE)
+    return [p.strip() for p in hgb.stdout.readlines()]
+
+# list of regexps to apply in order to get the summary, by order of precedence
+SUMMARY_REGEXPS = tuple(re.compile(regexp) for regexp in (
+    r'Total: (?P<tests>\d+) tests, (?P<fail>\d+) failures, '
+    '(?P<err>\d+) errors',
+    r'Total: (?P<tests>\d+) tests (?P<fail>\d+) failures (?P<err>\d+) errors',
+    r'Ran (?P<tests>\d+) tests with (?P<fail>\d+) failures and '
+    '(?P<err>\d+) errors',
+))
+
+
+def is_broken_test(output):
+    """Parse test run output and return a value that evals to True if broken.
+    """
+    for regexp in SUMMARY_REGEXPS:
+        summary = regexp.search(output)
+        if summary is not None:
+            break
+    else:
+        raise RuntimeError
+
+    failures, errors = int(summary.group('fail')), int(summary.group('err'))
+    return failures or errors
+
+def main():
+    options, args = optparser.parse_args()
+    if not args or len(args) >1:
+        optparser.error("Wrong number of arguments")
+    instance_path = args[0]
+
+    os.chdir(instance_path)
+
+    conf = 'etc/zope.conf'
+    if 'test.conf' in os.listdir('etc'):
+        conf = 'etc/test.conf'
+
+    tasks = list()
+    for name in list_testable_prods(options):
+        tasks.append((name, [
+                    'bin/zopectl', 'test', '--config-file=' + conf,
+                    '-s', 'Products.' + name]))
+
+    broken = []
+    unknown = []
+    reports = {}
+    t0=time()
+
+    for name, command in tasks:
+        t = time()
+        proc = Popen(command, bufsize=-1, stdout=PIPE, stderr=PIPE)
+        sout, serr = proc.communicate()
+        # we ignore stderr, as it's mostly made of pollution through logging
+        reports[name] = sout
+        try:
+            if is_broken_test(sout):
+                broken.append(name)
+        except RuntimeError:
+            unknown.append(name)
+        print 'Ran tests for %s in %.3f second(s)' % (name, time() - t)
+        # for real-time following, and possibly to avoid builbot timeouts
+        sys.stdout.flush()
+
+    print('='*72)
+    print('+' + ' Ran all tests for %d packages in %.3f second(s)' % (
+            len(tasks), time() - t0))
+    print('='*72)
+    if not broken and not unknown:
+        print "ALL SUCCESSFUL"
+        sys.exit(0)
+
+    print ("COULD NOT INTERPRET TESTS IN:" + os.linesep
+           + os.linesep.join(unknown))
+    print
+    print
+    print("FOUND BROKEN TESTS IN:" + os.linesep + os.linesep.join(broken))
+    print
+    print
+    for name in unknown + broken:
+        print "TEST RUN DETAILS FOR %s" % name
+        print reports[name]
+        print
+    sys.exit(1)
+
+if  __name__ == '__main__':
+    main()
