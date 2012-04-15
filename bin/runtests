@@ -136,13 +136,16 @@ def main():
         print "ALL SUCCESSFUL"
         sys.exit(0)
 
-    print ("COULD NOT INTERPRET TESTS IN:" + os.linesep
-           + os.linesep.join(unknown))
-    print
-    print
-    print("FOUND BROKEN TESTS IN:" + os.linesep + os.linesep.join(broken))
-    print
-    print
+    if unknown:
+        print("COULD NOT INTERPRET TESTS IN:" + os.linesep
+              + os.linesep.join(unknown))
+        print
+        print
+    if broken:
+        print("FOUND BROKEN TESTS IN:" + os.linesep + os.linesep.join(broken))
+        print
+        print
+
     for name in unknown + broken:
         print "TEST RUN DETAILS FOR %s" % name
         print reports[name]
