@@ -30,6 +30,9 @@ class TestUpdatePropDef(unittest.TestCase):
                                 mode='w'),)
         self.cls = WithProps
 
+    def test_failure(self):
+	self.fail("Volontary failure to test the new buildbot on runtests.")
+
     def test_type_change(self):
         ob = self.cls()
         ob._properties = deepcopy(ob._properties) + (dict(id='newprop'),)
