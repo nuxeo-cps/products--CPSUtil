@@ -1,4 +1,21 @@
 ===========================================================
+Package: CPSUtil 1.15.0-CPS-3.5
+===========================================================
+First release built by: gracinet at: 2012-05-08T14:32:00
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2519: rewrite of runalltests in python, as runtests
+Bug fixes
+~~~~~~~~~
+-
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.14.4-CPS-3.5
 ===========================================================
 First release built by: gracinet at: 2012-02-19T14:14:20
