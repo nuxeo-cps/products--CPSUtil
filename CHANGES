@@ -3,7 +3,7 @@ Requires
 -
 New features
 ~~~~~~~~~~~~
-- #2519: rewrite of runalltests in python, as runtests
+-
 Bug fixes
 ~~~~~~~~~
 -
