@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2565: From address encoding with non ascii characters
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
