@@ -7,7 +7,7 @@ New features
 - #2519: rewrite of runalltests in python, as runtests
 Bug fixes
 ~~~~~~~~~
--
+- #2565: incorrect From and other address headers if non ascii
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 

@@ -134,6 +134,41 @@ def _encode_header(header, encoding):
     except UnicodeEncodeError:
         return Header(header, encoding)
 
+ADDRESS_REGEXP = re.compile(r'(.*) <(.*?)>')
+
+def _encode_address(address, encoding, split_form=False):
+    """Encode an address for From or To headers.
+
+    If split_form is True, address is expected to be a tuple (fullname, email).
+    Otherwise, it's expected to be a unicode string in FullName <email> form.
+
+    Inspired from http://www.velocityreviews.com/forums/t752726-generate-and-send-mail-with-python-tutorial.html
+
+    >>> _encode_address(u"Jo\xe9 <joe@example.com>", 'latin-1')
+    '=?iso-8859-1?q?Jo=E9?= <joe@example.com>'
+    >>> _encode_address((u"Jo\xe9", "joe@example.com"), 'latin-1',
+    ...                 split_form=True)
+    '=?iso-8859-1?q?Jo=E9?= <joe@example.com>'
+    >>> _encode_address('cps@example.com', 'latin-1')
+    'cps@example.com'
+    """
+    if split_form:
+        fullname, email = address
+    else:
+        m = ADDRESS_REGEXP.match(address)
+        if m is None:
+            # assumed to be a pure email address, no need to encode
+            return address
+        fullname, email = m.group(1).strip(), m.group(2)
+    try:
+        str(fullname)
+    except UnicodeError:
+        fullname = Header(fullname, encoding).encode()
+    return '%s <%s>' % (fullname, str(email))
+
+
+
+
 def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
               attachments=(), related_parts=None,
               encoding=None, plain_text=True, additional_headers=()):
@@ -188,21 +223,22 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
 
     # Headers
     msg['Subject'] = _encode_header(subject, encoding)
-    msg['From'] = _encode_header(mfrom, encoding)
+    msg['From'] = _encode_address(mfrom, encoding)
 
     if not mto:
         mto = []
     if isinstance(mto, basestring):
         mto = [mto]
 
-    msg['To'] = _encode_header(COMMASPACE.join(mto), encoding)
+    msg['To'] = COMMASPACE.join([_encode_address(to, encoding) for to in mto])
 
     if mcc:
-        cc_header = isinstance(mcc, basestring) and mcc or COMMASPACE.join(mcc)
-        msg['Cc'] = _encode_header(cc_header, encoding)
+        mcc = isinstance(mcc, basestring) and mcc or (mcc,)
+        msg['Cc'] = COMMASPACE.join(
+            [_encode_address(cc, encoding) for cc in mcc])
         if not mto:
             # use first Cc as (non header) mail-to
-            mto = [isinstance(mcc, basestring) and mcc or mcc[0]]
+            mto = mcc[0]
     if mbcc:
         # Don't put Bcc in headers otherwise they'd get transferred
         if isinstance(mbcc, basestring):
