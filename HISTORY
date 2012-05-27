@@ -1,4 +1,22 @@
 ===========================================================
+Package: CPSUtil 1.16.0
+===========================================================
+First release built by: gracinet at: 2012-05-27T21:01:20
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+- #2537: GenericSetupAdapter for objects with properties and subobjects
+- #2519: rewrite of runalltests in python, as runtests
+Bug fixes
+~~~~~~~~~
+- #2565: incorrect From and other address headers if non ascii
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.15.0
 ===========================================================
 First release built by: gracinet at: 2012-01-21T22:23:50
