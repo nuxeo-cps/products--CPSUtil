@@ -233,7 +233,7 @@ def send_mail(context, mto, mfrom, subject, body, mcc=(), mbcc=(),
     msg['To'] = COMMASPACE.join([_encode_address(to, encoding) for to in mto])
 
     if mcc:
-        mcc = isinstance(mcc, basestring) and mcc or (mcc,)
+        mcc = isinstance(mcc, basestring) and (mcc,) or mcc
         msg['Cc'] = COMMASPACE.join(
             [_encode_address(cc, encoding) for cc in mcc])
         if not mto:

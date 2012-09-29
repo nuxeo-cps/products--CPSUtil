@@ -54,11 +54,12 @@ class MailTest(unittest.TestCase):
                   u'Cr\xe9ation de contenu', '<html><body>Body</body></html>',
                   plain_text=False)
 
+    def test_mcc(self):
+      send_mail(self, 'gr@example.com', 'gr@example.com',
+                  u'Cr\xe9ation de contenu', 'BODY', mcc=('cps@example.com',),)
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(MailTest))
     suite.addTest(doctest.DocTestSuite('Products.CPSUtil.mail'))
     return suite
-
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
