@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2570: allow passing through of absolute paths URIs as Dynatree icons. Caution that's a divergence from upstream that needs to be maintained.
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
