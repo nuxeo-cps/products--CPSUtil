@@ -1,4 +1,22 @@
 ===========================================================
+Package: CPSUtil 1.16.1
+===========================================================
+First release built by: gracinet at: 2012-09-30T10:16:08
+Requires
+~~~~~~~~
+-
+New features
+~~~~~~~~~~~~
+-
+Bug fixes
+~~~~~~~~~
+- #2570: allow passing through of absolute paths URIs as Dynatree icons. Caution that's a divergence from upstream that needs to be maintained.
+- #2572: Errors when Cc-ing several addresses in mail
+New internal features
+~~~~~~~~~~~~~~~~~~~~~
+- 
+
+===========================================================
 Package: CPSUtil 1.16.0
 ===========================================================
 First release built by: gracinet at: 2012-05-27T21:01:20
