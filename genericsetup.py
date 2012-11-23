@@ -106,7 +106,10 @@ class PropertiesSubObjectsXMLAdapter(XMLAdapterBase,
     def __init__(self, context, environ):
         super(PropertiesSubObjectsXMLAdapter, self).__init__(context, environ)
         base = aq_base(context)
-        self.name = getattr(base, 'generic_setup_name', 'generic')
+        # GR the name is used as the main part of the expected filename
+        # by importObjects() if it evaluates to True.
+        # That's why the default value must be None
+        self.name = getattr(base, 'generic_setup_name', None)
         self.LOGGER_ID = getattr(base, 'generic_setup_logger', 'generic')
 
     def _exportNode(self):
