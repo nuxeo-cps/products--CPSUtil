@@ -6,7 +6,7 @@ New features
 -
 Bug fixes
 ~~~~~~~~~
--
+- #2537: genericsetup.PropertiesSubObjectsXMLAdapter now ready for direct usage
 New internal features
 ~~~~~~~~~~~~~~~~~~~~~
 - 
